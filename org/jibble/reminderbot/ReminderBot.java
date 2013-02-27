@@ -19,13 +19,21 @@ package org.jibble.reminderbot;
 import org.jibble.pircbot.*;
 import java.util.*;
 import java.util.regex.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import java.io.*;
+import java.net.URL;
 
 public class ReminderBot extends PircBot implements Runnable {
 
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private boolean req = false;
+    private int latestPage;
     
     public ReminderBot(String name) {
         loadReminders();
@@ -99,7 +107,7 @@ public class ReminderBot extends PircBot implements Runnable {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, faq, gearup, kill, marco, mspa, mspawiki, ping, radio, req, reqoff, reqon, revive, serve, shoot, slap, slay, stab, time, wiki");
+            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, marco, mspa, mspawiki, ping, radio, req, reqoff, reqon, revive, serve, shoot, slap, slay, stab, time, udict, wiki");
         } else if (message.equalsIgnoreCase("$gearup")) {
             sendMessage(channel, "y0u are n0w geared up " + sender);
         } else if (message.equalsIgnoreCase("$ping")) {
@@ -111,13 +119,69 @@ public class ReminderBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$radio")) {
             sendMessage(channel, sender + ": http://mixlr.com/iarekylew00t/");
         } else if (message.equalsIgnoreCase("$mspawiki")) {
-            sendMessage(channel, sender + ": http://mspaintadventures.wikia.com/");
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
         } else if (message.equalsIgnoreCase("$wiki")) {
-            sendMessage(channel, sender + ": http://wikipedia.org/");
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.equalsIgnoreCase("$dict")) {
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.equalsIgnoreCase("$udict")) {
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
         } else if (message.equalsIgnoreCase("$tumblr")) {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$faq")) {
             sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+        } else if (message.equalsIgnoreCase("$latest")) {
+        	try {
+        		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
+        		InputStream xml = mspaXml.openStream();
+        		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        		Document doc = dBuilder.parse(xml);
+        		doc.getDocumentElement().normalize();
+        		NodeList nList = doc.getElementsByTagName("item");
+        		for (int temp = 0; temp < 1; temp++) {
+        			Node nNode = nList.item(temp);
+        			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+        				Element eElement = (Element) nNode;
+        				//System.out.println("First Name : " + eElement.getElementsByTagName("link").item(0).getTextContent());
+        				
+        				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
+        				
+        	            sendMessage(channel, sender + ": " + update);
+        			}
+        		}
+        	} catch (Exception e) {
+        		e.printStackTrace();
+            }
+        } else if (message.equalsIgnoreCase("$update")) {
+        	try {
+        		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
+        		InputStream xml = mspaXml.openStream();
+        		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        		Document doc = dBuilder.parse(xml);
+        		doc.getDocumentElement().normalize();
+        		NodeList nList = doc.getElementsByTagName("item");
+        		for (int temp = 0; temp < 1; temp++) {
+        			Node nNode = nList.item(temp);
+        			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+        				Element eElement = (Element) nNode;
+        				//System.out.println("First Name : " + eElement.getElementsByTagName("link").item(0).getTextContent());
+        				
+        				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
+        				int tempPage = Integer.parseInt(update.substring(41));
+        				int tempPage1 = latestPage;
+        				latestPage = tempPage;
+        				
+        				if (latestPage > tempPage1)
+        					sendMessage(channel, "there is an update");
+        				else
+        					sendMessage(channel, "there is n0 update");
+        			}
+        		}
+        	} catch (Exception e) {
+        		e.printStackTrace();
+            }
         } else if (message.equalsIgnoreCase("$kill")) {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$shoot")) {
@@ -176,7 +240,7 @@ public class ReminderBot extends PircBot implements Runnable {
         } else if (message.startsWith("$mspawiki ")) {
             String input = message.substring(10);
             if (input.equals("")){
-                sendMessage(channel, sender + ": http://mspaintadventures.wikia.com/");
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','_');
                 sendMessage(channel, "here are y0ur search results " + sender + ": http://mspaintadventures.wikia.com/wiki/index.php?search=" + newInput);
@@ -184,10 +248,26 @@ public class ReminderBot extends PircBot implements Runnable {
         } else if (message.startsWith("$wiki ")) {
             String input = message.substring(6);
             if (input.equals("")){
-                sendMessage(channel, sender + ": http://wikipedia.org/");
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','_');
                 sendMessage(channel, "here are y0ur search results " + sender + ": http://en.wikipedia.org/wiki/" + newInput);
+            }
+        } else if (message.startsWith("$dict ")) {
+            String input = message.substring(6);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','_');
+                sendMessage(channel, "here are y0ur search results " + sender + ": http://dictionary.reference.com/browse/" + newInput);
+            }
+        } else if (message.startsWith("$udict ")) {
+            String input = message.substring(7);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','+');
+                sendMessage(channel, "here are y0ur search results " + sender + ": http://www.urbandictionary.com/define.php?term=" + newInput);
             }
         } else if (message.startsWith("$tumblr ")) {
             String input = message.substring(8);
