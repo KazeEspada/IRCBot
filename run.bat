@@ -1,2 +1,2 @@
-java -classpath .;./lib/pircbot.jar org.jibble.reminderbot.ReminderBotMain
+java -classpath .;./lib/pircbot.jar com.iarekylew00t.ircbot.IRCBotMain
 pause

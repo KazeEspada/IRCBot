@@ -14,7 +14,7 @@ $Id: Reminder.java,v 1.1 2004/05/12 22:01:43 pjm2 Exp $
 
 */
 
-package org.jibble.reminderbot;
+package com.iarekylew00t.ircbot;
 
 import java.io.Serializable;
 

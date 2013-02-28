@@ -1,2 +1,2 @@
-javac -classpath ./lib/pircbot.jar ./org/jibble/reminderbot/*.java
+javac -classpath ./lib/pircbot.jar ./com/iarekylew00t/ircbot/*.java
 PAUSE

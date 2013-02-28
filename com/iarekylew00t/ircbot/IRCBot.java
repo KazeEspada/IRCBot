@@ -14,7 +14,7 @@ $Id: ReminderBot.java,v 1.3 2004/05/29 19:44:30 pjm2 Exp $
 
 */
 
-package org.jibble.reminderbot;
+package com.iarekylew00t.ircbot;
 
 import org.jibble.pircbot.*;
 import java.util.*;
@@ -28,19 +28,38 @@ import org.w3c.dom.Element;
 import java.io.*;
 import java.net.URL;
 
-public class ReminderBot extends PircBot implements Runnable {
+public class IRCBot extends PircBot implements Runnable {
 
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
+    private static final String CUR_SONG = "curSong.txt";
+    private static final String VER = "0.8.3-beta1";
     private boolean req = false;
     private int latestPage;
     
-    public ReminderBot(String name) {
+    public IRCBot(String name, String password) {
         loadReminders();
         setName(name);
+        setPass(password);
         setAutoNickChange(true);
         dispatchThread = new Thread(this);
         dispatchThread.start();
+        File file = new File(SONG_LIST);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    public void setPass(String pass) {
+    	if (pass == ""){
+    		//Do Nothing
+    	} else if (pass.length() > 0) {
+    		sendMessage("NICKSERV", "IDENTIFY " + pass);
+    	}
     }
     
     @SuppressWarnings("unchecked")
@@ -73,7 +92,7 @@ public class ReminderBot extends PircBot implements Runnable {
                 return;
             }
             Reminder reminder = new Reminder(channel, sender, reminderMessage, set, due);
-            sendMessage(channel, "0kay " + sender + " ill remind y0u ab0ut that 0n " + new Date(reminder.getDueTime()));
+            sendMessage(channel, "0kay " + sender + ", ill remind y0u ab0ut that 0n " + new Date(reminder.getDueTime()));
             reminders.add(reminder);
             dispatchThread.interrupt();
         } else if (message.equalsIgnoreCase("$time")) {
@@ -81,6 +100,8 @@ public class ReminderBot extends PircBot implements Runnable {
             sendMessage(channel, sender + ": the time is " + time);
         } else if (message.equalsIgnoreCase("$boner")) {
             sendMessage(channel, sender + ": b0ner");
+        } else if (message.equalsIgnoreCase("$lmtyahs")) {
+            sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
         } else if (message.equalsIgnoreCase("$req")) {
             if (req == true)
                 sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
@@ -107,13 +128,21 @@ public class ReminderBot extends PircBot implements Runnable {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, marco, mspa, mspawiki, ping, radio, req, reqoff, reqon, revive, serve, shoot, slap, slay, stab, time, udict, wiki");
+            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, stab, time, udict, ver, wiki");
         } else if (message.equalsIgnoreCase("$gearup")) {
             sendMessage(channel, "y0u are n0w geared up " + sender);
+        } else if (message.equalsIgnoreCase("$ver")) {
+            sendMessage(channel, "Aradiabot v" + VER);
         } else if (message.equalsIgnoreCase("$ping")) {
             sendMessage(channel, sender + ": p0ng");
         } else if (message.equalsIgnoreCase("$marco")) {
             sendMessage(channel, sender + ": p0l0");
+        } else if (message.equalsIgnoreCase("$shoosh")) {
+            sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+        } else if (message.equalsIgnoreCase("$pap")) {
+            sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+        } else if (message.equalsIgnoreCase("$shooshpap")) {
+            sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
         } else if (message.equalsIgnoreCase("$mspa")) {
             sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
         } else if (message.equalsIgnoreCase("$radio")) {
@@ -130,6 +159,18 @@ public class ReminderBot extends PircBot implements Runnable {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$faq")) {
             sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+        } else if (message.equalsIgnoreCase("$song")) {
+            FileInputStream fs;
+			try {
+				fs = new FileInputStream(CUR_SONG);
+	            @SuppressWarnings("resource")
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+	            br.readLine();
+	            String curSong = br.readLine();
+	            sendMessage(channel, "the current s0ng is: " + removeLastChar(curSong));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         } else if (message.equalsIgnoreCase("$latest")) {
         	try {
         		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
@@ -143,8 +184,6 @@ public class ReminderBot extends PircBot implements Runnable {
         			Node nNode = nList.item(temp);
         			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
         				Element eElement = (Element) nNode;
-        				//System.out.println("First Name : " + eElement.getElementsByTagName("link").item(0).getTextContent());
-        				
         				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
         				
         	            sendMessage(channel, sender + ": " + update);
@@ -166,8 +205,6 @@ public class ReminderBot extends PircBot implements Runnable {
         			Node nNode = nList.item(temp);
         			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
         				Element eElement = (Element) nNode;
-        				//System.out.println("First Name : " + eElement.getElementsByTagName("link").item(0).getTextContent());
-        				
         				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
         				int tempPage = Integer.parseInt(update.substring(41));
         				int tempPage1 = latestPage;
@@ -194,6 +231,12 @@ public class ReminderBot extends PircBot implements Runnable {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$slap")) {
             sendMessage(channel, "i need a name " + sender);
+        } else if (message.equalsIgnoreCase("$shoosh ")) {
+            sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+        } else if (message.equalsIgnoreCase("$pap ")) {
+            sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+        } else if (message.equalsIgnoreCase("$shooshpap ")) {
+            sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
         } else if (message.equalsIgnoreCase("$serve")) {
             sendMessage(channel, "i cann0t just serve n0thing " + sender);
         } else if (message.startsWith("$kill ")) {
@@ -225,10 +268,33 @@ public class ReminderBot extends PircBot implements Runnable {
             String input = message.substring(7);
             if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
                 sendMessage(channel, "that w0uld be very stupid 0f me t0 d0 " + sender);
+            } else if (input.equalsIgnoreCase("iarekylew00t")) {
+                sendMessage(channel, "IAreKyleW00t will n0t all0w me t0 d0 that " + sender);
             } else if (input.equals("")) {
                 sendMessage(channel, "i need a name " + sender);
             } else {
                 sendMessage(channel, "sh00ting " + input);
+            }
+        } else if (message.startsWith("$shoosh ")) {
+            String input = message.substring(8);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+            } else {
+                sendMessage(channel, "sh00shing " + input);
+            }
+        } else if (message.startsWith("$pap ")) {
+            String input = message.substring(5);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+            } else {
+                sendMessage(channel, "papping " + input);
+            }
+        } else if (message.startsWith("$shooshpap ")) {
+            String input = message.substring(11);
+            if (input.equals("")) {
+                sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
+            } else {
+                sendMessage(channel, input + " has been sh00shpapped");
             }
         } else if (message.startsWith("$serve ")) {
             String input = message.substring(7);
@@ -259,7 +325,7 @@ public class ReminderBot extends PircBot implements Runnable {
                 sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','_');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://dictionary.reference.com/browse/" + newInput);
+                sendMessage(channel, sender + ": here is the definiti0n for " + input + "; http://dictionary.reference.com/browse/" + newInput);
             }
         } else if (message.startsWith("$udict ")) {
             String input = message.substring(7);
@@ -267,7 +333,7 @@ public class ReminderBot extends PircBot implements Runnable {
                 sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','+');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://www.urbandictionary.com/define.php?term=" + newInput);
+                sendMessage(channel, sender + ": here is the definiti0n for " + input + ": http://www.urbandictionary.com/define.php?term=" + newInput);
             }
         } else if (message.startsWith("$tumblr ")) {
             String input = message.substring(8);
@@ -354,7 +420,7 @@ public class ReminderBot extends PircBot implements Runnable {
                 }
             }
             else {
-                sendMessage(reminder.getChannel(), "hell0 " + reminder.getNick() + " y0u asked me t0 remind y0u " + reminder.getMessage());
+                sendMessage(reminder.getChannel(), "hell0 " + reminder.getNick() + ", y0u asked me t0 remind y0u " + reminder.getMessage());
                 reminders.removeFirst();
                 saveReminders();
             }
@@ -385,6 +451,13 @@ public class ReminderBot extends PircBot implements Runnable {
             // If it doesn't work, no great loss!
         }
     }    
+    
+    public String removeLastChar(String s) {
+        if (s == null || s.length() == 0) {
+            return s;
+        }
+        return s.substring(0, s.length()-9);
+    }
     
     private Thread dispatchThread;
     @SuppressWarnings("rawtypes")
