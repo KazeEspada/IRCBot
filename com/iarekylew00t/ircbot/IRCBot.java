@@ -33,7 +33,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.3-beta1";
+    private static final String VER = "0.8.4-beta1";
     private boolean req = false;
     private int latestPage;
     
@@ -128,7 +128,7 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, stab, time, udict, ver, wiki");
+            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki");
         } else if (message.equalsIgnoreCase("$gearup")) {
             sendMessage(channel, "y0u are n0w geared up " + sender);
         } else if (message.equalsIgnoreCase("$ver")) {
@@ -143,6 +143,8 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
         } else if (message.equalsIgnoreCase("$shooshpap")) {
             sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
+        } else if (message.equalsIgnoreCase("$songlist")) {
+            sendMessage(channel, sender + ": http://goo.gl/eamsC");
         } else if (message.equalsIgnoreCase("$mspa")) {
             sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
         } else if (message.equalsIgnoreCase("$radio")) {
