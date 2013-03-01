@@ -32,8 +32,9 @@ public class IRCBot extends PircBot implements Runnable {
 
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
+    private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.4-beta1";
+    private static final String VER = "0.8.5-beta3.1";
     private boolean req = false;
     private int latestPage;
     
@@ -45,6 +46,14 @@ public class IRCBot extends PircBot implements Runnable {
         dispatchThread = new Thread(this);
         dispatchThread.start();
         File file = new File(SONG_LIST);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        file = new File(FEEDBACK_FILE);
         if (!file.exists()){
             try {
                 file.createNewFile();
@@ -100,6 +109,25 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, sender + ": the time is " + time);
         } else if (message.equalsIgnoreCase("$boner")) {
             sendMessage(channel, sender + ": b0ner");
+        } else if (message.equalsIgnoreCase("$feedback")) {
+            sendMessage(channel, "please use: $feedback <resp0nse>");
+        } else if (message.equalsIgnoreCase("$feedback ")) {
+            sendMessage(channel, "please use: $feedback <resp0nse>");
+        } else if (message.startsWith("$feedback ")) {
+            String input = message.substring(10);
+            if (input.equals("")){
+                sendMessage(channel, "please use: $feedback <resp0nse>");
+            } else {
+                sendMessage(channel, "thank y0u f0r y0ur feedback " + sender + ". kyle will read it s00n" );
+                try {
+                    Writer output = new BufferedWriter(new FileWriter(FEEDBACK_FILE, true));
+                    output.append(sender + ": " + input + "\n");
+                    output.close();
+                }
+                catch (Exception e) {
+                    // If it doesn't work, no great loss!
+                }
+            }
         } else if (message.equalsIgnoreCase("$lmtyahs")) {
             sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
         } else if (message.equalsIgnoreCase("$req")) {
@@ -114,6 +142,7 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage("#hs_radio", "requests have been turn 0n by " + sender);
                 sendMessage("#hs_rp", "requests have been turn 0n by " + sender);
                 sendMessage("#hs_nsfw", "requests have been turn 0n by " + sender);
+                sendMessage("#ircstuck", "requests have been turn 0n by " + sender);
             } else {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
@@ -124,11 +153,12 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage("#hs_radio", "requests have been turn 0ff by " + sender);
                 sendMessage("#hs_rp", "requests have been turn 0ff by " + sender);
                 sendMessage("#hs_nsfw", "requests have been turn 0ff by " + sender);
+                sendMessage("#ircstuck", "requests have been turn 0ff by " + sender);
             } else {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, dict, faq, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki");
+            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki");
         } else if (message.equalsIgnoreCase("$gearup")) {
             sendMessage(channel, "y0u are n0w geared up " + sender);
         } else if (message.equalsIgnoreCase("$ver")) {
