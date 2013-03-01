@@ -34,7 +34,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.5-beta3.1";
+    private static final String VER = "0.8.5-beta4";
     private boolean req = false;
     private int latestPage;
     
@@ -252,17 +252,17 @@ public class IRCBot extends PircBot implements Runnable {
         		e.printStackTrace();
             }
         } else if (message.equalsIgnoreCase("$kill")) {
-            sendMessage(channel, "i need a name " + sender);
+            sendMessage(channel, "i need s0me0ne t0 kill " + sender);
         } else if (message.equalsIgnoreCase("$shoot")) {
-            sendMessage(channel, "i need a name " + sender);
+            sendMessage(channel, "i need a target " + sender);
         } else if (message.equalsIgnoreCase("$revive")) {
-            sendMessage(channel, "i need a name " + sender);
+            sendMessage(channel, "wh0 am i supp0sed t0 revive " + sender);
         } else if (message.equalsIgnoreCase("$slay")) {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$stab")) {
-            sendMessage(channel, "i need a name " + sender);
+            sendMessage(channel, "i d0nt kn0w wh0 y0u want me t0 stab " + sender);
         } else if (message.equalsIgnoreCase("$slap")) {
-            sendMessage(channel, "i need a name " + sender);
+            sendMessage(channel, "wh0 sh0uld i slap " + sender);
         } else if (message.equalsIgnoreCase("$shoosh ")) {
             sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
         } else if (message.equalsIgnoreCase("$pap ")) {
@@ -278,13 +278,17 @@ public class IRCBot extends PircBot implements Runnable {
             } else if (input.equalsIgnoreCase("iarekylew00t")) {
                 sendMessage(channel, "d0 y0u want to end the stati0n " + sender);
             } else if (input.equals("")) {
-                sendMessage(channel, "i need a name " + sender);
+                sendMessage(channel, "i need s0me0ne t0 kill " + sender);
             } else {
               sendMessage(channel, "killing " + input);
             }
         } else if(message.startsWith("$revive ")) {
             String input = message.substring(8);
-            sendMessage(channel, "reviving " + input);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
+            } else {
+                sendMessage(channel, "reviving " + input);
+            }
         } else if(message.startsWith("$slay ")) {
             String input = message.substring(6);
             if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
@@ -303,7 +307,7 @@ public class IRCBot extends PircBot implements Runnable {
             } else if (input.equalsIgnoreCase("iarekylew00t")) {
                 sendMessage(channel, "IAreKyleW00t will n0t all0w me t0 d0 that " + sender);
             } else if (input.equals("")) {
-                sendMessage(channel, "i need a name " + sender);
+                sendMessage(channel, "i need a target " + sender);
             } else {
                 sendMessage(channel, "sh00ting " + input);
             }
@@ -384,7 +388,7 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.startsWith("$slap ")) {
             String input = message.substring(6);
             if (input.equals("")){
-                sendMessage(channel, "i need a name " + sender);
+                sendMessage(channel, "wh0 sh0uld i slap " + sender);
             } else {
                 sendMessage(channel, "slapping " + input);
             }
