@@ -34,7 +34,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.5-beta4";
+    private static final String VER = "0.8.7-beta3";
     private boolean req = false;
     private int latestPage;
     
@@ -158,7 +158,7 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki");
+            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, yt");
         } else if (message.equalsIgnoreCase("$gearup")) {
             sendMessage(channel, "y0u are n0w geared up " + sender);
         } else if (message.equalsIgnoreCase("$ver")) {
@@ -187,6 +187,26 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
         } else if (message.equalsIgnoreCase("$udict")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.equalsIgnoreCase("$google")) {
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$google ")) {
+            String input = message.substring(8);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','+');
+                sendMessage(channel, "here are y0ur search results " + sender + "; http://www.google.com/search?q=" + newInput);
+            }
+        } else if (message.equalsIgnoreCase("$yt")) {
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$yt ")) {
+            String input = message.substring(4);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','+');
+                sendMessage(channel, "here are y0ur search results " + sender + "; http://www.youtube.com/results?search_query=" + newInput);
+            }
         } else if (message.equalsIgnoreCase("$tumblr")) {
             sendMessage(channel, "i need a name " + sender);
         } else if (message.equalsIgnoreCase("$faq")) {
