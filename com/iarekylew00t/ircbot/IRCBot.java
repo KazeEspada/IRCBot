@@ -18,7 +18,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.8-beta1";
+    private static final String VER = "0.8.8-beta3";
     private boolean req = false;
     private int latestPage;
     
@@ -149,14 +149,7 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "please use: $feedback <resp0nse>");
             } else {
                 sendMessage(channel, "thank y0u f0r y0ur feedback " + sender + ". kyle will read it s00n" );
-                try {
-                    Writer output = new BufferedWriter(new FileWriter(FEEDBACK_FILE, true));
-                    output.append(sender + ": " + input + "\n");
-                    output.close();
-                }
-                catch (Exception e) {
-                    // If it doesn't work, no great loss!
-                }
+                writeToFile(FEEDBACK_FILE, sender, input);
             }
             
         //Shoosh Command
@@ -470,14 +463,7 @@ public class IRCBot extends PircBot implements Runnable {
                     sendMessage(channel, "please specify a s0ng name " + sender);
                 } else {
                     sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-                    try {
-                        Writer output = new BufferedWriter(new FileWriter(SONG_LIST, true));
-                        output.append(input + "\n");
-                        output.close();
-                    }
-                    catch (Exception e) {
-                        // If it doesn't work, no great loss!
-                    }
+                    writeToFile(SONG_LIST, sender, input);
                 }
             } else {
                 sendMessage(channel, "requests are currently cl0sed " + sender);
@@ -558,6 +544,17 @@ public class IRCBot extends PircBot implements Runnable {
             // If it doesn't work, no great loss!
         }
     }    
+    
+    public void writeToFile(String file, String sender, String msg) {
+        try {
+            Writer output = new BufferedWriter(new FileWriter(file, true));
+            output.append(sender + ": " + msg + "\n");
+            output.close();
+        }
+        catch (Exception e) {
+            // If it doesn't work, no great loss!
+        }
+    }
     
     public String removeLastChar(String s) {
         if (s == null || s.length() == 0) {
