@@ -18,9 +18,10 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.8-beta3";
+    private static final String VER = "0.8.8-beta5";
     private boolean req = false;
-    private int latestPage;
+	private static int latestPage;
+    private static boolean isUpdate = false;
     
     public IRCBot(String name, String password) {
         loadReminders();
@@ -29,6 +30,7 @@ public class IRCBot extends PircBot implements Runnable {
         setAutoNickChange(true);
         dispatchThread = new Thread(this);
         dispatchThread.start();
+        checkUpdate();
         //Check for SONG_LIST file
         File file = new File(SONG_LIST);
         if (!file.exists()){
@@ -93,7 +95,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
+            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -291,56 +293,16 @@ public class IRCBot extends PircBot implements Runnable {
 			
 		//Latest Homestuck Page
         } else if (message.equalsIgnoreCase("$latest")) {
-        	try {
-        		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
-        		InputStream xml = mspaXml.openStream();
-        		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        		Document doc = dBuilder.parse(xml);
-        		doc.getDocumentElement().normalize();
-        		NodeList nList = doc.getElementsByTagName("item");
-        		for (int temp = 0; temp < 1; temp++) {
-        			Node nNode = nList.item(temp);
-        			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-        				Element eElement = (Element) nNode;
-        				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
-        				
-        	            sendMessage(channel, sender + ": " + update);
-        			}
-        		}
-        	} catch (Exception e) {
-        		e.printStackTrace();
-            }
+                    sendMessage(channel, sender + ": " + getLatestPage());
         	
         //MSPA Update Command
         } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
-        	try {
-        		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
-        		InputStream xml = mspaXml.openStream();
-        		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        		Document doc = dBuilder.parse(xml);
-        		doc.getDocumentElement().normalize();
-        		NodeList nList = doc.getElementsByTagName("item");
-        		for (int temp = 0; temp < 1; temp++) {
-        			Node nNode = nList.item(temp);
-        			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-        				Element eElement = (Element) nNode;
-        				String update = eElement.getElementsByTagName("link").item(0).getTextContent();
-        				int tempPage = Integer.parseInt(update.substring(41));
-        				int tempPage1 = latestPage;
-        				latestPage = tempPage;
-        				
-        				if (latestPage > tempPage1)
-        					sendMessage(channel, "there is an update");
-        				else
-        					sendMessage(channel, "there is n0 update");
-        			}
-        		}
-        	} catch (Exception e) {
-        		e.printStackTrace();
-            }
-        	
+        	checkUpdate();
+        	if (isUpdate == true)
+                sendMessage(channel, "there is an update");
+            else
+                sendMessage(channel, "there is n0 update");
+            
         //Kill Command
         } else if (message.equalsIgnoreCase("$kill")) {
             sendMessage(channel, "i need s0me0ne t0 kill " + sender);
@@ -350,6 +312,8 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
             } else if (input.equalsIgnoreCase("iarekylew00t")) {
                 sendMessage(channel, "d0 y0u want to end the stati0n " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "y0ur n0t all0wed t0 kill y0urself " + sender);
             } else if (input.equals("")) {
                 sendMessage(channel, "i need s0me0ne t0 kill " + sender);
             } else {
@@ -365,6 +329,8 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "that w0uld be very stupid 0f me t0 d0 " + sender);
             } else if (input.equalsIgnoreCase("iarekylew00t")) {
                 sendMessage(channel, "IAreKyleW00t will n0t all0w me t0 d0 that " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "im n0t sure why y0u w0uld want t0 sh00t y0urself " + sender);
             } else if (input.equals("")) {
                 sendMessage(channel, "i need a target " + sender);
             } else {
@@ -378,8 +344,23 @@ public class IRCBot extends PircBot implements Runnable {
             String input = message.substring(8);
             if (input.equals("")) {
                 sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "y0u cant just revive y0urself silly");
             } else {
                 sendMessage(channel, "reviving " + input);
+            }
+            
+        //Heal Command
+        } else if (message.equalsIgnoreCase("$heal")) {
+            sendMessage(channel, "wh0 am i supp0sed t0 heal " + sender);
+        } else if(message.startsWith("$heal ")) {
+            String input = message.substring(6);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 am i sup0sed t0 heal " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "y0u have been healed " + sender);
+            } else {
+                sendMessage(channel, input + " has been healed ");
             }
             
         //Slay Command
@@ -389,6 +370,10 @@ public class IRCBot extends PircBot implements Runnable {
             String input = message.substring(6);
             if (input.equals("")){
                 sendMessage(channel, "i need s0me0ne t0 slay " + sender);
+            } else if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
+                sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
+            } else if (input.equalsIgnoreCase("iarekylew00t")) {
+                sendMessage(channel, "im n0t all0wed t0 d0 that " + sender);
             } else {
                 sendMessage(channel, input + " has been slain");
             }
@@ -400,6 +385,8 @@ public class IRCBot extends PircBot implements Runnable {
             String input = message.substring(6);
             if (input.equals("")){
                 sendMessage(channel, "i need a name " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "y0u want t0 stab y0urself... 0k");
             } else {
                 sendMessage(channel, input + " has been stabbed");
             }
@@ -411,6 +398,8 @@ public class IRCBot extends PircBot implements Runnable {
             String input = message.substring(6);
             if (input.equals("")){
                 sendMessage(channel, "wh0 sh0uld i slap " + sender);
+            } else if (input.equals(sender)) {
+                sendMessage(channel, "y0u just slapped y0urself " + sender + ". I h0pe y0ure pr0ud");
             } else {
                 sendMessage(channel, "slapping " + input);
             }
@@ -561,6 +550,60 @@ public class IRCBot extends PircBot implements Runnable {
             return s;
         }
         return s.substring(0, s.length()-9);
+    }
+    
+    public String getLatestPage() {
+        String update = "";
+        try {
+            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
+            InputStream xml = mspaXml.openStream();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xml);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("item");
+            for (int temp = 0; temp < 1; temp++) {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    update = eElement.getElementsByTagName("link").item(0).getTextContent();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return update;
+    }
+    
+    public static void checkUpdate() {
+        try {
+            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
+            InputStream xml = mspaXml.openStream();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xml);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("item");
+            for (int temp = 0; temp < 1; temp++) {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    String update = eElement.getElementsByTagName("link").item(0).getTextContent();
+                    int tempPage = Integer.parseInt(update.substring(41));
+                    int tempPage1 = latestPage;
+                    latestPage = tempPage;
+                    if (latestPage > tempPage1) {
+                        isUpdate = true;
+                    } else {
+                        isUpdate = false;
+                    }
+                }
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     private Thread dispatchThread;

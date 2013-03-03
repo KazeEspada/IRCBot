@@ -1,19 +1,3 @@
-/* 
-Copyright Paul James Mutton, 2001-2004, http://www.jibble.org/
-
-This file is part of ReminderBot.
-
-This software is dual-licensed, allowing you to choose between the GNU
-General Public License (GPL) and the www.jibble.org Commercial License.
-Since the GPL may be too restrictive for use in a proprietary application,
-a commercial license is also provided. Full license information can be
-found at http://www.jibble.org/licenses/
-
-$Author: pjm2 $
-$Id: Reminder.java,v 1.1 2004/05/12 22:01:43 pjm2 Exp $
-
-*/
-
 package com.iarekylew00t.ircbot;
 
 import java.io.Serializable;
