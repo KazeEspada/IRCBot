@@ -1,19 +1,3 @@
-/* 
-Copyright Paul James Mutton, 2001-2004, http://www.jibble.org/
-
-This file is part of ReminderBot.
-
-This software is dual-licensed, allowing you to choose between the GNU
-General Public License (GPL) and the www.jibble.org Commercial License.
-Since the GPL may be too restrictive for use in a proprietary application,
-a commercial license is also provided. Full license information can be
-found at http://www.jibble.org/licenses/
-
-$Author: pjm2 $
-$Id: ReminderBot.java,v 1.3 2004/05/29 19:44:30 pjm2 Exp $
-
-*/
-
 package com.iarekylew00t.ircbot;
 
 import org.jibble.pircbot.*;
@@ -34,28 +18,32 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.7-beta3";
+    private static final String VER = "0.8.8-beta1";
     private boolean req = false;
     private int latestPage;
     
     public IRCBot(String name, String password) {
         loadReminders();
         setName(name);
-        setPass(password);
+        login(password);
         setAutoNickChange(true);
         dispatchThread = new Thread(this);
         dispatchThread.start();
+        //Check for SONG_LIST file
         File file = new File(SONG_LIST);
         if (!file.exists()){
             try {
+            	//Create file if it's not there
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
+        //Check for FEEDBACK_FILE
         file = new File(FEEDBACK_FILE);
         if (!file.exists()){
             try {
+            	//Create file if it's not there
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -63,7 +51,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
-    public void setPass(String pass) {
+    public void login(String pass) {
     	if (pass == ""){
     		//Do Nothing
     	} else if (pass.length() > 0) {
@@ -73,16 +61,15 @@ public class IRCBot extends PircBot implements Runnable {
     
     @SuppressWarnings("unchecked")
 	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
-
         Pattern messagePattern = Pattern.compile("^\\s*(?i:(" + getNick() + ")?\\s*[\\:,]?\\s*remind\\s+me\\s+in\\s+(((\\d+\\.?\\d*|\\.\\d+)\\s+(weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[\\s,]*(and)?\\s+)+)(.*)\\s*)$");
         Matcher m = messagePattern.matcher(message);
+        
+        //Check if message Matches Reminder Pattern
         if (m.matches()) {
         String reminderMessage = m.group(7);
             String periods = m.group(2);
-            
             long set = System.currentTimeMillis();
             long due = set;
-            
             try {
                 double weeks = getPeriod(periods, "weeks|week");
                 double days = getPeriod(periods, "days|day");
@@ -95,7 +82,6 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "i cant deal with numbers like that " + sender);
                 return;
             }
-            
             if (due == set) {
                 sendMessage(channel, "Example of correct usage: \"Remind me in 1 hour, 10 minutes to check the oven.\"  I understand all combinations of weeks, days, hours, minutes and seconds.");
                 return;
@@ -104,16 +90,60 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "0kay " + sender + ", ill remind y0u ab0ut that 0n " + new Date(reminder.getDueTime()));
             reminders.add(reminder);
             dispatchThread.interrupt();
+            
+        //List Commands
+        } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
+            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
+      
+        //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
             String time = new java.util.Date().toString();
             sendMessage(channel, sender + ": the time is " + time);
+            
+        //boner
         } else if (message.equalsIgnoreCase("$boner")) {
             sendMessage(channel, sender + ": b0ner");
-        } else if (message.equalsIgnoreCase("$feedback")) {
+        
+        //Let me tell you about Homestuck
+        } else if (message.equalsIgnoreCase("$lmtyahs")) {
+            sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
+           
+        //Gear Up Command
+        } else if (message.equalsIgnoreCase("$gearup")) {
+            sendMessage(channel, "y0u are n0w geared up " + sender);
+           
+        //Aradiabot version
+        } else if (message.equalsIgnoreCase("$ver")) {
+            sendMessage(channel, "Aradiabot v" + VER);
+            
+        //Ping Command
+        } else if (message.equalsIgnoreCase("$ping")) {
+            sendMessage(channel, sender + ": p0ng");
+            
+        //Marco/Polo Command 
+        } else if (message.equalsIgnoreCase("$marco")) {
+            sendMessage(channel, sender + ": p0l0");
+            
+        //Songlist Command
+        } else if (message.equalsIgnoreCase("$songlist")) {
+            sendMessage(channel, sender + ": http://goo.gl/eamsC");
+        
+        //MSPA Page Command
+        } else if (message.equalsIgnoreCase("$mspa")) {
+            sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
+        
+        //Radio Link Command
+        } else if (message.equalsIgnoreCase("$radio")) {
+            sendMessage(channel, sender + ": http://mixlr.com/iarekylew00t/");
+            
+        //FAQ
+        } else if (message.equalsIgnoreCase("$faq")) {
+            sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+            
+        //Feedback Command
+        } else if (message.equalsIgnoreCase("$feedback") || message.equalsIgnoreCase("$fb")) {
             sendMessage(channel, "please use: $feedback <resp0nse>");
-        } else if (message.equalsIgnoreCase("$feedback ")) {
-            sendMessage(channel, "please use: $feedback <resp0nse>");
-        } else if (message.startsWith("$feedback ")) {
+        } else if (message.startsWith("$feedback ") || message.startsWith("$fb ")) {
             String input = message.substring(10);
             if (input.equals("")){
                 sendMessage(channel, "please use: $feedback <resp0nse>");
@@ -128,89 +158,131 @@ public class IRCBot extends PircBot implements Runnable {
                     // If it doesn't work, no great loss!
                 }
             }
-        } else if (message.equalsIgnoreCase("$lmtyahs")) {
-            sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
-        } else if (message.equalsIgnoreCase("$req")) {
-            if (req == true)
-                sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
-            else
-                sendMessage(channel, "requests are currently cl0sed");
-        } else if (message.equalsIgnoreCase("$reqon")) {
-            if (sender.equals("IAreKyleW00t")) {
-                req = true;
-                sendMessage("#hs_admin", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_radio", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_rp", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_nsfw", "requests have been turn 0n by " + sender);
-                sendMessage("#ircstuck", "requests have been turn 0n by " + sender);
-            } else {
-                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-            }
-        } else if (message.equalsIgnoreCase("$reqoff")) {
-            if (sender.equals("IAreKyleW00t")) {
-                req = false;
-                sendMessage("#hs_admin", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_radio", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_rp", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_nsfw", "requests have been turn 0ff by " + sender);
-                sendMessage("#ircstuck", "requests have been turn 0ff by " + sender);
-            } else {
-                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-            }
-        } else if (message.equalsIgnoreCase("$commands")) {
-            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, yt");
-        } else if (message.equalsIgnoreCase("$gearup")) {
-            sendMessage(channel, "y0u are n0w geared up " + sender);
-        } else if (message.equalsIgnoreCase("$ver")) {
-            sendMessage(channel, "Aradiabot v" + VER);
-        } else if (message.equalsIgnoreCase("$ping")) {
-            sendMessage(channel, sender + ": p0ng");
-        } else if (message.equalsIgnoreCase("$marco")) {
-            sendMessage(channel, sender + ": p0l0");
+            
+        //Shoosh Command
         } else if (message.equalsIgnoreCase("$shoosh")) {
             sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+        } else if (message.startsWith("$shoosh ")) {
+            String input = message.substring(8);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+            } else {
+                sendMessage(channel, "sh00shing " + input);
+            }
+            
+        //Pap commad
         } else if (message.equalsIgnoreCase("$pap")) {
             sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+        } else if (message.startsWith("$pap ")) {
+            String input = message.substring(5);
+            if (input.equals("")) {
+                sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+            } else {
+                sendMessage(channel, "papping " + input);
+            }
+            
+        //Shooshpap command
         } else if (message.equalsIgnoreCase("$shooshpap")) {
             sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
-        } else if (message.equalsIgnoreCase("$songlist")) {
-            sendMessage(channel, sender + ": http://goo.gl/eamsC");
-        } else if (message.equalsIgnoreCase("$mspa")) {
-            sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
-        } else if (message.equalsIgnoreCase("$radio")) {
-            sendMessage(channel, sender + ": http://mixlr.com/iarekylew00t/");
+        } else if (message.startsWith("$shooshpap ")) {
+            String input = message.substring(11);
+            if (input.equals("")) {
+                sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
+            } else {
+                sendMessage(channel, input + " has been sh00shpapped");
+            }
+        
+        //MSPAWiki Search
         } else if (message.equalsIgnoreCase("$mspawiki")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$mspawiki ")) {
+            String input = message.substring(10);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','_');
+                sendMessage(channel, "here are y0ur search results " + sender + ": http://mspaintadventures.wikia.com/wiki/index.php?search=" + newInput);
+            }
+            
+        //Wiki Search
         } else if (message.equalsIgnoreCase("$wiki")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$wiki ")) {
+            String input = message.substring(6);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','_');
+                sendMessage(channel, "here are y0ur search results " + sender + ": http://en.wikipedia.org/wiki/" + newInput);
+            }
+            
+        //Dictionary Search
         } else if (message.equalsIgnoreCase("$dict")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$dict ")) {
+            String input = message.substring(6);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','_');
+                sendMessage(channel, sender + ": here is the definiti0n for " + input + "; http://dictionary.reference.com/browse/" + newInput);
+            }
+            
+        //Urban Dictionary Search
         } else if (message.equalsIgnoreCase("$udict")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.equalsIgnoreCase("$google")) {
+        } else if (message.startsWith("$udict ")) {
+            String input = message.substring(7);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+            } else {
+                String newInput = input.replace(' ','+');
+                sendMessage(channel, sender + ": here is the definiti0n for " + input + ": http://www.urbandictionary.com/define.php?term=" + newInput);
+            }
+            
+        //Google Search
+        } else if (message.equalsIgnoreCase("$google") || message.equalsIgnoreCase("$g") || message.equalsIgnoreCase("$search")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$google ")) {
+        } else if (message.startsWith("$google ") || message.startsWith("$g ") || message.startsWith("$search ")) {
             String input = message.substring(8);
+            if (message.startsWith("$g "))
+            	input = message.substring(3);
+            else if (message.startsWith("$search "))
+            	input = message.substring(8);
+            
             if (input.equals("")){
                 sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','+');
                 sendMessage(channel, "here are y0ur search results " + sender + "; http://www.google.com/search?q=" + newInput);
             }
-        } else if (message.equalsIgnoreCase("$yt")) {
+            
+        //Youtube Search
+        } else if (message.equalsIgnoreCase("$youtube") || message.equalsIgnoreCase("$yt")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$yt ")) {
-            String input = message.substring(4);
+        } else if (message.startsWith("$youtube ") || message.startsWith("$yt ")) {
+            String input = message.substring(9);
+            if (message.startsWith("$yt "))
+            	input = message.substring(4);
             if (input.equals("")){
                 sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
             } else {
                 String newInput = input.replace(' ','+');
                 sendMessage(channel, "here are y0ur search results " + sender + "; http://www.youtube.com/results?search_query=" + newInput);
             }
+            
+        //Tumblr
         } else if (message.equalsIgnoreCase("$tumblr")) {
             sendMessage(channel, "i need a name " + sender);
-        } else if (message.equalsIgnoreCase("$faq")) {
-            sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+        } else if (message.startsWith("$tumblr ")) {
+            String input = message.substring(8);
+            if (input.equals("")){
+                sendMessage(channel, "i need a name " + sender);
+            } else {
+                sendMessage(channel, sender + ": " + input + ".tumblr.com");
+            }
+            
+        //Current Song
         } else if (message.equalsIgnoreCase("$song")) {
             FileInputStream fs;
 			try {
@@ -223,6 +295,8 @@ public class IRCBot extends PircBot implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+		//Latest Homestuck Page
         } else if (message.equalsIgnoreCase("$latest")) {
         	try {
         		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
@@ -244,7 +318,9 @@ public class IRCBot extends PircBot implements Runnable {
         	} catch (Exception e) {
         		e.printStackTrace();
             }
-        } else if (message.equalsIgnoreCase("$update")) {
+        	
+        //MSPA Update Command
+        } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
         	try {
         		URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
         		InputStream xml = mspaXml.openStream();
@@ -271,26 +347,10 @@ public class IRCBot extends PircBot implements Runnable {
         	} catch (Exception e) {
         		e.printStackTrace();
             }
+        	
+        //Kill Command
         } else if (message.equalsIgnoreCase("$kill")) {
             sendMessage(channel, "i need s0me0ne t0 kill " + sender);
-        } else if (message.equalsIgnoreCase("$shoot")) {
-            sendMessage(channel, "i need a target " + sender);
-        } else if (message.equalsIgnoreCase("$revive")) {
-            sendMessage(channel, "wh0 am i supp0sed t0 revive " + sender);
-        } else if (message.equalsIgnoreCase("$slay")) {
-            sendMessage(channel, "i need a name " + sender);
-        } else if (message.equalsIgnoreCase("$stab")) {
-            sendMessage(channel, "i d0nt kn0w wh0 y0u want me t0 stab " + sender);
-        } else if (message.equalsIgnoreCase("$slap")) {
-            sendMessage(channel, "wh0 sh0uld i slap " + sender);
-        } else if (message.equalsIgnoreCase("$shoosh ")) {
-            sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
-        } else if (message.equalsIgnoreCase("$pap ")) {
-            sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
-        } else if (message.equalsIgnoreCase("$shooshpap ")) {
-            sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
-        } else if (message.equalsIgnoreCase("$serve")) {
-            sendMessage(channel, "i cann0t just serve n0thing " + sender);
         } else if (message.startsWith("$kill ")) {
             String input = message.substring(6);
             if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
@@ -302,24 +362,10 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
               sendMessage(channel, "killing " + input);
             }
-        } else if(message.startsWith("$revive ")) {
-            String input = message.substring(8);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
-            } else {
-                sendMessage(channel, "reviving " + input);
-            }
-        } else if(message.startsWith("$slay ")) {
-            String input = message.substring(6);
-            if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
-                sendMessage(channel, "i cann0t d0 that " + sender);
-            } else if (input.equalsIgnoreCase("iarekylew00t")) {
-                sendMessage(channel, "seri0sly " + sender);
-            } else if (input.equals("")) {
-                sendMessage(channel, "i need a name " + sender);
-            } else {
-            sendMessage(channel, input + " has been slain");
-            }
+            
+        //Shoot Command
+        } else if (message.equalsIgnoreCase("$shoot")) {
+            sendMessage(channel, "i need a target " + sender);
         } else if (message.startsWith("$shoot ")) {
             String input = message.substring(7);
             if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
@@ -331,73 +377,32 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 sendMessage(channel, "sh00ting " + input);
             }
-        } else if (message.startsWith("$shoosh ")) {
+            
+        //Revive Command
+        } else if (message.equalsIgnoreCase("$revive")) {
+            sendMessage(channel, "wh0 am i supp0sed t0 revive " + sender);
+        } else if(message.startsWith("$revive ")) {
             String input = message.substring(8);
             if (input.equals("")) {
-                sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+                sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
             } else {
-                sendMessage(channel, "sh00shing " + input);
+                sendMessage(channel, "reviving " + input);
             }
-        } else if (message.startsWith("$pap ")) {
-            String input = message.substring(5);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
-            } else {
-                sendMessage(channel, "papping " + input);
-            }
-        } else if (message.startsWith("$shooshpap ")) {
-            String input = message.substring(11);
-            if (input.equals("")) {
-                sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
-            } else {
-                sendMessage(channel, input + " has been sh00shpapped");
-            }
-        } else if (message.startsWith("$serve ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-                sendMessage(channel, "i cann0t just serve n0thing");
-            } else {
-                sendMessage(channel, "serving " + input + " f0r everyone");
-            }
-        } else if (message.startsWith("$mspawiki ")) {
-            String input = message.substring(10);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://mspaintadventures.wikia.com/wiki/index.php?search=" + newInput);
-            }
-        } else if (message.startsWith("$wiki ")) {
+            
+        //Slay Command
+        } else if (message.equalsIgnoreCase("$slay")) {
+            sendMessage(channel, "i need a name " + sender);
+        } else if (message.startsWith("$slay ")) {
             String input = message.substring(6);
             if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+                sendMessage(channel, "i need s0me0ne t0 slay " + sender);
             } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://en.wikipedia.org/wiki/" + newInput);
+                sendMessage(channel, input + " has been slain");
             }
-        } else if (message.startsWith("$dict ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, sender + ": here is the definiti0n for " + input + "; http://dictionary.reference.com/browse/" + newInput);
-            }
-        } else if (message.startsWith("$udict ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','+');
-                sendMessage(channel, sender + ": here is the definiti0n for " + input + ": http://www.urbandictionary.com/define.php?term=" + newInput);
-            }
-        } else if (message.startsWith("$tumblr ")) {
-            String input = message.substring(8);
-            if (input.equals("")){
-                sendMessage(channel, "i need a name " + sender);
-            } else {
-                sendMessage(channel, sender + ": " + input + ".tumblr.com");
-            }
+            
+        //Stab Command
+        } else if (message.equalsIgnoreCase("$stab")) {
+            sendMessage(channel, "i d0nt kn0w wh0 y0u want me t0 stab " + sender);
         } else if (message.startsWith("$stab ")) {
             String input = message.substring(6);
             if (input.equals("")){
@@ -405,6 +410,10 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 sendMessage(channel, input + " has been stabbed");
             }
+            
+        //Slap Command
+        } else if (message.equalsIgnoreCase("$slap")) {
+            sendMessage(channel, "wh0 sh0uld i slap " + sender);
         } else if (message.startsWith("$slap ")) {
             String input = message.substring(6);
             if (input.equals("")){
@@ -412,6 +421,48 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 sendMessage(channel, "slapping " + input);
             }
+            
+        //Serve Command
+        } else if (message.equalsIgnoreCase("$serve")) {
+            sendMessage(channel, "i cann0t just serve n0thing " + sender);
+        } else if (message.startsWith("$serve ")) {
+            String input = message.substring(7);
+            if (input.equals("")){
+                sendMessage(channel, "i cann0t serve n0thing");
+            } else {
+                sendMessage(channel, "serving " + input + " t0 everyone");
+            }
+            
+        //Request ON|OFF
+        } else if (message.equalsIgnoreCase("$reqon")) {
+            if (sender.equals("IAreKyleW00t")) {
+                req = true;
+                sendMessage("#hs_admin", "requests have been turn 0n by " + sender);
+                sendMessage("#hs_radio", "requests have been turn 0n by " + sender);
+                sendMessage("#hs_rp", "requests have been turn 0n by " + sender);
+                sendMessage("#hs_nsfw", "requests have been turn 0n by " + sender);
+                sendMessage("#ircstuck", "requests have been turn 0n by " + sender);
+            } else {
+                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+            }
+        } else if (message.equalsIgnoreCase("$reqoff")) {
+            if (sender.equals("IAreKyleW00t")) {
+                req = false;
+                sendMessage("#hs_admin", "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_radio", "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_rp", "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_nsfw", "requests have been turn 0ff by " + sender);
+                sendMessage("#ircstuck", "requests have been turn 0ff by " + sender);
+            } else {
+                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+            }
+            
+        //Request song
+        } else if (message.equalsIgnoreCase("$req")) {
+            if (req == true)
+                sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
+            else
+                sendMessage(channel, "requests are currently cl0sed");
         } else if (message.startsWith("$req ")) {
             String input = message.substring(5);
             if (req == true) {
