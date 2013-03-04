@@ -18,7 +18,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.8-beta5";
+    private static final String VER = "0.8.8-beta6";
     private boolean req = false;
 	private static int latestPage;
     private static boolean isUpdate = false;
@@ -30,27 +30,12 @@ public class IRCBot extends PircBot implements Runnable {
         setAutoNickChange(true);
         dispatchThread = new Thread(this);
         dispatchThread.start();
+        //Check for page update
         checkUpdate();
         //Check for SONG_LIST file
-        File file = new File(SONG_LIST);
-        if (!file.exists()){
-            try {
-            	//Create file if it's not there
-                file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
+        checkFile(SONG_LIST);
         //Check for FEEDBACK_FILE
-        file = new File(FEEDBACK_FILE);
-        if (!file.exists()){
-            try {
-            	//Create file if it's not there
-                file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
+        checkFile(FEEDBACK_FILE);
     }
     
     public void login(String pass) {
@@ -279,17 +264,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Current Song
         } else if (message.equalsIgnoreCase("$song")) {
-            FileInputStream fs;
-			try {
-				fs = new FileInputStream(CUR_SONG);
-	            @SuppressWarnings("resource")
-				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-	            br.readLine();
-	            String curSong = br.readLine();
-	            sendMessage(channel, "the current s0ng is: " + removeLastChar(curSong));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            sendMessage(channel, "the current s0ng is: " + getCurSong());
 			
 		//Latest Homestuck Page
         } else if (message.equalsIgnoreCase("$latest")) {
@@ -460,6 +435,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
+    //Get the time to wait for the reminder
     public double getPeriod(String periods, String regex) throws NumberFormatException {
         Pattern pattern = Pattern.compile("^.*?([\\d\\.]+)\\s*(?i:(" + regex + ")).*$");
         Matcher m = pattern.matcher(periods);
@@ -474,6 +450,7 @@ public class IRCBot extends PircBot implements Runnable {
         return 0;
     }
     
+    //Run the reminder methods
     @SuppressWarnings("unchecked")
 	public synchronized void run() {
         boolean running = true;
@@ -510,6 +487,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
+    //Save any new reminders
     private void saveReminders() {
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(new File(REMINDER_FILE)));
@@ -522,6 +500,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
+    //Automatically load all reminds at start
     @SuppressWarnings("rawtypes")
 	private void loadReminders() {
         try {
@@ -534,6 +513,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }    
     
+    //Write user input to file
     public void writeToFile(String file, String sender, String msg) {
         try {
             Writer output = new BufferedWriter(new FileWriter(file, true));
@@ -545,13 +525,15 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
-    public String removeLastChar(String s) {
+    //Trim string (removes - Winamp from songname)
+    public String trimString(String s) {
         if (s == null || s.length() == 0) {
             return s;
         }
         return s.substring(0, s.length()-9);
     }
     
+    //Get Latest Page from MSPA RSS Feed
     public String getLatestPage() {
         String update = "";
         try {
@@ -576,6 +558,7 @@ public class IRCBot extends PircBot implements Runnable {
         return update;
     }
     
+    //Check for page update
     public static void checkUpdate() {
         try {
             URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
@@ -603,6 +586,35 @@ public class IRCBot extends PircBot implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    
+    //Get the Current Song
+    @SuppressWarnings("resource")
+	public String getCurSong() {
+        String curSong = "";
+        FileInputStream fs;
+		try {
+			fs = new FileInputStream(CUR_SONG);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+            br.readLine();
+            curSong = br.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return trimString(curSong);
+    }
+    
+    //Check if a file exists
+    public void checkFile(String fileLoc) {
+        File file = new File(fileLoc);
+        if (!file.exists()){
+            try {
+            	//Create file if it's not there
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
     
