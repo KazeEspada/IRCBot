@@ -18,7 +18,8 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.8-beta6";
+    private static final String VER = "0.8.8-beta6.1";
+    private String curChan;
     private boolean req = false;
 	private static int latestPage;
     private static boolean isUpdate = false;
@@ -48,6 +49,8 @@ public class IRCBot extends PircBot implements Runnable {
     
     @SuppressWarnings("unchecked")
 	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
+    	//Keep track of the senders current channel
+    	curChan = channel;
         Pattern messagePattern = Pattern.compile("^\\s*(?i:(" + getNick() + ")?\\s*[\\:,]?\\s*remind\\s+me\\s+in\\s+(((\\d+\\.?\\d*|\\.\\d+)\\s+(weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[\\s,]*(and)?\\s+)+)(.*)\\s*)$");
         Matcher m = messagePattern.matcher(message);
         
@@ -392,7 +395,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Request ON|OFF
         } else if (message.equalsIgnoreCase("$reqon")) {
-            if (sender.equals("IAreKyleW00t")) {
+            if (checkOp(sender) == true) {
                 req = true;
                 sendMessage("#hs_admin", "requests have been turn 0n by " + sender);
                 sendMessage("#hs_radio", "requests have been turn 0n by " + sender);
@@ -403,7 +406,7 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$reqoff")) {
-            if (sender.equals("IAreKyleW00t")) {
+            if (checkOp(sender)) {
                 req = false;
                 sendMessage("#hs_admin", "requests have been turn 0ff by " + sender);
                 sendMessage("#hs_radio", "requests have been turn 0ff by " + sender);
@@ -616,6 +619,46 @@ public class IRCBot extends PircBot implements Runnable {
                 ex.printStackTrace();
             }
         }
+    }
+    
+    //Check if sender is Op
+    public boolean checkOp(String sender) {
+    	User users[] = getUsers(curChan);
+    	User u = null;
+    	for(User user:users){
+    	   if(sender.equals(user.getNick())){
+    	      u = user;
+    	      break;
+    	   }
+    	}
+    	if(u != null){
+    	   if(u.isOp()){
+    		   return true;
+    	   } else {
+    		   return false;
+    	   }
+    	}
+    	return false;
+    }
+    
+    //Check if sender has Voice
+    public boolean checkVoice(String sender) {
+    	User users[] = getUsers(curChan);
+    	User u = null;
+    	for(User user:users){
+    	   if(sender.equals(user.getNick())){
+    	      u = user;
+    	      break;
+    	   }
+    	}
+    	if(u != null){
+    	   if(u.hasVoice()){
+    		   return true;
+    	   } else {
+    		   return false;
+    	   }
+    	}
+    	return false;
     }
     
     private Thread dispatchThread;
