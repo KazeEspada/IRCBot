@@ -10,6 +10,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.*;
+import java.util.Random;
 import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
@@ -18,7 +19,8 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.8-beta6.1";
+    private static final String VER = "0.8.9-beta3";
+    private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
     private boolean req = false;
 	private static int latestPage;
@@ -83,7 +85,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
+            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -129,6 +131,18 @@ public class IRCBot extends PircBot implements Runnable {
         //FAQ
         } else if (message.equalsIgnoreCase("$faq")) {
             sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+            
+        //8ball
+        } else if (message.equalsIgnoreCase("$8ball")) {
+            sendMessage(channel, "please give me s0mething t0 predict " + sender);
+        } else if (message.startsWith("$8ball ")) {
+            String input = message.substring(7);
+            if (input.equals("")){
+                sendMessage(channel, "please give me s0mething t0 predict " + sender);
+            } else {
+                sendMessage(channel, sender + ": " + getOutcome(eightBall));
+            }
+            
             
         //Feedback Command
         } else if (message.equalsIgnoreCase("$feedback") || message.equalsIgnoreCase("$fb")) {
@@ -267,7 +281,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Current Song
         } else if (message.equalsIgnoreCase("$song")) {
-            sendMessage(channel, "the current s0ng is: " + getCurSong());
+            sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
 			
 		//Latest Homestuck Page
         } else if (message.equalsIgnoreCase("$latest")) {
@@ -277,7 +291,7 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
         	checkUpdate();
         	if (isUpdate == true)
-                sendMessage(channel, "there is an update");
+                sendMessage(channel, Colors.GREEN + "there is an update");
             else
                 sendMessage(channel, "there is n0 update");
             
@@ -397,22 +411,22 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$reqon")) {
             if (checkOp(sender) == true) {
                 req = true;
-                sendMessage("#hs_admin", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_radio", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_rp", "requests have been turn 0n by " + sender);
-                sendMessage("#hs_nsfw", "requests have been turn 0n by " + sender);
-                sendMessage("#ircstuck", "requests have been turn 0n by " + sender);
+                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
             } else {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
         } else if (message.equalsIgnoreCase("$reqoff")) {
-            if (checkOp(sender)) {
+            if (checkOp(sender) == true) {
                 req = false;
-                sendMessage("#hs_admin", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_radio", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_rp", "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_nsfw", "requests have been turn 0ff by " + sender);
-                sendMessage("#ircstuck", "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
             } else {
                 sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
             }
@@ -534,6 +548,12 @@ public class IRCBot extends PircBot implements Runnable {
             return s;
         }
         return s.substring(0, s.length()-9);
+    }
+    
+    //Radomly choose 8ball outcome
+    public static String getOutcome(String[] array) {
+        int rnd = new Random().nextInt(array.length);
+        return array[rnd];
     }
     
     //Get Latest Page from MSPA RSS Feed
