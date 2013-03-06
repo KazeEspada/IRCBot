@@ -154,6 +154,8 @@ public class IRCBot extends PircBot implements Runnable {
             String input = message.substring(9);
             if (input.equals("")){
                 sendMessage(channel, "please enter a zipc0de " + sender);
+            } else if (!input.matches("^\\d*$")){
+                sendMessage(channel, "please enter a zipc0de " + sender);
             } else {
                 sendMessage(channel, sender + ": " + getWeather(input));
             }
