@@ -19,7 +19,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String VER = "0.8.9-beta3";
+    private static final String VER = "0.9.0.1-beta2";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
     private boolean req = false;
@@ -85,7 +85,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, time, udict, ver, wiki, youtube");
+            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, slap, slay, song, songlist, stab, submit, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -118,7 +118,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Songlist Command
         } else if (message.equalsIgnoreCase("$songlist")) {
-            sendMessage(channel, sender + ": http://goo.gl/eamsC");
+            sendMessage(channel, sender + ": http://goo.gl/0xJtz");
         
         //MSPA Page Command
         } else if (message.equalsIgnoreCase("$mspa")) {
@@ -132,6 +132,10 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$faq")) {
             sendMessage(channel, sender + ": http://goo.gl/53qWN/");
             
+        //Submit
+        } else if (message.equalsIgnoreCase("$submit")) {
+            sendMessage(channel, sender + ": http://goo.gl/dhvwC");
+            
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
             sendMessage(channel, "please give me s0mething t0 predict " + sender);
@@ -143,12 +147,40 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, sender + ": " + getOutcome(eightBall));
             }
             
+        //Weather
+        } else if (message.equalsIgnoreCase("$weather") || message.equalsIgnoreCase("$we")) {
+            sendMessage(channel, "please give me s0mething t0 predict " + sender);
+        } else if (message.startsWith("$weather ")) {
+            String input = message.substring(9);
+            if (input.equals("")){
+                sendMessage(channel, "please enter a zipc0de " + sender);
+            } else {
+                sendMessage(channel, sender + ": " + getWeather(input));
+            }
+            
+        //Random Number Generator
+        } else if (message.equalsIgnoreCase("$rand")) {
+            int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
+            sendMessage(channel, sender + ": " + randNum);
+        } else if (message.startsWith("$rand ")) {
+            String input = message.substring(6);
+            if (input.equals("")){
+                int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
+                sendMessage(channel, sender + ": " + randNum);
+            } else {
+            	int maxNum = Integer.parseInt(input);
+                int randNum = (0 + (int)(Math.random() * ((maxNum - 0)) + 1));
+                sendMessage(channel, sender + ": " + randNum);
+            }
             
         //Feedback Command
         } else if (message.equalsIgnoreCase("$feedback") || message.equalsIgnoreCase("$fb")) {
             sendMessage(channel, "please use: $feedback <resp0nse>");
         } else if (message.startsWith("$feedback ") || message.startsWith("$fb ")) {
             String input = message.substring(10);
+            if (input.startsWith("$fb "))
+                input = message.substring(4);
+                
             if (input.equals("")){
                 sendMessage(channel, "please use: $feedback <resp0nse>");
             } else {
@@ -409,28 +441,36 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Request ON|OFF
         } else if (message.equalsIgnoreCase("$reqon")) {
-            if (checkOp(sender) == true) {
-                req = true;
-                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+            if (channel.equalsIgnoreCase("#ircstuck")) {
+                sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
             } else {
-                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+                if (checkOp(sender) == true) {
+                    req = true;
+                    sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                } else {
+                    sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+                }
             }
         } else if (message.equalsIgnoreCase("$reqoff")) {
-            if (checkOp(sender) == true) {
-                req = false;
-                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+            if (channel.equalsIgnoreCase("#ircstuck")) {
+                sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
             } else {
-                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+	            if (checkOp(sender) == true) {
+	                req = false;
+	                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+	                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+	                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+	                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+	                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+	            } else {
+	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+	            }
             }
-            
+      
         //Request song
         } else if (message.equalsIgnoreCase("$req")) {
             if (req == true)
@@ -554,6 +594,36 @@ public class IRCBot extends PircBot implements Runnable {
     public static String getOutcome(String[] array) {
         int rnd = new Random().nextInt(array.length);
         return array[rnd];
+    }
+    
+    
+    //Gets the weather with the given zipcode
+    public String getWeather(String zip) {
+        String loc = "";
+        String tmp = "";
+        String flik = "";
+        String cond = "";
+        try {
+            URL weatherXml = new URL("http://xml.weather.com/weather/local/" + zip + "?cc=&unit=f");
+            InputStream xml = weatherXml.openStream();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xml);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("cc");
+                Node nNode = nList.item(0);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    loc = eElement.getElementsByTagName("obst").item(0).getTextContent();
+                    tmp = eElement.getElementsByTagName("tmp").item(0).getTextContent();
+                    flik = eElement.getElementsByTagName("flik").item(0).getTextContent();
+                    cond = eElement.getElementsByTagName("t").item(0).getTextContent();
+                }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and is " + Colors.BOLD + cond + Colors.NORMAL + ".";
     }
     
     //Get Latest Page from MSPA RSS Feed
