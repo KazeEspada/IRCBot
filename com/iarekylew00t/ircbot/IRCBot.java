@@ -19,6 +19,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
+    private static final String JADE_QUOTES = "jade-quotes.txt";
     private static final String VER = "0.9.0.1-beta2";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
@@ -570,7 +571,40 @@ public class IRCBot extends PircBot implements Runnable {
         catch (Exception e) {
             // If it doesn't work, no great loss!
         }
-    }    
+    }
+    
+    //Count number of lines in a file
+	public static int countLines(String filename) throws IOException {
+	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
+		int cnt = 0;
+		@SuppressWarnings("unused")
+		String lineRead = "";
+		while ((lineRead = reader.readLine()) != null) {}
+	
+		cnt = reader.getLineNumber(); 
+		reader.close();
+		return cnt;
+	}
+	
+	//Get a random quote from character
+	public String randomQuote(String c, int num) throws IOException {
+		String quote = "";
+		if (c.equalsIgnoreCase("jade")) {
+			int lines = countLines(JADE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			try {
+				FileInputStream fs= new FileInputStream(JADE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < num-1; ++i)
+				  br.readLine();
+				quote = Colors.GREEN + "GG: " + br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return quote;
+	}
     
     //Write user input to file
     public void writeToFile(String file, String sender, String msg) {
@@ -625,7 +659,9 @@ public class IRCBot extends PircBot implements Runnable {
             e.printStackTrace();
         }
         
-        return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and is " + Colors.BOLD + cond + Colors.NORMAL + ".";
+        return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " 
+        + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and is " 
+        + Colors.BOLD + cond + Colors.NORMAL + ".";
     }
     
     //Get Latest Page from MSPA RSS Feed
