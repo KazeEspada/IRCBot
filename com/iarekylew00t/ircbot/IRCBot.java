@@ -19,8 +19,48 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
-    private static final String JADE_QUOTES = "jade-quotes.txt";
-    private static final String VER = "0.9.0.1-beta2";
+    private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
+    private static final String ARANEA_QUOTES = "./quotes/aranea-quotes.txt";
+    private static final String ARQUIUS_QUOTES = "./quotes/arquiusprite-quotes.txt";
+    private static final String CALLIBORN_QUOTES = "./quotes/calliborn-quotes.txt";
+    private static final String CALLIOPE_QUOTES = "./quotes/calliope-quotes.txt";
+    private static final String CALSPRITE_QUOTES = "./quotes/calsprite-quotes.txt";
+    private static final String CRONUS_QUOTES = "./quotes/cronus-quotes.txt";
+    private static final String DAMARA_QUOTES = "./quotes/damara-quotes.txt";
+    private static final String DAVE_QUOTES = "./quotes/dave-quotes.txt";
+    private static final String DAVESPRITE_QUOTES = "./quotes/davesprite-quotes.txt";
+    private static final String DRAGONSPRITE_QUOTES = "./quotes/dragonsprite-quotes.txt";
+    private static final String EQUIUS_QUOTES = "./quotes/equius-quotes.txt";
+    private static final String ERIDAN_QUOTES = "./quotes/eridan-quotes.txt";
+    private static final String ERISOL_QUOTES = "./quotes/erisolsprite-quotes.txt";
+    private static final String FEFERI_QUOTES = "./quotes/feferi-quotes.txt";
+    private static final String FEFETA_QUOTES = "./quotes/fefetasprite-quotes.txt";
+    private static final String GAMZEE_QUOTES = "./quotes/gamzee-quotes.txt";
+    private static final String HORUSS_QUOTES = "./quotes/horuss-quotes.txt";
+    private static final String JADE_QUOTES = "./quotes/jade-quotes.txt";
+    private static final String JADESPRITE_QUOTES = "./quotes/jadesprite-quotes.txt";
+    private static final String JAKE_QUOTES = "./quotes/jake-quotes.txt";
+    private static final String JASPER_QUOTES = "./quotes/jaspersprite-quotes.txt";
+    private static final String JOHN_QUOTES = "./quotes/john-quotes.txt";
+    private static final String KANAYA_QUOTES = "./quotes/kanaya-quotes.txt";
+    private static final String KANKRI_QUOTES = "./quotes/kankri-quotes.txt";
+    private static final String KARKAT_QUOTES = "./quotes/karkat-quotes.txt";
+    private static final String KURLOZ_QUOTES = "./quotes/kurloz-quotes.txt";
+    private static final String LATULA_QUOTES = "./quotes/latula-quotes.txt";
+    private static final String MEENAH_QUOTES = "./quotes/meenah-quotes.txt";
+    private static final String MEULIN_QUOTES = "./quotes/meulin-quotes.txt";
+    private static final String MITUNA_QUOTES = "./quotes/mituna-quotes.txt";
+    private static final String NANNA_QUOTES = "./quotes/nannasprite-quotes.txt";
+    private static final String NEPETA_QUOTES = "./quotes/nepeta-quotes.txt";
+    private static final String PORRIM_QUOTES = "./quotes/porrim-quotes.txt";
+    private static final String RUFIOH_QUOTES = "./quotes/rufioh-quotes.txt";
+    private static final String SOLLUX_QUOTES = "./quotes/sollux-quotes.txt";
+    private static final String TAVROS_QUOTES = "./quotes/tavros-quotes.txt";
+    private static final String TEREZI_QUOTES = "./quotes/terezi-quotes.txt";
+    private static final String VRISKA_QUOTES = "./quotes/vriska-quotes.txt";
+    private static final String ANDREW_QUOTES = "./quotes/andrew-quotes.txt";
+    private static final String DOC_QUOTES = "./quotes/doc-quotes.txt";
+    private static final String VER = "0.9.1.4";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
     private boolean req = false;
@@ -442,6 +482,29 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "serving " + input + " t0 everyone");
             }
             
+        //Quote Command
+        } else if (message.equalsIgnoreCase("$quote")) {
+				sendMessage(channel, "please specify a character " + sender);
+        } else if (message.startsWith("$quote ")) {
+            String input = message.substring(7);
+            if (input.equals("")){
+				sendMessage(channel, "please specify a character " + sender);
+            } else if (!input.contains(" ")){
+				try {
+					sendMessage(channel, getRandQuote(input));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+            } else {
+            	String[] in = input.split(" ");
+            	int num = Integer.parseInt(in[1]);
+                try {
+					sendMessage(channel, getQuote(in[0], num));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+            }
+            
         //Request ON|OFF
         } else if (message.equalsIgnoreCase("$reqon")) {
             if (channel.equalsIgnoreCase("#ircstuck")) {
@@ -587,23 +650,1168 @@ public class IRCBot extends PircBot implements Runnable {
 	}
 	
 	//Get a random quote from character
-	public String randomQuote(String c, int num) throws IOException {
+	@SuppressWarnings("resource")
+	public String getQuote(String c, int num) throws IOException {
 		String quote = "";
 		if (c.equalsIgnoreCase("jade")) {
 			int lines = countLines(JADE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JADE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = "GG: " + br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("dave")) {
+			int lines = countLines(DAVE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DAVE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = "TG: " + br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("aradia")) {
+			int lines = countLines(ARADIA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ARADIA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("aranea")) {
+			int lines = countLines(ARANEA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ARANEA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("arquius") || c.equalsIgnoreCase("arquiusprite")) {
+			int lines = countLines(ARQUIUS_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ARQUIUS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("calliborn")) {
+			int lines = countLines(CALLIBORN_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(CALLIBORN_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("calliope")) {
+			int lines = countLines(CALLIOPE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(CALLIOPE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("calsprite") || c.equalsIgnoreCase("cal")) {
+			int lines = countLines(CALSPRITE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(CALSPRITE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("cronus")) {
+			int lines = countLines(CRONUS_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(CRONUS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("damara")) {
+			int lines = countLines(DAMARA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DAMARA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("davesprite")) {
+			int lines = countLines(DAVESPRITE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DAVESPRITE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("dragon") || c.equalsIgnoreCase("dragonsprite")) {
+			int lines = countLines(DRAGONSPRITE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DRAGONSPRITE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("equius")) {
+			int lines = countLines(EQUIUS_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(EQUIUS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("eridan")) {
+			int lines = countLines(ERIDAN_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ERIDAN_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("erisol") || c.equalsIgnoreCase("erisolsprite")) {
+			int lines = countLines(ERISOL_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ERISOL_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("feferi")) {
+			int lines = countLines(FEFERI_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(FEFERI_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("fefeta") || c.equalsIgnoreCase("fefetasprite")) {
+			int lines = countLines(FEFETA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(FEFETA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("gamzee")) {
+			int lines = countLines(GAMZEE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(GAMZEE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("horuss")) {
+			int lines = countLines(HORUSS_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(HORUSS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("jake")) {
+			int lines = countLines(JAKE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JAKE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("jasper") || c.equalsIgnoreCase("jaspersprite") || c.equalsIgnoreCase("jaspers")) {
+			int lines = countLines(JASPER_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JASPER_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("john")) {
+			int lines = countLines(JOHN_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JOHN_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("kanaya")) {
+			int lines = countLines(KANAYA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(KANAYA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("kankri")) {
+			int lines = countLines(KANKRI_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(KANKRI_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("karkat")) {
+			int lines = countLines(KARKAT_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(KARKAT_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("kurloz")) {
+			int lines = countLines(KURLOZ_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(KURLOZ_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("latula")) {
+			int lines = countLines(LATULA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(LATULA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("meenah")) {
+			int lines = countLines(MEENAH_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(MEENAH_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("meulin")) {
+			int lines = countLines(MEULIN_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(MEULIN_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("mituna")) {
+			int lines = countLines(MITUNA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(MITUNA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("nanna") || c.equalsIgnoreCase("nannasprite")) {
+			int lines = countLines(NANNA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(NANNA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("nepeta")) {
+			int lines = countLines(NEPETA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(NEPETA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("porrim")) {
+			int lines = countLines(PORRIM_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(PORRIM_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("rufioh")) {
+			int lines = countLines(RUFIOH_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(RUFIOH_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("sollux")) {
+			int lines = countLines(SOLLUX_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(SOLLUX_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("tavros")) {
+			int lines = countLines(TAVROS_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(TAVROS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("terezi")) {
+			int lines = countLines(TEREZI_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(TEREZI_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("vriska")) {
+			int lines = countLines(VRISKA_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(VRISKA_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("doc") || c.equalsIgnoreCase("doc scratch")) {
+			int lines = countLines(DOC_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DOC_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("andrew") || c.equalsIgnoreCase("andrew hussie") || c.equalsIgnoreCase("hussie")) {
+			int lines = countLines(ANDREW_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ANDREW_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("jadesprite")) {
+			int lines = countLines(JADESPRITE_QUOTES);
+				if (num > lines) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JADESPRITE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		return Colors.TEAL + Colors.BOLD + "Quote #" + (num+1) + " - " + Colors.NORMAL + quote;
+	}
+	
+	@SuppressWarnings("resource")
+	public String getRandQuote(String c) throws IOException {
+		String quote = "";
+		int quoteNum = 0;
+		if (c.equalsIgnoreCase("jade")) {
+			int lines = countLines(JADE_QUOTES);
 			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
 			try {
 				FileInputStream fs= new FileInputStream(JADE_QUOTES);
 				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-				for(int i = 0; i < num-1; ++i)
+				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
-				quote = Colors.GREEN + "GG: " + br.readLine();
+				quote = "GG: " + br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("dave")) {
+			int lines = countLines(DAVE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DAVE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = "TG: " + br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("aradia")) {
+			int lines = countLines(ARADIA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ARADIA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("aranea")) {
+			int lines = countLines(ARANEA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ARANEA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("arquius") || c.equalsIgnoreCase("arquiusprite")) {
+			int lines = countLines(ARQUIUS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ARQUIUS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("calliborn")) {
+			int lines = countLines(CALLIBORN_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(CALLIBORN_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("calliope")) {
+			int lines = countLines(CALLIOPE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(CALLIOPE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("calsprite") || c.equalsIgnoreCase("cal")) {
+			int lines = countLines(CALSPRITE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(CALSPRITE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("cronus")) {
+			int lines = countLines(CRONUS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(CRONUS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("damara")) {
+			int lines = countLines(DAMARA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DAMARA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("davesprite")) {
+			int lines = countLines(DAVESPRITE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DAVESPRITE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("dragon") || c.equalsIgnoreCase("dragonsprite")) {
+			int lines = countLines(DRAGONSPRITE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DRAGONSPRITE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("equius")) {
+			int lines = countLines(EQUIUS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(EQUIUS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("eridan")) {
+			int lines = countLines(ERIDAN_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ERIDAN_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("erisol") || c.equalsIgnoreCase("erisolsprite")) {
+			int lines = countLines(ERISOL_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ERISOL_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("feferi")) {
+			int lines = countLines(FEFERI_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(FEFERI_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("fefeta") || c.equalsIgnoreCase("fefetasprite")) {
+			int lines = countLines(FEFETA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(FEFETA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("gamzee")) {
+			int lines = countLines(GAMZEE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(GAMZEE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("horuss")) {
+			int lines = countLines(HORUSS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(HORUSS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("jake")) {
+			int lines = countLines(JAKE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(JAKE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("jasper") || c.equalsIgnoreCase("jaspersprite") || c.equalsIgnoreCase("jaspers")) {
+			int lines = countLines(JASPER_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(JASPER_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("john")) {
+			int lines = countLines(JOHN_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(JOHN_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("kanaya")) {
+			int lines = countLines(KANAYA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(KANAYA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("kankri")) {
+			int lines = countLines(KANKRI_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(KANKRI_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("karkat")) {
+			int lines = countLines(KARKAT_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(KARKAT_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("kurloz")) {
+			int lines = countLines(KURLOZ_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(KURLOZ_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("latula")) {
+			int lines = countLines(LATULA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(LATULA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("meenah")) {
+			int lines = countLines(MEENAH_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(MEENAH_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("meulin")) {
+			int lines = countLines(MEULIN_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(MEULIN_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("mituna")) {
+			int lines = countLines(MITUNA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(MITUNA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("nanna") || c.equalsIgnoreCase("nannasprite")) {
+			int lines = countLines(NANNA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(NANNA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("nepeta")) {
+			int lines = countLines(NEPETA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(NEPETA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("porrim")) {
+			int lines = countLines(PORRIM_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(PORRIM_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("rufioh")) {
+			int lines = countLines(RUFIOH_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(RUFIOH_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("sollux")) {
+			int lines = countLines(SOLLUX_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(SOLLUX_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("tavros")) {
+			int lines = countLines(TAVROS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(TAVROS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("terezi")) {
+			int lines = countLines(TEREZI_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(TEREZI_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("vriska")) {
+			int lines = countLines(VRISKA_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(VRISKA_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("doc") || c.equalsIgnoreCase("doc scratch")) {
+			int lines = countLines(DOC_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DOC_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("andrew") || c.equalsIgnoreCase("andrew hussie") || c.equalsIgnoreCase("hussie")) {
+			int lines = countLines(ANDREW_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ANDREW_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("jadesprite")) {
+			int lines = countLines(JADESPRITE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(JADESPRITE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		
-		return quote;
+			
+		return Colors.TEAL + Colors.BOLD + "Quote #" + (quoteNum+1) + " - " + Colors.NORMAL + quote;
 	}
     
     //Write user input to file
