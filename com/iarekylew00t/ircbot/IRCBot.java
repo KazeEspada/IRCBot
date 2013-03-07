@@ -15,6 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
+    private static final String VER = "0.9.1.9-beta2";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -22,7 +23,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
     private static final String ARANEA_QUOTES = "./quotes/aranea-quotes.txt";
     private static final String ARQUIUS_QUOTES = "./quotes/arquiusprite-quotes.txt";
-    private static final String CALLIBORN_QUOTES = "./quotes/calliborn-quotes.txt";
+    private static final String CALIBORN_QUOTES = "./quotes/caliborn-quotes.txt";
     private static final String CALLIOPE_QUOTES = "./quotes/calliope-quotes.txt";
     private static final String CALSPRITE_QUOTES = "./quotes/calsprite-quotes.txt";
     private static final String CRONUS_QUOTES = "./quotes/cronus-quotes.txt";
@@ -59,8 +60,12 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String TEREZI_QUOTES = "./quotes/terezi-quotes.txt";
     private static final String VRISKA_QUOTES = "./quotes/vriska-quotes.txt";
     private static final String ANDREW_QUOTES = "./quotes/andrew-quotes.txt";
+    private static final String SQUAREWAVE_QUOTES = "./quotes/squarewave-quotes.txt";
     private static final String DOC_QUOTES = "./quotes/doc-quotes.txt";
-    private static final String VER = "0.9.1.4";
+    private static final String ROSE_QUOTES = "./quotes/rose-quotes.txt";
+    private static final String ROXY_QUOTES = "./quotes/roxy-quotes.txt";
+    private static final String DIRK_QUOTES = "./quotes/dirk-quotes.txt";
+    private static final String JANE_QUOTES = "./quotes/jane-quotes.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
     private boolean req = false;
@@ -655,7 +660,7 @@ public class IRCBot extends PircBot implements Runnable {
 		String quote = "";
 		if (c.equalsIgnoreCase("jade")) {
 			int lines = countLines(JADE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num <= 0) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -663,14 +668,14 @@ public class IRCBot extends PircBot implements Runnable {
 						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
-						quote = "GG: " + br.readLine();
+						quote = br.readLine();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			} else if (c.equalsIgnoreCase("dave")) {
 			int lines = countLines(DAVE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -678,14 +683,74 @@ public class IRCBot extends PircBot implements Runnable {
 						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
-						quote = "TG: " + br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("dirk")) {
+			int lines = countLines(DIRK_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(DIRK_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("rose")) {
+			int lines = countLines(ROSE_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ROSE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("roxy")) {
+			int lines = countLines(ROXY_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(ROXY_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else if (c.equalsIgnoreCase("jane")) {
+			int lines = countLines(JANE_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(JANE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			} else if (c.equalsIgnoreCase("aradia")) {
 			int lines = countLines(ARADIA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -700,7 +765,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("aranea")) {
 			int lines = countLines(ARANEA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -715,7 +780,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("arquius") || c.equalsIgnoreCase("arquiusprite")) {
 			int lines = countLines(ARQUIUS_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -728,13 +793,13 @@ public class IRCBot extends PircBot implements Runnable {
 						e.printStackTrace();
 					}
 				}
-			} else if (c.equalsIgnoreCase("calliborn")) {
-			int lines = countLines(CALLIBORN_QUOTES);
-				if (num > lines) {
+			} else if (c.equalsIgnoreCase("caliborn")) {
+			int lines = countLines(CALIBORN_QUOTES);
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
-						FileInputStream fs= new FileInputStream(CALLIBORN_QUOTES);
+						FileInputStream fs= new FileInputStream(CALIBORN_QUOTES);
 						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
@@ -745,7 +810,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("calliope")) {
 			int lines = countLines(CALLIOPE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -760,7 +825,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("calsprite") || c.equalsIgnoreCase("cal")) {
 			int lines = countLines(CALSPRITE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -775,7 +840,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("cronus")) {
 			int lines = countLines(CRONUS_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -790,7 +855,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("damara")) {
 			int lines = countLines(DAMARA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -805,7 +870,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("davesprite")) {
 			int lines = countLines(DAVESPRITE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -820,7 +885,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("dragon") || c.equalsIgnoreCase("dragonsprite")) {
 			int lines = countLines(DRAGONSPRITE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -835,7 +900,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("equius")) {
 			int lines = countLines(EQUIUS_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -850,7 +915,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("eridan")) {
 			int lines = countLines(ERIDAN_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -865,7 +930,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("erisol") || c.equalsIgnoreCase("erisolsprite")) {
 			int lines = countLines(ERISOL_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -880,7 +945,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("feferi")) {
 			int lines = countLines(FEFERI_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -895,7 +960,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("fefeta") || c.equalsIgnoreCase("fefetasprite")) {
 			int lines = countLines(FEFETA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -910,7 +975,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("gamzee")) {
 			int lines = countLines(GAMZEE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -925,7 +990,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("horuss")) {
 			int lines = countLines(HORUSS_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -940,7 +1005,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("jake")) {
 			int lines = countLines(JAKE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -955,7 +1020,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("jasper") || c.equalsIgnoreCase("jaspersprite") || c.equalsIgnoreCase("jaspers")) {
 			int lines = countLines(JASPER_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -970,7 +1035,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("john")) {
 			int lines = countLines(JOHN_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -985,7 +1050,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("kanaya")) {
 			int lines = countLines(KANAYA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1000,7 +1065,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("kankri")) {
 			int lines = countLines(KANKRI_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1015,7 +1080,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("karkat")) {
 			int lines = countLines(KARKAT_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1030,7 +1095,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("kurloz")) {
 			int lines = countLines(KURLOZ_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1045,7 +1110,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("latula")) {
 			int lines = countLines(LATULA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1060,7 +1125,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("meenah")) {
 			int lines = countLines(MEENAH_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1075,7 +1140,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("meulin")) {
 			int lines = countLines(MEULIN_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1090,7 +1155,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("mituna")) {
 			int lines = countLines(MITUNA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1105,7 +1170,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("nanna") || c.equalsIgnoreCase("nannasprite")) {
 			int lines = countLines(NANNA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1120,7 +1185,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("nepeta")) {
 			int lines = countLines(NEPETA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1135,7 +1200,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("porrim")) {
 			int lines = countLines(PORRIM_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1150,7 +1215,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("rufioh")) {
 			int lines = countLines(RUFIOH_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1165,7 +1230,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("sollux")) {
 			int lines = countLines(SOLLUX_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1180,7 +1245,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("tavros")) {
 			int lines = countLines(TAVROS_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1195,7 +1260,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("terezi")) {
 			int lines = countLines(TEREZI_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1210,7 +1275,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("vriska")) {
 			int lines = countLines(VRISKA_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1225,7 +1290,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("doc") || c.equalsIgnoreCase("doc scratch")) {
 			int lines = countLines(DOC_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1240,7 +1305,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("andrew") || c.equalsIgnoreCase("andrew hussie") || c.equalsIgnoreCase("hussie")) {
 			int lines = countLines(ANDREW_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1255,7 +1320,7 @@ public class IRCBot extends PircBot implements Runnable {
 				}
 			} else if (c.equalsIgnoreCase("jadesprite")) {
 			int lines = countLines(JADESPRITE_QUOTES);
-				if (num > lines) {
+				if (num > lines || num < 1) {
 					quote = "please enter a number between 1-" + lines;
 				} else {
 					try {
@@ -1268,8 +1333,25 @@ public class IRCBot extends PircBot implements Runnable {
 						e.printStackTrace();
 					}
 				}
+			} else if (c.equalsIgnoreCase("squarewave")) {
+			int lines = countLines(SQUAREWAVE_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(SQUAREWAVE_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			} else {
+                return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 			}
-		return Colors.TEAL + Colors.BOLD + "Quote #" + (num+1) + " - " + Colors.NORMAL + quote;
+		return Colors.TEAL + Colors.BOLD + "Quote #" + (num) + " - " + Colors.NORMAL + quote;
 	}
 	
 	@SuppressWarnings("resource")
@@ -1285,7 +1367,7 @@ public class IRCBot extends PircBot implements Runnable {
 				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
-				quote = "GG: " + br.readLine();
+				quote = br.readLine();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1298,7 +1380,59 @@ public class IRCBot extends PircBot implements Runnable {
 				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
-				quote = "TG: " + br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("rose")) {
+			int lines = countLines(ROSE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ROSE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("dirk")) {
+			int lines = countLines(DIRK_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(DIRK_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("roxy")) {
+			int lines = countLines(ROXY_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(ROXY_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote =  br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (c.equalsIgnoreCase("jane")) {
+			int lines = countLines(JANE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(JANE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1341,12 +1475,12 @@ public class IRCBot extends PircBot implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else if (c.equalsIgnoreCase("calliborn")) {
-			int lines = countLines(CALLIBORN_QUOTES);
+		} else if (c.equalsIgnoreCase("caliborn")) {
+			int lines = countLines(CALIBORN_QUOTES);
 			int randNum = new Random().nextInt(lines);
 			quoteNum = randNum;
 			try {
-				FileInputStream fs= new FileInputStream(CALLIBORN_QUOTES);
+				FileInputStream fs= new FileInputStream(CALIBORN_QUOTES);
 				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
@@ -1809,6 +1943,21 @@ public class IRCBot extends PircBot implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else if (c.equalsIgnoreCase("squarewave")) {
+			int lines = countLines(SQUAREWAVE_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(SQUAREWAVE_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 		}
 			
 		return Colors.TEAL + Colors.BOLD + "Quote #" + (quoteNum+1) + " - " + Colors.NORMAL + quote;
