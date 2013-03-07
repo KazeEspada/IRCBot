@@ -66,6 +66,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String ROXY_QUOTES = "./quotes/roxy-quotes.txt";
     private static final String DIRK_QUOTES = "./quotes/dirk-quotes.txt";
     private static final String JANE_QUOTES = "./quotes/jane-quotes.txt";
+    private static final String HIC_QUOTES = "./quotes/hic-quotes.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private String curChan;
     private boolean req = false;
@@ -1348,6 +1349,21 @@ public class IRCBot extends PircBot implements Runnable {
 						e.printStackTrace();
 					}
 				}
+			} else if (c.equalsIgnoreCase("hic") || c.equalsIgnoreCase(")(ic")) {
+			int lines = countLines(HIC_QUOTES);
+				if (num > lines || num < 1) {
+					quote = "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(HIC_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			} else {
                 return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 			}
@@ -1956,6 +1972,19 @@ public class IRCBot extends PircBot implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else if (c.equalsIgnoreCase("hic") || c.equalsIgnoreCase(")(ic")) {
+			int lines = countLines(HIC_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(HIC_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 		}
@@ -2085,12 +2114,11 @@ public class IRCBot extends PircBot implements Runnable {
 		try {
 			fs = new FileInputStream(CUR_SONG);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-            br.readLine();
             curSong = br.readLine();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return trimString(curSong);
+		return curSong;
     }
     
     //Check if a file exists
