@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.14-beta1";
+    private static final String VER = "0.9.1.14-beta2";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -597,6 +597,12 @@ public class IRCBot extends PircBot implements Runnable {
 	                	} else {
 	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
 	                	}
+                	} else {
+                        sendMessage(channel, "y0u have already v0ted " + sender);
+                	}
+                } else if (openVote == true && (!in[0].equalsIgnoreCase("yes") || !in[0].equalsIgnoreCase("y") || !in[0].equalsIgnoreCase("no") || !in[0].equalsIgnoreCase("n"))){
+                	if (voterList.contains(sender) == false) {
+	                		sendMessage(channel, "please v0te either yes 0r n0 " + sender);	
                 	} else {
                         sendMessage(channel, "y0u have already v0ted " + sender);
                 	}
