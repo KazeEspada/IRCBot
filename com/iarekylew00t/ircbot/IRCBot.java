@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.13";
+    private static final String VER = "0.9.1.14-beta1";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -72,6 +72,7 @@ public class IRCBot extends PircBot implements Runnable {
     private boolean req = false;
     private boolean openVote = false;
     private int voteYes, voteNo = 0;
+    List<String> voterList = new ArrayList<String>();
 	private static int latestPage;
     private static boolean isUpdate = false;
     
@@ -534,7 +535,6 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, "y0u d0 n0t have permissi0n t0 d0 that " + sender);
         	}
         } else if (message.startsWith("$vote ")) {
-            List<String> voters = new ArrayList<String>();
             String input = message.substring(6);
             if (input.equals("")){
             	if (openVote == false)
@@ -577,10 +577,10 @@ public class IRCBot extends PircBot implements Runnable {
             			sendMessage(channel, "y0ure n0t all0wed t0 d0 that " + sender);
                 	}
                 } else if (in[0].equalsIgnoreCase("yes") || in[0].equalsIgnoreCase("y")) {
-                	if (voters.contains(sender) == false) {
+                	if (voterList.contains(sender) == false) {
 	                	if (openVote == true) {
 	                		voteYes++;
-	                		voters.add(sender);
+	                		voterList.add(sender);
 	                        sendMessage(channel, voteYes + "/" + voteNo);
 	                	} else {
 	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
@@ -589,10 +589,10 @@ public class IRCBot extends PircBot implements Runnable {
                         sendMessage(channel, "y0u have already v0ted " + sender);
                 	}
                 } else if (in[0].equalsIgnoreCase("no") || in[0].equalsIgnoreCase("n")) {
-                	if (voters.contains(sender) == false) {
+                	if (voterList.contains(sender) == false) {
 	                	if (openVote == true) {
 	                		voteNo++;
-	                		voters.add(sender);
+	                		voterList.add(sender);
 	                        sendMessage(channel, voteYes + "/" + voteNo);
 	                	} else {
 	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
