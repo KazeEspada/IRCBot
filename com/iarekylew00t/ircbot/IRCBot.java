@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.14-beta2";
+    private static final String VER = "0.9.1.27";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -67,7 +67,10 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String DIRK_QUOTES = "./quotes/dirk-quotes.txt";
     private static final String JANE_QUOTES = "./quotes/jane-quotes.txt";
     private static final String HIC_QUOTES = "./quotes/hic-quotes.txt";
+    private static final String TAVRIS_QUOTES = "./quotes/tavrisprite-quotes.txt";
+    private static final String REQ_FILE = "songs.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
+    private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4", "#hs_rp", "#hs_nsfw","#ircstuck"};
     private String curChan, voteTitle = "";
     private boolean req = false;
     private boolean openVote = false;
@@ -135,7 +138,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, kill, lmtyahs, marco, mspa, mspawiki, pap, ping, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -170,6 +173,10 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$songlist")) {
             sendMessage(channel, sender + ": http://goo.gl/0xJtz");
         
+        //IRC Command
+        } else if (message.equalsIgnoreCase("$irc")) {
+            sendMessage(channel, sender + ": http://goo.gl/dIfQu");
+            
         //MSPA Page Command
         } else if (message.equalsIgnoreCase("$mspa")) {
             sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
@@ -180,11 +187,15 @@ public class IRCBot extends PircBot implements Runnable {
             
         //FAQ
         } else if (message.equalsIgnoreCase("$faq")) {
-            sendMessage(channel, sender + ": http://goo.gl/53qWN/");
+            sendMessage(channel, sender + ": http://goo.gl/53qWN");
             
         //Submit
         } else if (message.equalsIgnoreCase("$submit")) {
             sendMessage(channel, sender + ": http://goo.gl/dhvwC");
+            
+        //Playflute
+        } else if (message.equalsIgnoreCase("$playflute")) {
+            sendMessage(channel, "have fun " + sender + ": http://goo.gl/LpK89");
             
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
@@ -199,7 +210,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Weather
         } else if (message.equalsIgnoreCase("$weather") || message.equalsIgnoreCase("$we")) {
-            sendMessage(channel, "please give me s0mething t0 predict " + sender);
+            sendMessage(channel, "please enter a zipc0de " + sender);
         } else if (message.startsWith("$weather ")) {
             String input = message.substring(9);
             if (input.equals("")){
@@ -363,23 +374,23 @@ public class IRCBot extends PircBot implements Runnable {
                 sendMessage(channel, sender + ": " + input + ".tumblr.com");
             }
             
-        //Shout
-        } else if (message.equalsIgnoreCase("$shout")) {
+        //Talk as Aradiabot
+        } else if (message.equalsIgnoreCase("$talk")) {
             if (channel.equalsIgnoreCase("#hs_admin")) {
                 if (checkOp(sender) == true) {
-                    sendMessage(channel, "$shout <channel> <msg>");
+                    sendMessage(channel, "$talk <channel> <msg>");
                 } else {
                     sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
                 }
             } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that here");
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             }
-        } else if (message.startsWith("$shout ")) {
+        } else if (message.startsWith("$talk ")) {
             if (channel.equalsIgnoreCase("#hs_admin")) {
                 if (checkOp(sender) == true) {
-                    String input = message.substring(7);
+                    String input = message.substring(6);
                     if (input.equals("")){
-                        sendMessage(channel, "$shout <channel> <msg>");
+                        sendMessage(channel, "$talk <channel> <msg>");
                     } else {
                         String[] in = input.split(" ");
                         String argChan, sentence = "";
@@ -395,7 +406,7 @@ public class IRCBot extends PircBot implements Runnable {
                     sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
                 }
             } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that here");
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             }
             
         //Current Song
@@ -529,25 +540,29 @@ public class IRCBot extends PircBot implements Runnable {
 
         //Vote Command
         } else if (message.equalsIgnoreCase("$vote")) {
-        	if (checkOp(sender) == true) {
+        	if (checkOp(sender) == true || checkVoice(sender) == true) {
             sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
-        	} else {
+        	} else  if (openVote == false){
                 sendMessage(channel, "y0u d0 n0t have permissi0n t0 d0 that " + sender);
+        	} else {
+                sendMessage(channel, "please v0te yes 0r n0 " + sender);
         	}
         } else if (message.startsWith("$vote ")) {
             String input = message.substring(6);
             if (input.equals("")){
-            	if (openVote == false)
-            		if (checkOp(sender) == true)
+            	if (openVote == false) {
+            		if (checkOp(sender) == true || checkVoice(sender) == true) {
             			sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
-            		else
+            		} else {
             			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
-            	else
+            		}
+            	} else {
                     sendMessage(channel, "please v0te yes 0r n0 " + sender);
+            	}
             } else {
                 String[] in = input.split(" ");
                 if (in[0].equalsIgnoreCase("open")) {
-                	if (checkOp(sender) == true) {
+                	if (checkOp(sender) == true || checkVoice(sender) == true) {
 	                	if (openVote == true) {
 	                        sendMessage(channel, "there is already a p0ll 0pen " + sender);
 	                	} else {
@@ -562,7 +577,7 @@ public class IRCBot extends PircBot implements Runnable {
             			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
                 	}
                 } else if (in[0].equalsIgnoreCase("close")) {
-                	if (checkOp(sender) == true) {
+                	if (checkOp(sender) == true || checkVoice(sender) == true) {
 	                	if (openVote == false) {
 	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
 	                	} else {
@@ -571,6 +586,7 @@ public class IRCBot extends PircBot implements Runnable {
 		                    sendMessage(channel, "the results were: " + voteYes + "/" + voteNo);
 	                		voteYes = 0;
 	                		voteNo = 0;
+	                		voterList.clear();
 	                		voteTitle = "";
 	                	}
                 	} else {
@@ -632,6 +648,40 @@ public class IRCBot extends PircBot implements Runnable {
 				}
             }
             
+        //Page Command
+        } else if (message.equalsIgnoreCase("$page")) {
+				sendMessage(channel, sender + ": " + getRandPage());
+        } else if (message.startsWith("$page ")) {
+            String input = message.substring(6);
+            if (input.equals("")){
+				sendMessage(channel, sender + ": " + getRandPage());
+            } else {
+            	int pageNum = Integer.parseInt(input);
+					sendMessage(channel, sender + ": " + getPage(pageNum));
+            }
+       
+        //Shout Command
+        } else if (message.equalsIgnoreCase("$shout")) {
+            if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else if (checkOp(sender) == false) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else {
+                sendMessage(channel, "please use: $shout <message>");
+            }
+        } else if (message.startsWith("$shout ")) {
+            if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else if (checkOp(sender) == false) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else {
+            	String input = message.substring(7);
+                req = true;
+                for (int i = 0; i < chanList.length; i++) {
+                	sendMessage(chanList[i], Colors.BOLD + Colors.RED + input);
+                }
+            }
+            
         //Request ON|OFF
         } else if (message.equalsIgnoreCase("$reqon")) {
             if (channel.equalsIgnoreCase("#ircstuck")) {
@@ -639,11 +689,9 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 if (checkOp(sender) == true) {
                     req = true;
-                    sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                    sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                    sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                    sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
-                    sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    for (int i = 0; i < chanList.length; i++) {
+                    sendMessage(chanList[i], Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    }
                 } else {
                     sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
                 }
@@ -654,11 +702,9 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
 	            if (checkOp(sender) == true) {
 	                req = false;
-	                sendMessage("#hs_admin", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-	                sendMessage("#hs_radio", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-	                sendMessage("#hs_rp", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-	                sendMessage("#hs_nsfw", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
-	                sendMessage("#ircstuck", Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                    for (int i = 0; i < chanList.length; i++) {
+                    sendMessage(chanList[i], Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                    }
 	            } else {
 	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
 	            }
@@ -673,12 +719,20 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.startsWith("$req ")) {
             String input = message.substring(5);
             if (req == true) {
-                if (input.equals("")){
-                    sendMessage(channel, "please specify a s0ng name " + sender);
-                } else {
-                    sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-                    writeToFile(SONG_LIST, sender, input);
-                }
+            	try {
+					if (countReq(sender) < 3) {
+					    if (input.equals("")){
+					        sendMessage(channel, "please specify a s0ng name " + sender);
+					    } else {
+					        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
+					        writeToFile(SONG_LIST, sender, input);
+					    }
+					} else {
+				        sendMessage(channel, "y0u have already made 3 requests " + sender);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
             } else {
                 sendMessage(channel, "requests are currently cl0sed " + sender);
             }
@@ -762,6 +816,28 @@ public class IRCBot extends PircBot implements Runnable {
             // If it doesn't work, no great loss!
         }
     }
+
+    //Returns a Random page in Homestuck
+    public String getRandPage() {
+    	int pageNum = getLatestPageNum();
+		int randNum = new Random().nextInt(pageNum-1900);
+		while (randNum == 4299 || randNum == 4938 || randNum == 4988) {
+			randNum = new Random().nextInt(pageNum);
+		}
+    	return "http://www.mspaintadventures.com/?s=6&p=00" + (1900 + randNum);
+    }
+    
+    //Returns a specific page in Homestuck
+    public String getPage(int page) {
+    	int pageNum = getLatestPageNum();
+    	if (page > latestPage || page <= 0) {
+    		return "please enter a number fr0m 1-" + (pageNum-1900);
+    	} else if (page == 4299 || page == 4938 || page == 4988) {
+    		return "that page d0es n0t exist";
+    	}
+    	
+    	return "http://www.mspaintadventures.com/?s=6&p=00" + (1900 + page);
+    }
     
     //Count number of lines in a file
 	public static int countLines(String filename) throws IOException {
@@ -775,6 +851,21 @@ public class IRCBot extends PircBot implements Runnable {
 		reader.close();
 		return cnt;
 	}
+    
+    //Count Number of times a Users name is in a File
+	public int countReq(String snd) throws IOException {
+		String line;
+        int count = 0;
+		BufferedReader br = new BufferedReader(new FileReader(REQ_FILE));
+        while ((line = br.readLine()) != null) {
+			if (line.startsWith(snd + ":")) {
+				count++;
+			}
+		}
+		br.close();
+		
+		return count;
+    }
 	
 	//Get a random quote from character
 	@SuppressWarnings("resource")
@@ -1485,6 +1576,21 @@ public class IRCBot extends PircBot implements Runnable {
 						e.printStackTrace();
 					}
 				}
+			} else if (c.equalsIgnoreCase("tavris") || c.equalsIgnoreCase("tavrisprite")) {
+			int lines = countLines(TAVRIS_QUOTES);
+				if (num > lines || num < 1) {
+					return "please enter a number between 1-" + lines;
+				} else {
+					try {
+						FileInputStream fs= new FileInputStream(TAVRIS_QUOTES);
+						BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+						for(int i = 0; i < num-1; ++i)
+						  br.readLine();
+						quote = br.readLine();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			} else {
                 return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 			}
@@ -2106,6 +2212,19 @@ public class IRCBot extends PircBot implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else if (c.equalsIgnoreCase("tavris") || c.equalsIgnoreCase("tavrisprite")) {
+			int lines = countLines(TAVRIS_QUOTES);
+			int randNum = new Random().nextInt(lines);
+			quoteNum = randNum;
+			try {
+				FileInputStream fs= new FileInputStream(TAVRIS_QUOTES);
+				BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+				for(int i = 0; i < randNum; ++i)
+				  br.readLine();
+				quote = br.readLine();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
 		}
@@ -2167,7 +2286,7 @@ public class IRCBot extends PircBot implements Runnable {
         }
         
         return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " 
-        + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and is " 
+        + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and it is " 
         + Colors.BOLD + cond + Colors.NORMAL + ".";
     }
     
@@ -2227,6 +2346,32 @@ public class IRCBot extends PircBot implements Runnable {
         }
     }
     
+    //Check for page update
+    public static int getLatestPageNum() {
+    	int pageNum = 0;
+        try {
+            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
+            InputStream xml = mspaXml.openStream();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xml);
+            doc.getDocumentElement().normalize();
+            NodeList nList = doc.getElementsByTagName("item");
+            for (int temp = 0; temp < 1; temp++) {
+                Node nNode = nList.item(temp);
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode;
+                    String update = eElement.getElementsByTagName("link").item(0).getTextContent();
+                    pageNum = Integer.parseInt(update.substring(41));
+                }
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return pageNum;
+    }
+    
     //Get the Current Song
     @SuppressWarnings("resource")
 	public String getCurSong() {
@@ -2235,11 +2380,13 @@ public class IRCBot extends PircBot implements Runnable {
 		try {
 			fs = new FileInputStream(CUR_SONG);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+			br.readLine(); //Skips first line
             curSong = br.readLine();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return curSong;
+		
+		return trimString(curSong, 9);
     }
     
     //Check if a file exists
