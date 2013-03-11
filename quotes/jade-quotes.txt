@@ -2423,4 +2423,4 @@ JADE: its nice to meet you too jane
 JADE: so uh...
 JADE: jake
 JADE: where are your pants?
-JADE: <span style="color: #000000">BARK
+JADE: BARK
