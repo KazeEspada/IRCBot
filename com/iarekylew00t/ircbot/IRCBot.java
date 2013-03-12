@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.27";
+    private static final String VER = "0.9.1.29";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -71,6 +71,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String REQ_FILE = "songs.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4", "#hs_rp", "#hs_nsfw","#ircstuck"};
+    private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
     private String curChan, voteTitle = "";
     private boolean req = false;
     private boolean openVote = false;
@@ -138,7 +139,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -192,11 +193,19 @@ public class IRCBot extends PircBot implements Runnable {
         //Submit
         } else if (message.equalsIgnoreCase("$submit")) {
             sendMessage(channel, sender + ": http://goo.gl/dhvwC");
-            
+
         //Playflute
         } else if (message.equalsIgnoreCase("$playflute")) {
             sendMessage(channel, "have fun " + sender + ": http://goo.gl/LpK89");
             
+        //Gotta go fast
+        } else if (message.equalsIgnoreCase("$gottagofast")) {
+            sendMessage(channel, "g0tta g0 fastfs: http://goo.gl/P1av7");
+            
+        //Go Fast
+        } else if (message.equalsIgnoreCase("$gofast")) {
+            sendMessage(channel, goFast(fastList));
+        
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
             sendMessage(channel, "please give me s0mething t0 predict " + sender);
@@ -664,7 +673,7 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$shout")) {
             if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
                 sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else if (checkOp(sender) == false) {
+            } else if (checkOp(sender) == false || checkVoice(sender) == false) {
                 sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             } else {
                 sendMessage(channel, "please use: $shout <message>");
@@ -672,14 +681,16 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.startsWith("$shout ")) {
             if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
                 sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else if (checkOp(sender) == false) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else {
+            } else if (checkOp(sender) == true) {
             	String input = message.substring(7);
-                req = true;
                 for (int i = 0; i < chanList.length; i++) {
                 	sendMessage(chanList[i], Colors.BOLD + Colors.RED + input);
                 }
+            } else if (checkVoice(sender) == true){
+            	String input = message.substring(7);
+            	sendMessage(channel, Colors.BOLD + Colors.RED + input);
+            } else {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             }
             
         //Request ON|OFF
@@ -2254,6 +2265,12 @@ public class IRCBot extends PircBot implements Runnable {
     
     //Radomly choose 8ball outcome
     public static String getOutcome(String[] array) {
+        int rnd = new Random().nextInt(array.length);
+        return array[rnd];
+    }    
+    
+    //Radomly go fast
+    public static String goFast(String[] array) {
         int rnd = new Random().nextInt(array.length);
         return array[rnd];
     }
