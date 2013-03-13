@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.29";
+    private static final String VER = "0.9.1.40";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -69,13 +69,14 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String HIC_QUOTES = "./quotes/hic-quotes.txt";
     private static final String TAVRIS_QUOTES = "./quotes/tavrisprite-quotes.txt";
     private static final String REQ_FILE = "songs.txt";
-    private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t precit n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
+    private static final String HS_LINKS = "links.txt";
+    private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4", "#hs_rp", "#hs_nsfw","#ircstuck"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
     private String curChan, voteTitle = "";
     private boolean req = false;
     private boolean openVote = false;
-    private int voteYes, voteNo = 0;
+    private int voteYes, voteNo, curSearchPage = 0;
     List<String> voterList = new ArrayList<String>();
 	private static int latestPage;
     private static boolean isUpdate = false;
@@ -139,7 +140,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -206,6 +207,21 @@ public class IRCBot extends PircBot implements Runnable {
         } else if (message.equalsIgnoreCase("$gofast")) {
             sendMessage(channel, goFast(fastList));
         
+        //Search for a page in HS
+        } else if (message.equalsIgnoreCase("$search")) {
+            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+        } else if (message.startsWith("$search ")) {
+            String input = message.substring(8);
+            if (input.equalsIgnoreCase("next")) {
+				sendMessage(channel, getNextPage());
+            } else {
+	            try {
+					sendMessage(channel, searchPage(input));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+            }
+            
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
             sendMessage(channel, "please give me s0mething t0 predict " + sender);
@@ -342,14 +358,12 @@ public class IRCBot extends PircBot implements Runnable {
             }
             
         //Google Search
-        } else if (message.equalsIgnoreCase("$google") || message.equalsIgnoreCase("$g") || message.equalsIgnoreCase("$search")) {
+        } else if (message.equalsIgnoreCase("$google") || message.equalsIgnoreCase("$g")) {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$google ") || message.startsWith("$g ") || message.startsWith("$search ")) {
+        } else if (message.startsWith("$google ") || message.startsWith("$g ")) {
             String input = message.substring(8);
             if (message.startsWith("$g "))
             	input = message.substring(3);
-            else if (message.startsWith("$search "))
-            	input = message.substring(8);
             
             if (input.equals("")){
                 sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
@@ -701,7 +715,7 @@ public class IRCBot extends PircBot implements Runnable {
                 if (checkOp(sender) == true) {
                     req = true;
                     for (int i = 0; i < chanList.length; i++) {
-                    sendMessage(chanList[i], Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0n by " + sender);
+                    sendMessage(chanList[i], Colors.BOLD + Colors.GREEN + "requests have been turn 0n by " + sender);
                     }
                 } else {
                     sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
@@ -714,7 +728,7 @@ public class IRCBot extends PircBot implements Runnable {
 	            if (checkOp(sender) == true) {
 	                req = false;
                     for (int i = 0; i < chanList.length; i++) {
-                    sendMessage(chanList[i], Colors.BOLD + Colors.UNDERLINE + "requests have been turn 0ff by " + sender);
+                    sendMessage(chanList[i], Colors.BOLD + Colors.RED + "requests have been turn 0ff by " + sender);
                     }
 	            } else {
 	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
@@ -733,10 +747,14 @@ public class IRCBot extends PircBot implements Runnable {
             	try {
 					if (countReq(sender) < 3) {
 					    if (input.equals("")){
-					        sendMessage(channel, "please specify a s0ng name " + sender);
+					        sendMessage(channel, "please specify a s0ng " + sender);
 					    } else {
-					        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-					        writeToFile(SONG_LIST, sender, input);
+					    	if (checkReq(input) == false) {
+						        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
+						        writeToFile(SONG_LIST, sender, input);
+					    	} else {
+						        sendMessage(channel, "that s0ng has already been requested " + sender);
+					    	}
 					    }
 					} else {
 				        sendMessage(channel, "y0u have already made 3 requests " + sender);
@@ -2305,6 +2323,60 @@ public class IRCBot extends PircBot implements Runnable {
         return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " 
         + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and it is " 
         + Colors.BOLD + cond + Colors.NORMAL + ".";
+    }
+    
+    //Checks if a current song has already been requested
+    public boolean checkReq(String song) throws IOException {
+    	String line;
+		@SuppressWarnings("resource")
+		BufferedReader br = new BufferedReader(new FileReader(SONG_LIST));
+		while ((line = br.readLine()) != null) {
+			if (line.toLowerCase().contains(song.toLowerCase())) {
+				return true;
+			}
+		}
+    	return false;
+    }
+    
+    //Search for a Specific page in HS
+    public String searchPage(String search) throws IOException{
+    	String line;
+    	String[] splitLine;
+    	String searchLine = "";
+		BufferedReader br = new BufferedReader(new FileReader(HS_LINKS));
+		while ((line = br.readLine()) != null) {
+			curSearchPage++;
+			if (line.toLowerCase().contains(search)) {
+				searchLine = line;
+				break;
+			}
+		}
+		br.close();
+		if (searchLine.equalsIgnoreCase("")){
+			return "i c0uld n0t find any page with \"" + search + "\" in it";
+		} else {
+			splitLine = searchLine.split("\"");
+	    	return splitLine[1] + ": " + splitLine[0];
+		}
+    }
+    
+    //Get the next page in the Search
+    @SuppressWarnings("resource")
+	public String getNextPage() {
+    	String searchLine = "";
+    	String[] splitLine;
+		try {
+			FileInputStream fs= new FileInputStream(HS_LINKS);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+			for(int i = 0; i < curSearchPage-1; ++i)
+			  br.readLine();
+			searchLine = br.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		curSearchPage--;
+		splitLine = searchLine.split("\"");
+    	return splitLine[1] + ": " + splitLine[0];
     }
     
     //Get Latest Page from MSPA RSS Feed
