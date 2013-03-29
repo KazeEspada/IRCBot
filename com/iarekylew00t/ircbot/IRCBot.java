@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.40";
+    private static final String VER = "0.9.1.52";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -140,7 +140,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, ping, playflute, radio, req, reqoff, reqon, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -212,15 +212,16 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
         } else if (message.startsWith("$search ")) {
             String input = message.substring(8);
-            if (input.equalsIgnoreCase("next")) {
-				sendMessage(channel, getNextPage());
-            } else {
+            //if (input.equalsIgnoreCase("next")) {
+			//	sendMessage(channel, getNextPage());
+            //} else {
+            // TODO Fix NullPointerException
 	            try {
 					sendMessage(channel, searchPage(input));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-            }
+            //}
             
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
@@ -286,7 +287,29 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 sendMessage(channel, "sh00shing " + input);
             }
-            
+
+	    //Bind Command
+	    } else if (message.equalsIgnoreCase("$bind")) {
+	        sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
+	    } else if (message.startsWith("$bind ")) {
+	        String input = message.substring(6);
+	        if (input.equals("")) {
+	            sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
+	        } else {
+	            sendMessage(channel, input + " has been b0und");
+	        }
+
+	    //Pin Command
+	    } else if (message.equalsIgnoreCase("$pin")) {
+	        sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
+	    } else if (message.startsWith("$pin ")) {
+	        String input = message.substring(5);
+	        if (input.equals("")) {
+	            sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
+	        } else {
+	            sendMessage(channel, input + " has been pinned");
+	        }
+	            
         //Pap commad
         } else if (message.equalsIgnoreCase("$pap")) {
             sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
@@ -394,7 +417,7 @@ public class IRCBot extends PircBot implements Runnable {
             if (input.equals("")){
                 sendMessage(channel, "i need a name " + sender);
             } else {
-                sendMessage(channel, sender + ": " + input + ".tumblr.com");
+                sendMessage(channel, sender + ": http://" + input + ".tumblr.com");
             }
             
         //Talk as Aradiabot
@@ -2293,6 +2316,15 @@ public class IRCBot extends PircBot implements Runnable {
         return array[rnd];
     }
     
+    public String getLink(String str) {
+    	if (str.toLowerCase().contains("cherubim")) {
+    		return " | DL: http://goo.gl/zxu1y";
+    	} else if (str.toLowerCase().contains("genesis frog")) {
+    		return " | DL: http://goo.gl/RZWOy";
+    	}
+    	return " [No Link]";
+    }
+    
     
     //Gets the weather with the given zipcode
     public String getWeather(String zip) {
@@ -2346,7 +2378,7 @@ public class IRCBot extends PircBot implements Runnable {
 		BufferedReader br = new BufferedReader(new FileReader(HS_LINKS));
 		while ((line = br.readLine()) != null) {
 			curSearchPage++;
-			if (line.toLowerCase().contains(search)) {
+			if (line.toLowerCase().contains(search.toLowerCase())) {
 				searchLine = line;
 				break;
 			}
@@ -2368,7 +2400,7 @@ public class IRCBot extends PircBot implements Runnable {
 		try {
 			FileInputStream fs= new FileInputStream(HS_LINKS);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-			for(int i = 0; i < curSearchPage-1; ++i)
+			for(int i = 0; i < curSearchPage-2; ++i)
 			  br.readLine();
 			searchLine = br.readLine();
 		} catch (Exception e) {
@@ -2474,8 +2506,8 @@ public class IRCBot extends PircBot implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		return trimString(curSong, 9);
+		curSong = trimString(curSong, 9);
+		return curSong;
     }
     
     //Check if a file exists
