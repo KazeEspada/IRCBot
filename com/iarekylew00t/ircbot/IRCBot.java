@@ -9,13 +9,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+
+import java.awt.Color;
 import java.io.*;
 import java.util.Random;
 import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.52";
+    private static final String VER = "0.9.1.84";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -140,7 +142,7 @@ public class IRCBot extends PircBot implements Runnable {
             
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
       
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -708,28 +710,40 @@ public class IRCBot extends PircBot implements Runnable {
        
         //Shout Command
         } else if (message.equalsIgnoreCase("$shout")) {
-            if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else if (checkOp(sender) == false || checkVoice(sender) == false) {
+        	if (checkOp(sender) == false || checkVoice(sender) == false) {
                 sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             } else {
                 sendMessage(channel, "please use: $shout <message>");
             }
         } else if (message.startsWith("$shout ")) {
-            if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else if (checkOp(sender) == true) {
-            	String input = message.substring(7);
-                for (int i = 0; i < chanList.length; i++) {
-                	sendMessage(chanList[i], Colors.BOLD + Colors.RED + input);
-                }
-            } else if (checkVoice(sender) == true){
+        	if (checkOp(sender) || checkVoice(sender)) {
             	String input = message.substring(7);
             	sendMessage(channel, Colors.BOLD + Colors.RED + input);
             } else {
                 sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
             }
             
+        //Announce Command
+        } else if (message.equalsIgnoreCase("$announce")) {
+        	if (checkOp(sender) == false || checkVoice(sender) == false) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+        	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+                    sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else {
+                sendMessage(channel, "please use: $announce <message>");
+            }
+        } else if (message.startsWith("$announce ")) {
+        	if (checkOp(sender)) {
+            	String input = message.substring(10);
+                for (int i = 0; i < chanList.length; i++) {
+                	sendMessage(chanList[i], Colors.BOLD + Colors.RED + "ANNOUNCEMENT: " + Colors.YELLOW + input);
+                }
+        	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            } else {
+                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+            }
+            	
         //Request ON|OFF
         } else if (message.equalsIgnoreCase("$reqon")) {
             if (channel.equalsIgnoreCase("#ircstuck")) {
@@ -788,6 +802,34 @@ public class IRCBot extends PircBot implements Runnable {
             } else {
                 sendMessage(channel, "requests are currently cl0sed " + sender);
             }
+            
+        //Restart Winamp Command
+        } else if (message.startsWith("$restart")) {
+        	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
+                sendMessage(channel, Colors.BOLD + "----- RESTARTING WINAMP -----");
+        		try {
+        			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
+				} catch (IOException e) {
+	                sendMessage(channel, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
+	                sendMessage(channel, "PING IAreKyleW00t");
+					e.printStackTrace();
+				}
+        		try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+        		try {
+					Process p = Runtime.getRuntime().exec("winamp.exe");
+				} catch (IOException e) {
+	                sendMessage(channel, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
+	                sendMessage(channel, "PING IAreKyleW00t");
+					e.printStackTrace();
+				}
+                sendMessage(channel, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED -----");
+        	} else {
+                sendMessage(channel, "im s0rry, y0u d0nt have permissi0n t0 d0 that - please c0ntact a m0d 0r admin");
+        	}
         }
     }
     
@@ -2301,7 +2343,10 @@ public class IRCBot extends PircBot implements Runnable {
         if (s == null || s.length() == 0) {
             return s;
         }
-        return s.substring(0, s.length()-num);
+        s = s.substring(0, s.length()-num);
+        s = s.replaceFirst("[0-9]+. ", "");
+        s = s.replace("?/?", "/");
+        return s;
     }
     
     //Radomly choose 8ball outcome
