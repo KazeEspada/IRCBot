@@ -1,23 +1,24 @@
 package com.iarekylew00t.ircbot;
 
 import org.jibble.pircbot.*;
+
 import java.util.*;
 import java.util.regex.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-import java.awt.Color;
 import java.io.*;
 import java.util.Random;
 import java.net.URL;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.1.84";
+    private static final String VER = "0.9.2.10";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -82,6 +83,7 @@ public class IRCBot extends PircBot implements Runnable {
     List<String> voterList = new ArrayList<String>();
 	private static int latestPage;
     private static boolean isUpdate = false;
+    private static int numOfAttempts = 0;
     
     public IRCBot(String name, String password) {
         loadReminders();
@@ -139,7 +141,7 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "0kay " + sender + ", ill remind y0u ab0ut that 0n " + new Date(reminder.getDueTime()));
             reminders.add(reminder);
             dispatchThread.interrupt();
-            
+        
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
             sendMessage(channel, "8ball, announce, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
@@ -459,7 +461,18 @@ public class IRCBot extends PircBot implements Runnable {
             
         //Current Song
         } else if (message.equalsIgnoreCase("$song")) {
-            sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
+        	if (getCurSong().contains("?????")) {
+        		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
+        		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
+                try {
+					restartWinamp();
+				} catch (InterruptedException e) {
+		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+					e.printStackTrace();
+				}
+        	} else {
+        		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
+        	}
 			
 		//Latest Homestuck Page
         } else if (message.equalsIgnoreCase("$latest")) {
@@ -804,29 +817,14 @@ public class IRCBot extends PircBot implements Runnable {
             }
             
         //Restart Winamp Command
-        } else if (message.startsWith("$restart")) {
+        } else if (message.equalsIgnoreCase("$restart")) {
         	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
-                sendMessage(channel, Colors.BOLD + "----- RESTARTING WINAMP -----");
-        		try {
-        			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
-				} catch (IOException e) {
-	                sendMessage(channel, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
-	                sendMessage(channel, "PING IAreKyleW00t");
+                try {
+					restartWinamp();
+				} catch (InterruptedException e) {
+		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
 					e.printStackTrace();
 				}
-        		try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-        		try {
-					Process p = Runtime.getRuntime().exec("winamp.exe");
-				} catch (IOException e) {
-	                sendMessage(channel, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
-	                sendMessage(channel, "PING IAreKyleW00t");
-					e.printStackTrace();
-				}
-                sendMessage(channel, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED -----");
         	} else {
                 sendMessage(channel, "im s0rry, y0u d0nt have permissi0n t0 d0 that - please c0ntact a m0d 0r admin");
         	}
@@ -909,6 +907,45 @@ public class IRCBot extends PircBot implements Runnable {
         catch (Exception e) {
             // If it doesn't work, no great loss!
         }
+    }
+    
+    @SuppressWarnings("unused")
+	public void restartWinamp() throws InterruptedException {
+        sendMessage(curChan, Colors.BOLD + "----- RESTARTING WINAMP -----");
+        numOfAttempts++;
+		try {
+			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
+		} catch (IOException e) {
+			if (numOfAttempts <= 3) {
+	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp - Attempt " + numOfAttempts);
+				restartWinamp();
+			} else {
+	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
+                sendMessage(curChan, getCurOnlineStaff() + "; please n0tify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+				e.printStackTrace();
+				return;
+			}
+		}
+		pause(1500);
+		try {
+			Process p = Runtime.getRuntime().exec("winamp.exe");
+		} catch (IOException e) {
+			if (numOfAttempts <= 3) {
+	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp - Attempt " + numOfAttempts);
+				restartWinamp();
+			} else {
+	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
+                sendMessage(curChan, getCurOnlineStaff() + "; please n0tify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+				e.printStackTrace();
+				return;
+			}
+		};
+        numOfAttempts = 0;
+        sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED -----");
+    }
+    
+    private void pause(int ms) throws InterruptedException {
+    	Thread.sleep(ms);
     }
 
     //Returns a Random page in Homestuck
@@ -2606,6 +2643,24 @@ public class IRCBot extends PircBot implements Runnable {
     	   }
     	}
     	return false;
+    }
+    
+    private String getCurOnlineStaff() {
+    	User users[] = getUsers(curChan);
+    	String staff = "";
+    	boolean first = true;
+    	for (User user : users) {
+    		if (user.isOp() || user.hasVoice()) {
+    			if (first) {
+    			staff += user;
+    			first = false;
+    			} else {
+    				staff += ", " + user;
+    			}
+    		}
+    	}
+    	
+    	return staff;
     }
     
     private Thread dispatchThread;
