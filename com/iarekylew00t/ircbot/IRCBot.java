@@ -12,7 +12,6 @@ import java.net.URL;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.mail.*;
-import javax.mail.internet.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -21,7 +20,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.2.25";
+    private static final String VER = "0.9.2.50";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -87,6 +86,12 @@ public class IRCBot extends PircBot implements Runnable {
 	private static int latestPage;
     private static boolean isUpdate = false;
     private static int numOfAttempts = 0;
+    private String emailAccount = IRCBotMain.getEmail();
+    private String emailPassword = IRCBotMain.getEmailPass();
+    private GMailClient email;
+    private String curTime;
+	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+	Date date;
     
     public IRCBot(String name, String password) {
         loadReminders();
@@ -101,10 +106,19 @@ public class IRCBot extends PircBot implements Runnable {
         checkFile(SONG_LIST);
         //Check for FEEDBACK_FILE
         checkFile(FEEDBACK_FILE);
+        if (emailAccount.equals("") || emailPassword.equals("")) {
+        	//Do Nothing
+        } else {
+		    try {
+				email = new GMailClient(emailAccount, emailPassword, "smtp.gmail.com");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
     }
     
     public void login(String pass) {
-    	if (pass == ""){
+    	if (pass.equals("")){
     		//Do Nothing
     	} else if (pass.length() > 0) {
     		sendMessage("NICKSERV", "IDENTIFY " + pass);
@@ -114,6 +128,8 @@ public class IRCBot extends PircBot implements Runnable {
     @SuppressWarnings("unchecked")
 	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
     	//Keep track of the senders current channel
+    	date = new Date();
+    	curTime = dateFormat.format(date);
     	curChan = channel;
     	curSender = sender;
         Pattern messagePattern = Pattern.compile("^\\s*(?i:(" + getNick() + ")?\\s*[\\:,]?\\s*remind\\s+me\\s+in\\s+(((\\d+\\.?\\d*|\\.\\d+)\\s+(weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[\\s,]*(and)?\\s+)+)(.*)\\s*)$");
@@ -148,12 +164,37 @@ public class IRCBot extends PircBot implements Runnable {
         
         //List Commands
         } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, time, udict, ver, weather, wiki, youtube");
+            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
       
+        //TellKyle Command (Email)
+        } else if (message.equalsIgnoreCase("$tellkyle")) {
+        	if (checkOp(sender) || checkVoice(sender)) {
+        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
+        	} else {
+        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+        	}
+        } else if (message.startsWith("$tellkyle ")) {
+            String input = message.substring(10);
+        	if (checkOp(sender) || checkVoice(sender)) {
+	            if (input.equals("")){
+	        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
+	            } else {
+	            	try {
+						email.sendEmail("kyle10468@gmail.com", "Message from " + sender, input);
+						sendMessage(channel, Colors.GREEN + "- email sent successfully -");
+					} catch (MessagingException e) {
+		        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
+						e.printStackTrace();
+					}
+	            }
+        	} else {
+        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+        	}
+            
+            
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
-            String time = new java.util.Date().toString();
-            sendMessage(channel, sender + ": the time is " + time);
+            sendMessage(channel, sender + ": the time is " + curTime);
             
         //boner
         } else if (message.equalsIgnoreCase("$boner")) {
@@ -470,8 +511,15 @@ public class IRCBot extends PircBot implements Runnable {
         		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
                 try {
 					restartWinamp();
-				} catch (InterruptedException | MessagingException e) {
-		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+					email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted automatically @ " + curTime);
+				} catch (Exception e) {
+					try {
+						email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to automatically restart @ " + curTime);
+			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
+					} catch (MessagingException e1) {
+			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
+						e1.printStackTrace();
+					}
 					e.printStackTrace();
 				}
         	} else {
@@ -825,8 +873,15 @@ public class IRCBot extends PircBot implements Runnable {
         	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
                 try {
 					restartWinamp();
-				} catch (InterruptedException | MessagingException e) {
-		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+					email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + curSender);
+				} catch (Exception e) {
+					try {
+						email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to restart @ " + curTime);
+			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
+					} catch (MessagingException e1) {
+			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
+						e1.printStackTrace();
+					}
 					e.printStackTrace();
 				}
         	} else {
@@ -914,23 +969,22 @@ public class IRCBot extends PircBot implements Runnable {
     }
     
     @SuppressWarnings("unused")
-	public void restartWinamp() throws InterruptedException, AddressException, MessagingException {
-    	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-    	Date date = new Date();
-    	String curTime = dateFormat.format(date);
+	public void restartWinamp() throws Exception {
+    	curTime = dateFormat.format(date);
     	
         sendMessage(curChan, Colors.BOLD + "----- RESTARTING WINAMP -----");
+        System.out.println("----- RESTARTING WINAMP -----");
         numOfAttempts++;
 		try {
 			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			if (numOfAttempts <= 3) {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp - Attempt " + numOfAttempts);
 				restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
-        		sendEmail("WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
+                email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 				e.printStackTrace();
 				return;
 			}
@@ -938,22 +992,22 @@ public class IRCBot extends PircBot implements Runnable {
 		pause(1500);
 		try {
 			Process p = Runtime.getRuntime().exec("winamp.exe");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			if (numOfAttempts <= 3) {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp - Attempt " + numOfAttempts);
 				restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
-        		sendEmail("WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
+        		email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 				e.printStackTrace();
 				return;
 			}
 		};
         numOfAttempts = 0;
-        sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED -----");
+        sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
+        System.out.println("----- WINAMP RESTARTED SUCCESSFULLY -----");
         sendMessage(curChan, "IAreKyleW00t has been notified via Email");
-		sendEmail("NOTICE: Winamp Restarted", "Winamp has restarted succesfully @ " + curTime + " by user " + curSender);
 
     }
     
@@ -2676,41 +2730,6 @@ public class IRCBot extends PircBot implements Runnable {
     	return staff;
     }
     
-    private void sendEmail(String subject, String message) throws AddressException, MessagingException {
-    	String host = "smtp.gmail.com";
-        String from = "from@gmail.com";
-        String pass = "password";
-        Properties props = System.getProperties();
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.user", from);
-        props.put("mail.smtp.password", pass);
-        props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.auth", "true");
-        //props.put("mail.debug", "true");
-        String[] to = {"to@gmail.com", "to2@example.com"};
-
-        Session session = Session.getInstance(props, new GMailAuthenticator(from, pass));
-        MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(from));
-
-        InternetAddress[] toAddress = new InternetAddress[to.length];
-
-        for( int i=0; i < to.length; i++ ) {
-            toAddress[i] = new InternetAddress(to[i]);
-        }
-        System.out.println(Message.RecipientType.TO);
-
-        for( int i=0; i < toAddress.length; i++) {
-        	email.addRecipient(Message.RecipientType.TO, toAddress[i]);
-        }
-        email.setSubject(subject);
-        email.setText(message);
-        Transport transport = session.getTransport("smtp");
-        transport.connect(host, from, pass);
-        transport.sendMessage(email, email.getAllRecipients());
-        transport.close();
-    }
     
     private Thread dispatchThread;
     @SuppressWarnings("rawtypes")
