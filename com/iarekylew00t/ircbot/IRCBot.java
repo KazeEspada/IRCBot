@@ -2,23 +2,26 @@ package com.iarekylew00t.ircbot;
 
 import org.jibble.pircbot.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.*;
+import java.io.*;
+import java.util.Random;
+import java.net.URL;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.mail.*;
+import javax.mail.internet.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-import java.io.*;
-import java.util.Random;
-import java.net.URL;
-
 public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.2.10";
+    private static final String VER = "0.9.2.25";
     private static final String REMINDER_FILE = "reminders.dat";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
@@ -76,7 +79,7 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4", "#hs_rp", "#hs_nsfw","#ircstuck"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
-    private String curChan, voteTitle = "";
+    private String curChan, curSender, voteTitle = "";
     private boolean req = false;
     private boolean openVote = false;
     private int voteYes, voteNo, curSearchPage = 0;
@@ -112,6 +115,7 @@ public class IRCBot extends PircBot implements Runnable {
 	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
     	//Keep track of the senders current channel
     	curChan = channel;
+    	curSender = sender;
         Pattern messagePattern = Pattern.compile("^\\s*(?i:(" + getNick() + ")?\\s*[\\:,]?\\s*remind\\s+me\\s+in\\s+(((\\d+\\.?\\d*|\\.\\d+)\\s+(weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[\\s,]*(and)?\\s+)+)(.*)\\s*)$");
         Matcher m = messagePattern.matcher(message);
         
@@ -466,7 +470,7 @@ public class IRCBot extends PircBot implements Runnable {
         		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
                 try {
 					restartWinamp();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | MessagingException e) {
 		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
 					e.printStackTrace();
 				}
@@ -821,7 +825,7 @@ public class IRCBot extends PircBot implements Runnable {
         	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
                 try {
 					restartWinamp();
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | MessagingException e) {
 		            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - Please contact IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
 					e.printStackTrace();
 				}
@@ -910,7 +914,11 @@ public class IRCBot extends PircBot implements Runnable {
     }
     
     @SuppressWarnings("unused")
-	public void restartWinamp() throws InterruptedException {
+	public void restartWinamp() throws InterruptedException, AddressException, MessagingException {
+    	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    	Date date = new Date();
+    	String curTime = dateFormat.format(date);
+    	
         sendMessage(curChan, Colors.BOLD + "----- RESTARTING WINAMP -----");
         numOfAttempts++;
 		try {
@@ -921,7 +929,8 @@ public class IRCBot extends PircBot implements Runnable {
 				restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
-                sendMessage(curChan, getCurOnlineStaff() + "; please n0tify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+                sendMessage(curChan, "IAreKyleW00t has been notified via Email");
+        		sendEmail("WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 				e.printStackTrace();
 				return;
 			}
@@ -935,13 +944,17 @@ public class IRCBot extends PircBot implements Runnable {
 				restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
-                sendMessage(curChan, getCurOnlineStaff() + "; please n0tify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+                sendMessage(curChan, "IAreKyleW00t has been notified via Email");
+        		sendEmail("WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 				e.printStackTrace();
 				return;
 			}
 		};
         numOfAttempts = 0;
         sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED -----");
+        sendMessage(curChan, "IAreKyleW00t has been notified via Email");
+		sendEmail("NOTICE: Winamp Restarted", "Winamp has restarted succesfully @ " + curTime + " by user " + curSender);
+
     }
     
     private void pause(int ms) throws InterruptedException {
@@ -2661,6 +2674,42 @@ public class IRCBot extends PircBot implements Runnable {
     	}
     	
     	return staff;
+    }
+    
+    private void sendEmail(String subject, String message) throws AddressException, MessagingException {
+    	String host = "smtp.gmail.com";
+        String from = "from@gmail.com";
+        String pass = "password";
+        Properties props = System.getProperties();
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.user", from);
+        props.put("mail.smtp.password", pass);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        //props.put("mail.debug", "true");
+        String[] to = {"to@gmail.com", "to2@example.com"};
+
+        Session session = Session.getInstance(props, new GMailAuthenticator(from, pass));
+        MimeMessage email = new MimeMessage(session);
+        email.setFrom(new InternetAddress(from));
+
+        InternetAddress[] toAddress = new InternetAddress[to.length];
+
+        for( int i=0; i < to.length; i++ ) {
+            toAddress[i] = new InternetAddress(to[i]);
+        }
+        System.out.println(Message.RecipientType.TO);
+
+        for( int i=0; i < toAddress.length; i++) {
+        	email.addRecipient(Message.RecipientType.TO, toAddress[i]);
+        }
+        email.setSubject(subject);
+        email.setText(message);
+        Transport transport = session.getTransport("smtp");
+        transport.connect(host, from, pass);
+        transport.sendMessage(email, email.getAllRecipients());
+        transport.close();
     }
     
     private Thread dispatchThread;
