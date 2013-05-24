@@ -1,5 +1,7 @@
 package com.iarekylew00t.ircbot;
 
+import com.iarekylew00t.email.EmailClient;
+import com.iarekylew00t.google.Google;
 import org.jibble.pircbot.*;
 
 import java.text.DateFormat;
@@ -18,10 +20,10 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-public class IRCBot extends PircBot implements Runnable {
 
-    private static final String VER = "0.9.2.50";
-    private static final String REMINDER_FILE = "reminders.dat";
+public class IRCBot extends PircBot {
+
+    private static final String VER = "0.9.2.70";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
@@ -76,96 +78,135 @@ public class IRCBot extends PircBot implements Runnable {
     private static final String REQ_FILE = "songs.txt";
     private static final String HS_LINKS = "links.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
-    private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4", "#hs_rp", "#hs_nsfw","#ircstuck"};
+    private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
-    private String curChan, curSender, voteTitle = "";
-    private boolean req = false;
-    private boolean openVote = false;
+    private String curChan, curSender, curTime, voteTitle = "";
+    private boolean req = false, openVote = false;
     private int voteYes, voteNo, curSearchPage = 0;
     List<String> voterList = new ArrayList<String>();
-	private static int latestPage;
+	private static int latestPage, numOfAttempts = 0;
     private static boolean isUpdate = false;
-    private static int numOfAttempts = 0;
     private String emailAccount = IRCBotMain.getEmail();
     private String emailPassword = IRCBotMain.getEmailPass();
-    private GMailClient email;
-    private String curTime;
-	DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	Date date;
+    private EmailClient email;
+	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+	private Date date;
+	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
     
     public IRCBot(String name, String password) {
-        loadReminders();
         setName(name);
         login(password);
-        setAutoNickChange(true);
-        dispatchThread = new Thread(this);
-        dispatchThread.start();
-        //Check for page update
         checkUpdate();
-        //Check for SONG_LIST file
         checkFile(SONG_LIST);
-        //Check for FEEDBACK_FILE
         checkFile(FEEDBACK_FILE);
-        if (emailAccount.equals("") || emailPassword.equals("")) {
-        	//Do Nothing
-        } else {
-		    try {
-				email = new GMailClient(emailAccount, emailPassword, "smtp.gmail.com");
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
+        setupEmail();
     }
     
-    public void login(String pass) {
-    	if (pass.equals("")){
-    		//Do Nothing
-    	} else if (pass.length() > 0) {
+    private final void login(String pass) {
+    	if (!pass.equals("")){
     		sendMessage("NICKSERV", "IDENTIFY " + pass);
     	}
     }
     
-    @SuppressWarnings("unchecked")
-	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
-    	//Keep track of the senders current channel
+    @Override
+    protected void onConnect() {
+		System.out.println("----- SUCCESSFULLY CONNECTED TO SERVER -----");
+    }
+    
+    @Override
+    protected void onDisconnect() {
+		System.out.println("----- DISCONNECTED FROM SERVER -----");
+    	date = new Date();
+    	curTime = dateFormat.format(date);
+		System.out.println("----- DISPOSING OF OLD BOT -----");
+		this.dispose();
+		try {
+			System.out.println("----- RECREATING BOT AND RECONNECTING -----");
+			IRCBotMain.setupBot();
+		} catch (Exception e) {
+			System.out.println("----- RECREATION/RECONNECT FAILED -----");
+			try {
+				email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Failed to Reconnect", "Aradiabot failed to reconnect to the server @ " + curTime + "\n" + e);
+			} catch (MessagingException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+			return;
+		}
+		System.out.println("----- SUCCESSFULLY RECONNECTED -----");
+		try {
+			email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    @Override
+    public void log(String line) {
+    	System.out.println(line);
+    }
+    
+    
+	public void onMessage(String channel, String sender, String login, String hostname, String message) {
     	date = new Date();
     	curTime = dateFormat.format(date);
     	curChan = channel;
     	curSender = sender;
-        Pattern messagePattern = Pattern.compile("^\\s*(?i:(" + getNick() + ")?\\s*[\\:,]?\\s*remind\\s+me\\s+in\\s+(((\\d+\\.?\\d*|\\.\\d+)\\s+(weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[\\s,]*(and)?\\s+)+)(.*)\\s*)$");
-        Matcher m = messagePattern.matcher(message);
-        
-        //Check if message Matches Reminder Pattern
-        if (m.matches()) {
-        String reminderMessage = m.group(7);
-            String periods = m.group(2);
-            long set = System.currentTimeMillis();
-            long due = set;
-            try {
-                double weeks = getPeriod(periods, "weeks|week");
-                double days = getPeriod(periods, "days|day");
-                double hours = getPeriod(periods, "hours|hrs|hour|hr");
-                double minutes = getPeriod(periods, "minutes|mins|minute|min");
-                double seconds = getPeriod(periods, "seconds|secs|second|sec");
-                due += (weeks * 604800 + days * 86400 + hours * 3600 + minutes * 60 + seconds) * 1000;
-            }
-            catch (NumberFormatException e) {
-                sendMessage(channel, "i cant deal with numbers like that " + sender);
-                return;
-            }
-            if (due == set) {
-                sendMessage(channel, "Example of correct usage: \"Remind me in 1 hour, 10 minutes to check the oven.\"  I understand all combinations of weeks, days, hours, minutes and seconds.");
-                return;
-            }
-            Reminder reminder = new Reminder(channel, sender, reminderMessage, set, due);
-            sendMessage(channel, "0kay " + sender + ", ill remind y0u ab0ut that 0n " + new Date(reminder.getDueTime()));
-            reminders.add(reminder);
-            dispatchThread.interrupt();
-        
-        //List Commands
-        } else if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shout, slap, slay, song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
+    	
+    	//List All Commands
+    	if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
+            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, expand, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, reboot, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shorten, shout, slap, slay, song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
       
+        //Reboot Aradiabot (Disconnect, Dispose, Recreate and reconnect)
+        } else if (message.equalsIgnoreCase("$reboot")) {
+        	if (checkOp(sender) || checkVoice(sender)) {
+        		sendMessage(channel, Colors.BOLD + "----- REBOOTING ARADIABOT -----");
+        		this.disconnect();
+        	} else {
+        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+        	}
+
+        } else if (message.equalsIgnoreCase("$shorten")) {
+        	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
+
+        } else if (message.startsWith("$shorten ")) {
+            String input = message.substring(9);
+            if (input.equals("")) {
+            	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
+            } else {
+            	String shortUrl = "";
+				try {
+					shortUrl = google.shortenUrl(input);
+				} catch (Exception e) {
+					e.printStackTrace();
+	            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not shrink URL");
+	            	return;
+				}
+            	sendMessage(channel, "here is y0ur sh0rtened url " + sender + ": " + shortUrl);
+            }
+
+        } else if (message.equalsIgnoreCase("$expand")) {
+        	sendMessage(channel, "please give me a goo.gl url t0 sh0rten " + sender);
+
+        } else if (message.startsWith("$expand ")) {
+            String input = message.substring(8);
+            if (input.equals("")) {
+            	sendMessage(channel, "please give me a goo.gl url t0 expand " + sender);
+            } else if (!input.contains("goo.gl")) {
+            	sendMessage(channel, "im s0rry but i 0nly w0rk with goo.gl urls");
+            } else {
+            	String longUrl = "";
+				try {
+					longUrl = google.expandUrl(input);
+				} catch (Exception e) {
+					e.printStackTrace();
+	            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not expand URL");
+	            	return;
+				}
+            	sendMessage(channel, "here is y0ur expanded url " + sender + ": " + longUrl);
+            }
+        	
+        	
         //TellKyle Command (Email)
         } else if (message.equalsIgnoreCase("$tellkyle")) {
         	if (checkOp(sender) || checkVoice(sender)) {
@@ -180,7 +221,7 @@ public class IRCBot extends PircBot implements Runnable {
 	        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
 	            } else {
 	            	try {
-						email.sendEmail("kyle10468@gmail.com", "Message from " + sender, input);
+						email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input);
 						sendMessage(channel, Colors.GREEN + "- email sent successfully -");
 					} catch (MessagingException e) {
 		        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
@@ -190,7 +231,6 @@ public class IRCBot extends PircBot implements Runnable {
         	} else {
         		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
         	}
-            
             
         //Current Time    
         } else if (message.equalsIgnoreCase("$time")) {
@@ -261,16 +301,11 @@ public class IRCBot extends PircBot implements Runnable {
             sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
         } else if (message.startsWith("$search ")) {
             String input = message.substring(8);
-            //if (input.equalsIgnoreCase("next")) {
-			//	sendMessage(channel, getNextPage());
-            //} else {
-            // TODO Fix NullPointerException
-	            try {
-					sendMessage(channel, searchPage(input));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-            //}
+            try {
+				sendMessage(channel, searchPage(input));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
             
         //8ball
         } else if (message.equalsIgnoreCase("$8ball")) {
@@ -903,69 +938,6 @@ public class IRCBot extends PircBot implements Runnable {
             return d;
         }
         return 0;
-    }
-    
-    //Run the reminder methods
-    @SuppressWarnings("unchecked")
-	public synchronized void run() {
-        boolean running = true;
-        while (running) {
-
-            // If the list is empty, wait until something gets added.
-            if (reminders.size() == 0) {
-                try {
-                    wait();
-                }
-                catch (InterruptedException e) {
-                    // Do nothing.
-                }
-            }
-
-            Reminder reminder = (Reminder) reminders.getFirst();
-            long delay = reminder.getDueTime() - System.currentTimeMillis();
-            if (delay > 0) {
-                try {
-                    wait(delay);
-                }
-                catch (InterruptedException e) {
-                    // A new Reminder was added. Sort the list.
-                    Collections.sort(reminders);
-                    saveReminders();
-                }
-            }
-            else {
-                sendMessage(reminder.getChannel(), "hell0 " + reminder.getNick() + ", y0u asked me t0 remind y0u " + reminder.getMessage());
-                reminders.removeFirst();
-                saveReminders();
-            }
-            
-        }
-    }
-    
-    //Save any new reminders
-    private void saveReminders() {
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(new File(REMINDER_FILE)));
-            out.writeObject(reminders);
-            out.flush();
-            out.close();
-        }
-        catch (Exception e) {
-            // If it doesn't work, no great loss!
-        }
-    }
-    
-    //Automatically load all reminds at start
-    @SuppressWarnings("rawtypes")
-	private void loadReminders() {
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(new File(REMINDER_FILE)));
-            reminders = (LinkedList) in.readObject();
-            in.close();
-        }
-        catch (Exception e) {
-            // If it doesn't work, no great loss!
-        }
     }
     
     @SuppressWarnings("unused")
@@ -2730,9 +2702,15 @@ public class IRCBot extends PircBot implements Runnable {
     	return staff;
     }
     
-    
-    private Thread dispatchThread;
-    @SuppressWarnings("rawtypes")
-	private LinkedList reminders = new LinkedList();
+    private void setupEmail() {
+        if (!emailAccount.equals("") || !emailPassword.equals("")) {
+		    try {
+				email = new EmailClient(emailAccount, emailPassword, "smtp.gmail.com", false);
+			} catch (Exception e) {
+				System.out.println("----- ERROR SETTING UP GMAIL CLIENT -----");
+				e.printStackTrace();
+			}
+        }
+    }
     
 }

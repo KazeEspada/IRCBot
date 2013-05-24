@@ -1,13 +1,13 @@
-package com.iarekylew00t.ircbot;
+package com.iarekylew00t.email;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
-public class GMailAuthenticator extends Authenticator {
+public class EmailAuthenticator extends Authenticator {
 	String user;
 	String pw;
 	
-	public GMailAuthenticator (String username, String password) {
+	public EmailAuthenticator (String username, String password) {
 		super();
 		this.user = username;
 		this.pw = password;
