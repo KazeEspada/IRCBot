@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.2.70";
+    private static final String VER = "0.9.2.77";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String CUR_SONG = "curSong.txt";
@@ -91,6 +91,7 @@ public class IRCBot extends PircBot {
     private EmailClient email;
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private Date date;
+	private LogHandler logger = new LogHandler();
 	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
     
     public IRCBot(String name, String password) {
@@ -110,21 +111,21 @@ public class IRCBot extends PircBot {
     
     @Override
     protected void onConnect() {
-		System.out.println("----- SUCCESSFULLY CONNECTED TO SERVER -----");
+    	logger.notice("SUCCESSFULLY CONNECTED TO SERVER");
     }
     
     @Override
     protected void onDisconnect() {
-		System.out.println("----- DISCONNECTED FROM SERVER -----");
+		logger.warning("DISCONNECTED FROM SERVER");
     	date = new Date();
     	curTime = dateFormat.format(date);
-		System.out.println("----- DISPOSING OF OLD BOT -----");
+		logger.notice("DISPOSING OF OLD BOT");
 		this.dispose();
 		try {
-			System.out.println("----- RECREATING BOT AND RECONNECTING -----");
+			logger.notice("RECREATING BOT AND RECONNECTING");
 			IRCBotMain.setupBot();
 		} catch (Exception e) {
-			System.out.println("----- RECREATION/RECONNECT FAILED -----");
+			logger.error("RECREATION/RECONNECT FAILED");
 			try {
 				email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Failed to Reconnect", "Aradiabot failed to reconnect to the server @ " + curTime + "\n" + e);
 			} catch (MessagingException e1) {
@@ -133,7 +134,7 @@ public class IRCBot extends PircBot {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("----- SUCCESSFULLY RECONNECTED -----");
+		logger.notice("SUCCESSFULLY RECONNECTED");
 		try {
 			email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
 		} catch (MessagingException e) {
@@ -141,788 +142,833 @@ public class IRCBot extends PircBot {
 		}
     }
     
-    @Override
+    public void onAction(String sender, String login, String hostname, String target, String action) {
+		logger.log(sender + "!" + login + ": " + action);
+    }
+    
+    public void onJoin(String channel, String sender, String login, String hostname) {
+    	logger.notice(sender + "!" + login + "@" + hostname + " JOINED " + channel);
+    }
+    
+    public void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
+    	logger.notice(sourceNick + " SET MODE " + mode);
+    }
+    
+    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
+    	logger.notice(oldNick + "!" + login + " SET NICK " + newNick);
+    }
+    
+    public void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice) {
+    	logger.notice(sourceNick + "!" + sourceLogin + " NOTICE " + target + ": " + notice);
+    }
+    
+    public void onPart(String channel, String sender, String login, String hostname) {
+    	logger.notice(sender + "!" + login + "@" + hostname + " PARTED " + channel);
+    }
+    
+    public void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue) {
+    	logger.notice(sourceNick + "!" + sourceLogin + " PINGED " + target);
+    }
+    
+    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
+    	logger.notice(sourceNick + "!" + sourceLogin + "@" + sourceHostname + " QUIT (" + reason + ")");
+    }
+    
+    public void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
+    	logger.warning(kickerNick + "!" + kickerLogin + "@" + kickerHostname + "(" + channel + ")" + " KICKED " + recipientNick + "(" + reason + ")");
+    }
+    
     public void log(String line) {
-    	System.out.println(line);
+    	if (line.startsWith("PING")) {
+    		logger.notice(line);
+    	} else if (line.startsWith(">>>")) {
+    		logger.notice(line);
+    	}
     }
     
     
-	public void onMessage(String channel, String sender, String login, String hostname, String message) {
+	public synchronized void onMessage(String channel, String sender, String login, String hostname, String message) {
+		logger.log(sender + "!" + login + " (" + channel + "): " + message);
     	date = new Date();
     	curTime = dateFormat.format(date);
     	curChan = channel;
     	curSender = sender;
     	
-    	//List All Commands
-    	if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-            sendMessage(channel, "8ball, announce, bind, boner, commands, dict, expand, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, reboot, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shorten, shout, slap, slay, song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
-      
-        //Reboot Aradiabot (Disconnect, Dispose, Recreate and reconnect)
-        } else if (message.equalsIgnoreCase("$reboot")) {
-        	if (checkOp(sender) || checkVoice(sender)) {
-        		sendMessage(channel, Colors.BOLD + "----- REBOOTING ARADIABOT -----");
-        		this.disconnect();
-        	} else {
-        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
-        	}
-
-        } else if (message.equalsIgnoreCase("$shorten")) {
-        	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
-
-        } else if (message.startsWith("$shorten ")) {
-            String input = message.substring(9);
-            if (input.equals("")) {
-            	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
-            } else {
-            	String shortUrl = "";
-				try {
-					shortUrl = google.shortenUrl(input);
-				} catch (Exception e) {
+    	//Only check commands if it start's with command symbol ($)
+    	if (message.startsWith("$")) {
+			//List All Commands
+			if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
+		        sendMessage(channel, "8ball, announce, bind, boner, commands, dict, expand, faq, feedback, gearup, google, gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, reboot, radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shorten, shout, slap, slay, song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
+		  
+		    //Reboot Aradiabot (Disconnect, Dispose, Recreate and reconnect)
+		    } else if (message.equalsIgnoreCase("$reboot")) {
+		    	if (checkOp(sender) || checkVoice(sender)) {
+		    		sendMessage(channel, Colors.BOLD + "REBOOTING ARADIABOT");
+		    		this.disconnect();
+		    	} else {
+		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+		    	}
+		
+		    } else if (message.equalsIgnoreCase("$shorten")) {
+		    	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
+		
+		    } else if (message.startsWith("$shorten ")) {
+		        String input = message.substring(9);
+		        if (input.equals("")) {
+		        	sendMessage(channel, "please give me a url t0 sh0rten " + sender);
+		        } else {
+		        	String shortUrl = "";
+					try {
+						shortUrl = google.shortenUrl(input);
+					} catch (Exception e) {
+						e.printStackTrace();
+		            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not shrink URL");
+		            	return;
+					}
+		        	sendMessage(channel, "here is y0ur sh0rtened url " + sender + ": " + shortUrl);
+		        }
+		
+		    } else if (message.equalsIgnoreCase("$expand")) {
+		    	sendMessage(channel, "please give me a goo.gl url t0 sh0rten " + sender);
+		
+		    } else if (message.startsWith("$expand ")) {
+		        String input = message.substring(8);
+		        if (input.equals("")) {
+		        	sendMessage(channel, "please give me a goo.gl url t0 expand " + sender);
+		        } else if (!input.contains("goo.gl")) {
+		        	sendMessage(channel, "im s0rry but i 0nly w0rk with goo.gl urls");
+		        } else {
+		        	String longUrl = "";
+					try {
+						longUrl = google.expandUrl(input);
+					} catch (Exception e) {
+						e.printStackTrace();
+		            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not expand URL");
+		            	return;
+					}
+		        	sendMessage(channel, "here is y0ur expanded url " + sender + ": " + longUrl);
+		        }
+		    	
+		    	
+		    //TellKyle Command (Email)
+		    } else if (message.equalsIgnoreCase("$tellkyle")) {
+		    	if (checkOp(sender) || checkVoice(sender)) {
+		    		sendMessage(channel, "please add s0mething t0 tell him " + sender);
+		    	} else {
+		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+		    	}
+		    } else if (message.startsWith("$tellkyle ")) {
+		        String input = message.substring(10);
+		    	if (checkOp(sender) || checkVoice(sender)) {
+		            if (input.equals("")){
+		        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
+		            } else {
+		            	try {
+							email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input);
+							sendMessage(channel, Colors.GREEN + "- email sent successfully -");
+						} catch (MessagingException e) {
+			        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
+							e.printStackTrace();
+						}
+		            }
+		    	} else {
+		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+		    	}
+		        
+		    //Current Time    
+		    } else if (message.equalsIgnoreCase("$time")) {
+		        sendMessage(channel, sender + ": the time is " + curTime);
+		        
+		    //boner
+		    } else if (message.equalsIgnoreCase("$boner")) {
+		        sendMessage(channel, sender + ": b0ner");
+		    
+		    //Let me tell you about Homestuck
+		    } else if (message.equalsIgnoreCase("$lmtyahs")) {
+		        sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
+		       
+		    //Gear Up Command
+		    } else if (message.equalsIgnoreCase("$gearup")) {
+		        sendMessage(channel, "y0u are n0w geared up " + sender);
+		       
+		    //Aradiabot version
+		    } else if (message.equalsIgnoreCase("$ver")) {
+		        sendMessage(channel, "Aradiabot v" + VER);
+		        
+		    //Ping Command
+		    } else if (message.equalsIgnoreCase("$ping")) {
+		        sendMessage(channel, sender + ": p0ng");
+		        
+		    //Marco/Polo Command 
+		    } else if (message.equalsIgnoreCase("$marco")) {
+		        sendMessage(channel, sender + ": p0l0");
+		        
+		    //Songlist Command
+		    } else if (message.equalsIgnoreCase("$songlist")) {
+		        sendMessage(channel, sender + ": http://goo.gl/0xJtz");
+		    
+		    //IRC Command
+		    } else if (message.equalsIgnoreCase("$irc")) {
+		        sendMessage(channel, sender + ": http://goo.gl/dIfQu");
+		        
+		    //MSPA Page Command
+		    } else if (message.equalsIgnoreCase("$mspa")) {
+		        sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
+		    
+		    //Radio Link Command
+		    } else if (message.equalsIgnoreCase("$radio")) {
+		        sendMessage(channel, sender + ": http://mixlr.com/iarekylew00t/");
+		        
+		    //FAQ
+		    } else if (message.equalsIgnoreCase("$faq")) {
+		        sendMessage(channel, sender + ": http://goo.gl/53qWN");
+		        
+		    //Submit
+		    } else if (message.equalsIgnoreCase("$submit")) {
+		        sendMessage(channel, sender + ": http://goo.gl/dhvwC");
+		
+		    //Playflute
+		    } else if (message.equalsIgnoreCase("$playflute")) {
+		        sendMessage(channel, "have fun " + sender + ": http://goo.gl/LpK89");
+		        
+		    //Gotta go fast
+		    } else if (message.equalsIgnoreCase("$gottagofast")) {
+		        sendMessage(channel, "g0tta g0 fastfs: http://goo.gl/P1av7");
+		        
+		    //Go Fast
+		    } else if (message.equalsIgnoreCase("$gofast")) {
+		        sendMessage(channel, goFast(fastList));
+		    
+		    //Search for a page in HS
+		    } else if (message.equalsIgnoreCase("$search")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$search ")) {
+		        String input = message.substring(8);
+		        try {
+					sendMessage(channel, searchPage(input));
+				} catch (IOException e) {
 					e.printStackTrace();
-	            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not shrink URL");
-	            	return;
 				}
-            	sendMessage(channel, "here is y0ur sh0rtened url " + sender + ": " + shortUrl);
-            }
-
-        } else if (message.equalsIgnoreCase("$expand")) {
-        	sendMessage(channel, "please give me a goo.gl url t0 sh0rten " + sender);
-
-        } else if (message.startsWith("$expand ")) {
-            String input = message.substring(8);
-            if (input.equals("")) {
-            	sendMessage(channel, "please give me a goo.gl url t0 expand " + sender);
-            } else if (!input.contains("goo.gl")) {
-            	sendMessage(channel, "im s0rry but i 0nly w0rk with goo.gl urls");
-            } else {
-            	String longUrl = "";
-				try {
-					longUrl = google.expandUrl(input);
-				} catch (Exception e) {
-					e.printStackTrace();
-	            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not expand URL");
-	            	return;
-				}
-            	sendMessage(channel, "here is y0ur expanded url " + sender + ": " + longUrl);
-            }
-        	
-        	
-        //TellKyle Command (Email)
-        } else if (message.equalsIgnoreCase("$tellkyle")) {
-        	if (checkOp(sender) || checkVoice(sender)) {
-        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
-        	} else {
-        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
-        	}
-        } else if (message.startsWith("$tellkyle ")) {
-            String input = message.substring(10);
-        	if (checkOp(sender) || checkVoice(sender)) {
-	            if (input.equals("")){
-	        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
-	            } else {
-	            	try {
-						email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input);
-						sendMessage(channel, Colors.GREEN + "- email sent successfully -");
-					} catch (MessagingException e) {
-		        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
+		        
+		    //8ball
+		    } else if (message.equalsIgnoreCase("$8ball")) {
+		        sendMessage(channel, "please give me s0mething t0 predict " + sender);
+		    } else if (message.startsWith("$8ball ")) {
+		        String input = message.substring(7);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 predict " + sender);
+		        } else {
+		            sendMessage(channel, sender + ": " + getOutcome(eightBall));
+		        }
+		        
+		    //Weather
+		    } else if (message.equalsIgnoreCase("$weather") || message.equalsIgnoreCase("$we")) {
+		        sendMessage(channel, "please enter a zipc0de " + sender);
+		    } else if (message.startsWith("$weather ")) {
+		        String input = message.substring(9);
+		        if (input.equals("")){
+		            sendMessage(channel, "please enter a zipc0de " + sender);
+		        } else if (!input.matches("^\\d*$")){
+		            sendMessage(channel, "please enter a zipc0de " + sender);
+		        } else {
+		            sendMessage(channel, sender + ": " + getWeather(input));
+		        }
+		        
+		    //Random Number Generator
+		    } else if (message.equalsIgnoreCase("$rand")) {
+		        int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
+		        sendMessage(channel, sender + ": " + randNum);
+		    } else if (message.startsWith("$rand ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
+		            sendMessage(channel, sender + ": " + randNum);
+		        } else {
+		        	int maxNum = Integer.parseInt(input);
+		            int randNum = (0 + (int)(Math.random() * ((maxNum - 0)) + 1));
+		            sendMessage(channel, sender + ": " + randNum);
+		        }
+		        
+		    //Feedback Command
+		    } else if (message.equalsIgnoreCase("$feedback") || message.equalsIgnoreCase("$fb")) {
+		        sendMessage(channel, "please use: $feedback <resp0nse>");
+		    } else if (message.startsWith("$feedback ") || message.startsWith("$fb ")) {
+		        String input = message.substring(10);
+		        if (input.startsWith("$fb "))
+		            input = message.substring(4);
+		            
+		        if (input.equals("")){
+		            sendMessage(channel, "please use: $feedback <resp0nse>");
+		        } else {
+		            sendMessage(channel, "thank y0u f0r y0ur feedback " + sender + ". kyle will read it s00n" );
+		            writeToFile(FEEDBACK_FILE, sender, input);
+		        }
+		        
+		    //Shoosh Command
+		    } else if (message.equalsIgnoreCase("$shoosh")) {
+		        sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+		    } else if (message.startsWith("$shoosh ")) {
+		        String input = message.substring(8);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
+		        } else {
+		            sendMessage(channel, "sh00shing " + input);
+		        }
+		
+		    //Bind Command
+		    } else if (message.equalsIgnoreCase("$bind")) {
+		        sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
+		    } else if (message.startsWith("$bind ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
+		        } else {
+		            sendMessage(channel, input + " has been b0und");
+		        }
+		
+		    //Pin Command
+		    } else if (message.equalsIgnoreCase("$pin")) {
+		        sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
+		    } else if (message.startsWith("$pin ")) {
+		        String input = message.substring(5);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
+		        } else {
+		            sendMessage(channel, input + " has been pinned");
+		        }
+		            
+		    //Pap commad
+		    } else if (message.equalsIgnoreCase("$pap")) {
+		        sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+		    } else if (message.startsWith("$pap ")) {
+		        String input = message.substring(5);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
+		        } else {
+		            sendMessage(channel, "papping " + input);
+		        }
+		        
+		    //Shooshpap command
+		    } else if (message.equalsIgnoreCase("$shooshpap")) {
+		        sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
+		    } else if (message.startsWith("$shooshpap ")) {
+		        String input = message.substring(11);
+		        if (input.equals("")) {
+		            sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
+		        } else {
+		            sendMessage(channel, input + " has been sh00shpapped");
+		        }
+		    
+		    //MSPAWiki Search
+		    } else if (message.equalsIgnoreCase("$mspawiki")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$mspawiki ")) {
+		        String input = message.substring(10);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','_');
+		            sendMessage(channel, "here are y0ur search results " + sender + ": http://mspaintadventures.wikia.com/wiki/index.php?search=" + newInput);
+		        }
+		        
+		    //Wiki Search
+		    } else if (message.equalsIgnoreCase("$wiki")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$wiki ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','_');
+		            sendMessage(channel, "here are y0ur search results " + sender + ": http://en.wikipedia.org/wiki/" + newInput);
+		        }
+		        
+		    //Dictionary Search
+		    } else if (message.equalsIgnoreCase("$dict")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$dict ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','_');
+		            sendMessage(channel, sender + ": here is the definiti0n for " + input + "; http://dictionary.reference.com/browse/" + newInput);
+		        }
+		        
+		    //Urban Dictionary Search
+		    } else if (message.equalsIgnoreCase("$udict")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$udict ")) {
+		        String input = message.substring(7);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','+');
+		            sendMessage(channel, sender + ": here is the definiti0n for " + input + ": http://www.urbandictionary.com/define.php?term=" + newInput);
+		        }
+		        
+		    //Google Search
+		    } else if (message.equalsIgnoreCase("$google") || message.equalsIgnoreCase("$g")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$google ") || message.startsWith("$g ")) {
+		        String input = message.substring(8);
+		        if (message.startsWith("$g "))
+		        	input = message.substring(3);
+		        
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','+');
+		            sendMessage(channel, "here are y0ur search results " + sender + "; http://www.google.com/search?q=" + newInput);
+		        }
+		        
+		    //Youtube Search
+		    } else if (message.equalsIgnoreCase("$youtube") || message.equalsIgnoreCase("$yt")) {
+		        sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		    } else if (message.startsWith("$youtube ") || message.startsWith("$yt ")) {
+		        String input = message.substring(9);
+		        if (message.startsWith("$yt "))
+		        	input = message.substring(4);
+		        if (input.equals("")){
+		            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
+		        } else {
+		            String newInput = input.replace(' ','+');
+		            sendMessage(channel, "here are y0ur search results " + sender + "; http://www.youtube.com/results?search_query=" + newInput);
+		        }
+		        
+		    //Tumblr
+		    } else if (message.equalsIgnoreCase("$tumblr")) {
+		        sendMessage(channel, "i need a name " + sender);
+		    } else if (message.startsWith("$tumblr ")) {
+		        String input = message.substring(8);
+		        if (input.equals("")){
+		            sendMessage(channel, "i need a name " + sender);
+		        } else {
+		            sendMessage(channel, sender + ": http://" + input + ".tumblr.com");
+		        }
+		        
+		    //Talk as Aradiabot
+		    } else if (message.equalsIgnoreCase("$talk")) {
+		        if (channel.equalsIgnoreCase("#hs_admin")) {
+		            if (checkOp(sender) == true) {
+		                sendMessage(channel, "$talk <channel> <msg>");
+		            } else {
+		                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		            }
+		        } else {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        }
+		    } else if (message.startsWith("$talk ")) {
+		        if (channel.equalsIgnoreCase("#hs_admin")) {
+		            if (checkOp(sender) == true) {
+		                String input = message.substring(6);
+		                if (input.equals("")){
+		                    sendMessage(channel, "$talk <channel> <msg>");
+		                } else {
+		                    String[] in = input.split(" ");
+		                    String argChan, sentence = "";
+		                    argChan = in[0];
+		                    for (int i = 1; i < in.length; i++) {
+		                    	sentence += in[i];
+		                    	sentence += " ";
+		                    }
+		                    sentence = sentence.toLowerCase().replace('o', '0').replace('O', '0');
+		                    sendMessage(argChan, sentence);
+		                }
+		            } else {
+		                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		            }
+		        } else {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        }
+		        
+		    //Current Song
+		    } else if (message.equalsIgnoreCase("$song")) {
+		    	if (getCurSong().contains("?????")) {
+		    		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
+		    		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
+		            try {
+						restartWinamp();
+						email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted automatically @ " + curTime);
+					} catch (Exception e) {
+						try {
+							email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to automatically restart @ " + curTime);
+				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
+				            logger.error("COULD NOT RESTART WINAMP");
+						} catch (MessagingException e1) {
+				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
+							e1.printStackTrace();
+						}
 						e.printStackTrace();
 					}
-	            }
-        	} else {
-        		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
-        	}
-            
-        //Current Time    
-        } else if (message.equalsIgnoreCase("$time")) {
-            sendMessage(channel, sender + ": the time is " + curTime);
-            
-        //boner
-        } else if (message.equalsIgnoreCase("$boner")) {
-            sendMessage(channel, sender + ": b0ner");
-        
-        //Let me tell you about Homestuck
-        } else if (message.equalsIgnoreCase("$lmtyahs")) {
-            sendMessage(channel, "let me tell y0u ab0ut h0mestuck: http://goo.gl/XFYbz");
-           
-        //Gear Up Command
-        } else if (message.equalsIgnoreCase("$gearup")) {
-            sendMessage(channel, "y0u are n0w geared up " + sender);
-           
-        //Aradiabot version
-        } else if (message.equalsIgnoreCase("$ver")) {
-            sendMessage(channel, "Aradiabot v" + VER);
-            
-        //Ping Command
-        } else if (message.equalsIgnoreCase("$ping")) {
-            sendMessage(channel, sender + ": p0ng");
-            
-        //Marco/Polo Command 
-        } else if (message.equalsIgnoreCase("$marco")) {
-            sendMessage(channel, sender + ": p0l0");
-            
-        //Songlist Command
-        } else if (message.equalsIgnoreCase("$songlist")) {
-            sendMessage(channel, sender + ": http://goo.gl/0xJtz");
-        
-        //IRC Command
-        } else if (message.equalsIgnoreCase("$irc")) {
-            sendMessage(channel, sender + ": http://goo.gl/dIfQu");
-            
-        //MSPA Page Command
-        } else if (message.equalsIgnoreCase("$mspa")) {
-            sendMessage(channel, sender + ": http://www.mspaintadventures.com/");
-        
-        //Radio Link Command
-        } else if (message.equalsIgnoreCase("$radio")) {
-            sendMessage(channel, sender + ": http://mixlr.com/iarekylew00t/");
-            
-        //FAQ
-        } else if (message.equalsIgnoreCase("$faq")) {
-            sendMessage(channel, sender + ": http://goo.gl/53qWN");
-            
-        //Submit
-        } else if (message.equalsIgnoreCase("$submit")) {
-            sendMessage(channel, sender + ": http://goo.gl/dhvwC");
-
-        //Playflute
-        } else if (message.equalsIgnoreCase("$playflute")) {
-            sendMessage(channel, "have fun " + sender + ": http://goo.gl/LpK89");
-            
-        //Gotta go fast
-        } else if (message.equalsIgnoreCase("$gottagofast")) {
-            sendMessage(channel, "g0tta g0 fastfs: http://goo.gl/P1av7");
-            
-        //Go Fast
-        } else if (message.equalsIgnoreCase("$gofast")) {
-            sendMessage(channel, goFast(fastList));
-        
-        //Search for a page in HS
-        } else if (message.equalsIgnoreCase("$search")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$search ")) {
-            String input = message.substring(8);
-            try {
-				sendMessage(channel, searchPage(input));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-            
-        //8ball
-        } else if (message.equalsIgnoreCase("$8ball")) {
-            sendMessage(channel, "please give me s0mething t0 predict " + sender);
-        } else if (message.startsWith("$8ball ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 predict " + sender);
-            } else {
-                sendMessage(channel, sender + ": " + getOutcome(eightBall));
-            }
-            
-        //Weather
-        } else if (message.equalsIgnoreCase("$weather") || message.equalsIgnoreCase("$we")) {
-            sendMessage(channel, "please enter a zipc0de " + sender);
-        } else if (message.startsWith("$weather ")) {
-            String input = message.substring(9);
-            if (input.equals("")){
-                sendMessage(channel, "please enter a zipc0de " + sender);
-            } else if (!input.matches("^\\d*$")){
-                sendMessage(channel, "please enter a zipc0de " + sender);
-            } else {
-                sendMessage(channel, sender + ": " + getWeather(input));
-            }
-            
-        //Random Number Generator
-        } else if (message.equalsIgnoreCase("$rand")) {
-            int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
-            sendMessage(channel, sender + ": " + randNum);
-        } else if (message.startsWith("$rand ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                int randNum = (0 + (int)(Math.random() * ((10 - 0)) + 1));
-                sendMessage(channel, sender + ": " + randNum);
-            } else {
-            	int maxNum = Integer.parseInt(input);
-                int randNum = (0 + (int)(Math.random() * ((maxNum - 0)) + 1));
-                sendMessage(channel, sender + ": " + randNum);
-            }
-            
-        //Feedback Command
-        } else if (message.equalsIgnoreCase("$feedback") || message.equalsIgnoreCase("$fb")) {
-            sendMessage(channel, "please use: $feedback <resp0nse>");
-        } else if (message.startsWith("$feedback ") || message.startsWith("$fb ")) {
-            String input = message.substring(10);
-            if (input.startsWith("$fb "))
-                input = message.substring(4);
-                
-            if (input.equals("")){
-                sendMessage(channel, "please use: $feedback <resp0nse>");
-            } else {
-                sendMessage(channel, "thank y0u f0r y0ur feedback " + sender + ". kyle will read it s00n" );
-                writeToFile(FEEDBACK_FILE, sender, input);
-            }
-            
-        //Shoosh Command
-        } else if (message.equalsIgnoreCase("$shoosh")) {
-            sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
-        } else if (message.startsWith("$shoosh ")) {
-            String input = message.substring(8);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 am i supp0se t0 be sh00shing " + sender);
-            } else {
-                sendMessage(channel, "sh00shing " + input);
-            }
-
-	    //Bind Command
-	    } else if (message.equalsIgnoreCase("$bind")) {
-	        sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
-	    } else if (message.startsWith("$bind ")) {
-	        String input = message.substring(6);
-	        if (input.equals("")) {
-	            sendMessage(channel, "wh0 am i supp0se t0 bind " + sender);
-	        } else {
-	            sendMessage(channel, input + " has been b0und");
-	        }
-
-	    //Pin Command
-	    } else if (message.equalsIgnoreCase("$pin")) {
-	        sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
-	    } else if (message.startsWith("$pin ")) {
-	        String input = message.substring(5);
-	        if (input.equals("")) {
-	            sendMessage(channel, "wh0 am i supp0se t0 pin " + sender);
-	        } else {
-	            sendMessage(channel, input + " has been pinned");
-	        }
-	            
-        //Pap commad
-        } else if (message.equalsIgnoreCase("$pap")) {
-            sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
-        } else if (message.startsWith("$pap ")) {
-            String input = message.substring(5);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 did y0u want me t0 pap " + sender);
-            } else {
-                sendMessage(channel, "papping " + input);
-            }
-            
-        //Shooshpap command
-        } else if (message.equalsIgnoreCase("$shooshpap")) {
-            sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
-        } else if (message.startsWith("$shooshpap ")) {
-            String input = message.substring(11);
-            if (input.equals("")) {
-                sendMessage(channel, "i need y0u t0 specify wh0 t0 sh00shpap " + sender);
-            } else {
-                sendMessage(channel, input + " has been sh00shpapped");
-            }
-        
-        //MSPAWiki Search
-        } else if (message.equalsIgnoreCase("$mspawiki")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$mspawiki ")) {
-            String input = message.substring(10);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://mspaintadventures.wikia.com/wiki/index.php?search=" + newInput);
-            }
-            
-        //Wiki Search
-        } else if (message.equalsIgnoreCase("$wiki")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$wiki ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, "here are y0ur search results " + sender + ": http://en.wikipedia.org/wiki/" + newInput);
-            }
-            
-        //Dictionary Search
-        } else if (message.equalsIgnoreCase("$dict")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$dict ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','_');
-                sendMessage(channel, sender + ": here is the definiti0n for " + input + "; http://dictionary.reference.com/browse/" + newInput);
-            }
-            
-        //Urban Dictionary Search
-        } else if (message.equalsIgnoreCase("$udict")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$udict ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','+');
-                sendMessage(channel, sender + ": here is the definiti0n for " + input + ": http://www.urbandictionary.com/define.php?term=" + newInput);
-            }
-            
-        //Google Search
-        } else if (message.equalsIgnoreCase("$google") || message.equalsIgnoreCase("$g")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$google ") || message.startsWith("$g ")) {
-            String input = message.substring(8);
-            if (message.startsWith("$g "))
-            	input = message.substring(3);
-            
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','+');
-                sendMessage(channel, "here are y0ur search results " + sender + "; http://www.google.com/search?q=" + newInput);
-            }
-            
-        //Youtube Search
-        } else if (message.equalsIgnoreCase("$youtube") || message.equalsIgnoreCase("$yt")) {
-            sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-        } else if (message.startsWith("$youtube ") || message.startsWith("$yt ")) {
-            String input = message.substring(9);
-            if (message.startsWith("$yt "))
-            	input = message.substring(4);
-            if (input.equals("")){
-                sendMessage(channel, "please give me s0mething t0 search f0r " + sender);
-            } else {
-                String newInput = input.replace(' ','+');
-                sendMessage(channel, "here are y0ur search results " + sender + "; http://www.youtube.com/results?search_query=" + newInput);
-            }
-            
-        //Tumblr
-        } else if (message.equalsIgnoreCase("$tumblr")) {
-            sendMessage(channel, "i need a name " + sender);
-        } else if (message.startsWith("$tumblr ")) {
-            String input = message.substring(8);
-            if (input.equals("")){
-                sendMessage(channel, "i need a name " + sender);
-            } else {
-                sendMessage(channel, sender + ": http://" + input + ".tumblr.com");
-            }
-            
-        //Talk as Aradiabot
-        } else if (message.equalsIgnoreCase("$talk")) {
-            if (channel.equalsIgnoreCase("#hs_admin")) {
-                if (checkOp(sender) == true) {
-                    sendMessage(channel, "$talk <channel> <msg>");
-                } else {
-                    sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-                }
-            } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            }
-        } else if (message.startsWith("$talk ")) {
-            if (channel.equalsIgnoreCase("#hs_admin")) {
-                if (checkOp(sender) == true) {
-                    String input = message.substring(6);
-                    if (input.equals("")){
-                        sendMessage(channel, "$talk <channel> <msg>");
-                    } else {
-                        String[] in = input.split(" ");
-                        String argChan, sentence = "";
-                        argChan = in[0];
-                        for (int i = 1; i < in.length; i++) {
-                        	sentence += in[i];
-                        	sentence += " ";
-                        }
-                        sentence = sentence.toLowerCase().replace('o', '0').replace('O', '0');
-                        sendMessage(argChan, sentence);
-                    }
-                } else {
-                    sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-                }
-            } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            }
-            
-        //Current Song
-        } else if (message.equalsIgnoreCase("$song")) {
-        	if (getCurSong().contains("?????")) {
-        		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
-        		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
-                try {
-					restartWinamp();
-					email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted automatically @ " + curTime);
-				} catch (Exception e) {
+		    	} else {
+		    		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
+		    	}
+				
+			//Latest Homestuck Page
+		    } else if (message.equalsIgnoreCase("$latest")) {
+		                sendMessage(channel, sender + ": " + getLatestPage());
+		    	
+		    //MSPA Update Command
+		    } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
+		    	checkUpdate();
+		    	if (isUpdate == true)
+		            sendMessage(channel, Colors.GREEN + "there is an update");
+		        else
+		            sendMessage(channel, "there is n0 update");
+		        
+		    //Kill Command
+		    } else if (message.equalsIgnoreCase("$kill")) {
+		        sendMessage(channel, "i need s0me0ne t0 kill " + sender);
+		    } else if (message.startsWith("$kill ")) {
+		        String input = message.substring(6);
+		        if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
+		            sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
+		        } else if (input.equalsIgnoreCase("iarekylew00t")) {
+		            sendMessage(channel, "d0 y0u want to end the stati0n " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "y0ur n0t all0wed t0 kill y0urself " + sender);
+		        } else if (input.equals("")) {
+		            sendMessage(channel, "i need s0me0ne t0 kill " + sender);
+		        } else {
+		          sendMessage(channel, "killing " + input);
+		        }
+		        
+		    //Shoot Command
+		    } else if (message.equalsIgnoreCase("$shoot")) {
+		        sendMessage(channel, "i need a target " + sender);
+		    } else if (message.startsWith("$shoot ")) {
+		        String input = message.substring(7);
+		        if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
+		            sendMessage(channel, "that w0uld be very stupid 0f me t0 d0 " + sender);
+		        } else if (input.equalsIgnoreCase("iarekylew00t")) {
+		            sendMessage(channel, "IAreKyleW00t will n0t all0w me t0 d0 that " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "im n0t sure why y0u w0uld want t0 sh00t y0urself " + sender);
+		        } else if (input.equals("")) {
+		            sendMessage(channel, "i need a target " + sender);
+		        } else {
+		            sendMessage(channel, "sh00ting " + input);
+		        }
+		        
+		    //Revive Command
+		    } else if (message.equalsIgnoreCase("$revive")) {
+		        sendMessage(channel, "wh0 am i supp0sed t0 revive " + sender);
+		    } else if(message.startsWith("$revive ")) {
+		        String input = message.substring(8);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "y0u cant just revive y0urself silly");
+		        } else {
+		            sendMessage(channel, "reviving " + input);
+		        }
+		        
+		    //Heal Command
+		    } else if (message.equalsIgnoreCase("$heal")) {
+		        sendMessage(channel, "wh0 am i supp0sed t0 heal " + sender);
+		    } else if(message.startsWith("$heal ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")) {
+		            sendMessage(channel, "wh0 am i sup0sed t0 heal " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "y0u have been healed " + sender);
+		        } else {
+		            sendMessage(channel, input + " has been healed ");
+		        }
+		        
+		    //Slay Command
+		    } else if (message.equalsIgnoreCase("$slay")) {
+		        sendMessage(channel, "i need a name " + sender);
+		    } else if (message.startsWith("$slay ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            sendMessage(channel, "i need s0me0ne t0 slay " + sender);
+		        } else if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
+		            sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
+		        } else if (input.equalsIgnoreCase("iarekylew00t")) {
+		            sendMessage(channel, "im n0t all0wed t0 d0 that " + sender);
+		        } else {
+		            sendMessage(channel, input + " has been slain");
+		        }
+		        
+		    //Stab Command
+		    } else if (message.equalsIgnoreCase("$stab")) {
+		        sendMessage(channel, "i d0nt kn0w wh0 y0u want me t0 stab " + sender);
+		    } else if (message.startsWith("$stab ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            sendMessage(channel, "i need a name " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "y0u want t0 stab y0urself... 0k");
+		        } else {
+		            sendMessage(channel, input + " has been stabbed");
+		        }
+		        
+		    //Slap Command
+		    } else if (message.equalsIgnoreCase("$slap")) {
+		        sendMessage(channel, "wh0 sh0uld i slap " + sender);
+		    } else if (message.startsWith("$slap ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		            sendMessage(channel, "wh0 sh0uld i slap " + sender);
+		        } else if (input.equals(sender)) {
+		            sendMessage(channel, "y0u just slapped y0urself " + sender + ". I h0pe y0ure pr0ud");
+		        } else {
+		            sendMessage(channel, "slapping " + input);
+		        }
+		        
+		    //Serve Command
+		    } else if (message.equalsIgnoreCase("$serve")) {
+		        sendMessage(channel, "i cann0t just serve n0thing " + sender);
+		    } else if (message.startsWith("$serve ")) {
+		        String input = message.substring(7);
+		        if (input.equals("")){
+		            sendMessage(channel, "i cann0t serve n0thing");
+		        } else {
+		            sendMessage(channel, "serving " + input + " t0 everyone");
+		        }
+		    
+		
+		    //Vote Command
+		    } else if (message.equalsIgnoreCase("$vote")) {
+		    	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		        sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
+		    	} else  if (openVote == false){
+		            sendMessage(channel, "y0u d0 n0t have permissi0n t0 d0 that " + sender);
+		    	} else {
+		            sendMessage(channel, "please v0te yes 0r n0 " + sender);
+		    	}
+		    } else if (message.startsWith("$vote ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+		        	if (openVote == false) {
+		        		if (checkOp(sender) == true || checkVoice(sender) == true) {
+		        			sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
+		        		} else {
+		        			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
+		        		}
+		        	} else {
+		                sendMessage(channel, "please v0te yes 0r n0 " + sender);
+		        	}
+		        } else {
+		            String[] in = input.split(" ");
+		            if (in[0].equalsIgnoreCase("open")) {
+		            	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		                	if (openVote == true) {
+		                        sendMessage(channel, "there is already a p0ll 0pen " + sender);
+		                	} else {
+			                	openVote = true;
+			                    for (int i = 1; i < in.length; i++) {
+			                    	voteTitle += in[i];
+			                    	voteTitle += " ";
+			                    }
+		                        sendMessage(channel, sender + " has 0pened a p0ll with the t0pic: " + voteTitle);
+		                	}
+		            	} else {
+		        			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
+		            	}
+		            } else if (in[0].equalsIgnoreCase("close")) {
+		            	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		                	if (openVote == false) {
+		                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
+		                	} else {
+		                		openVote = false;
+			                    sendMessage(channel, sender + " has cl0sed the p0ll: " + voteTitle);
+			                    sendMessage(channel, "the results were: " + voteYes + "/" + voteNo);
+		                		voteYes = 0;
+		                		voteNo = 0;
+		                		voterList.clear();
+		                		voteTitle = "";
+		                	}
+		            	} else {
+		        			sendMessage(channel, "y0ure n0t all0wed t0 d0 that " + sender);
+		            	}
+		            } else if (in[0].equalsIgnoreCase("yes") || in[0].equalsIgnoreCase("y")) {
+		            	if (voterList.contains(sender) == false) {
+		                	if (openVote == true) {
+		                		voteYes++;
+		                		voterList.add(sender);
+		                        sendMessage(channel, voteYes + "/" + voteNo);
+		                	} else {
+		                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
+		                	}
+		            	} else {
+		                    sendMessage(channel, "y0u have already v0ted " + sender);
+		            	}
+		            } else if (in[0].equalsIgnoreCase("no") || in[0].equalsIgnoreCase("n")) {
+		            	if (voterList.contains(sender) == false) {
+		                	if (openVote == true) {
+		                		voteNo++;
+		                		voterList.add(sender);
+		                        sendMessage(channel, voteYes + "/" + voteNo);
+		                	} else {
+		                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
+		                	}
+		            	} else {
+		                    sendMessage(channel, "y0u have already v0ted " + sender);
+		            	}
+		            } else if (openVote == true && (!in[0].equalsIgnoreCase("yes") || !in[0].equalsIgnoreCase("y") || !in[0].equalsIgnoreCase("no") || !in[0].equalsIgnoreCase("n"))){
+		            	if (voterList.contains(sender) == false) {
+		                		sendMessage(channel, "please v0te either yes 0r n0 " + sender);	
+		            	} else {
+		                    sendMessage(channel, "y0u have already v0ted " + sender);
+		            	}
+		            }
+		        }
+		        
+		    //Quote Command
+		    } else if (message.equalsIgnoreCase("$quote")) {
+					sendMessage(channel, "please specify a character " + sender);
+		    } else if (message.startsWith("$quote ")) {
+		        String input = message.substring(7);
+		        if (input.equals("")){
+					sendMessage(channel, "please specify a character " + sender);
+		        } else if (!input.contains(" ")){
 					try {
-						email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to automatically restart @ " + curTime);
-			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
-					} catch (MessagingException e1) {
-			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-						e1.printStackTrace();
+						sendMessage(channel, getRandQuote(input));
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					e.printStackTrace();
-				}
-        	} else {
-        		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + getCurSong());
-        	}
-			
-		//Latest Homestuck Page
-        } else if (message.equalsIgnoreCase("$latest")) {
-                    sendMessage(channel, sender + ": " + getLatestPage());
-        	
-        //MSPA Update Command
-        } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
-        	checkUpdate();
-        	if (isUpdate == true)
-                sendMessage(channel, Colors.GREEN + "there is an update");
-            else
-                sendMessage(channel, "there is n0 update");
-            
-        //Kill Command
-        } else if (message.equalsIgnoreCase("$kill")) {
-            sendMessage(channel, "i need s0me0ne t0 kill " + sender);
-        } else if (message.startsWith("$kill ")) {
-            String input = message.substring(6);
-            if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
-                sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
-            } else if (input.equalsIgnoreCase("iarekylew00t")) {
-                sendMessage(channel, "d0 y0u want to end the stati0n " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "y0ur n0t all0wed t0 kill y0urself " + sender);
-            } else if (input.equals("")) {
-                sendMessage(channel, "i need s0me0ne t0 kill " + sender);
-            } else {
-              sendMessage(channel, "killing " + input);
-            }
-            
-        //Shoot Command
-        } else if (message.equalsIgnoreCase("$shoot")) {
-            sendMessage(channel, "i need a target " + sender);
-        } else if (message.startsWith("$shoot ")) {
-            String input = message.substring(7);
-            if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
-                sendMessage(channel, "that w0uld be very stupid 0f me t0 d0 " + sender);
-            } else if (input.equalsIgnoreCase("iarekylew00t")) {
-                sendMessage(channel, "IAreKyleW00t will n0t all0w me t0 d0 that " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "im n0t sure why y0u w0uld want t0 sh00t y0urself " + sender);
-            } else if (input.equals("")) {
-                sendMessage(channel, "i need a target " + sender);
-            } else {
-                sendMessage(channel, "sh00ting " + input);
-            }
-            
-        //Revive Command
-        } else if (message.equalsIgnoreCase("$revive")) {
-            sendMessage(channel, "wh0 am i supp0sed t0 revive " + sender);
-        } else if(message.startsWith("$revive ")) {
-            String input = message.substring(8);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 am i sup0sed t0 revive " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "y0u cant just revive y0urself silly");
-            } else {
-                sendMessage(channel, "reviving " + input);
-            }
-            
-        //Heal Command
-        } else if (message.equalsIgnoreCase("$heal")) {
-            sendMessage(channel, "wh0 am i supp0sed t0 heal " + sender);
-        } else if(message.startsWith("$heal ")) {
-            String input = message.substring(6);
-            if (input.equals("")) {
-                sendMessage(channel, "wh0 am i sup0sed t0 heal " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "y0u have been healed " + sender);
-            } else {
-                sendMessage(channel, input + " has been healed ");
-            }
-            
-        //Slay Command
-        } else if (message.equalsIgnoreCase("$slay")) {
-            sendMessage(channel, "i need a name " + sender);
-        } else if (message.startsWith("$slay ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "i need s0me0ne t0 slay " + sender);
-            } else if (input.equalsIgnoreCase("aradiabot") || input.equalsIgnoreCase("self")) {
-                sendMessage(channel, "why w0uld i kill myself when im already dead " + sender);
-            } else if (input.equalsIgnoreCase("iarekylew00t")) {
-                sendMessage(channel, "im n0t all0wed t0 d0 that " + sender);
-            } else {
-                sendMessage(channel, input + " has been slain");
-            }
-            
-        //Stab Command
-        } else if (message.equalsIgnoreCase("$stab")) {
-            sendMessage(channel, "i d0nt kn0w wh0 y0u want me t0 stab " + sender);
-        } else if (message.startsWith("$stab ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "i need a name " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "y0u want t0 stab y0urself... 0k");
-            } else {
-                sendMessage(channel, input + " has been stabbed");
-            }
-            
-        //Slap Command
-        } else if (message.equalsIgnoreCase("$slap")) {
-            sendMessage(channel, "wh0 sh0uld i slap " + sender);
-        } else if (message.startsWith("$slap ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-                sendMessage(channel, "wh0 sh0uld i slap " + sender);
-            } else if (input.equals(sender)) {
-                sendMessage(channel, "y0u just slapped y0urself " + sender + ". I h0pe y0ure pr0ud");
-            } else {
-                sendMessage(channel, "slapping " + input);
-            }
-            
-        //Serve Command
-        } else if (message.equalsIgnoreCase("$serve")) {
-            sendMessage(channel, "i cann0t just serve n0thing " + sender);
-        } else if (message.startsWith("$serve ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-                sendMessage(channel, "i cann0t serve n0thing");
-            } else {
-                sendMessage(channel, "serving " + input + " t0 everyone");
-            }
-        
-
-        //Vote Command
-        } else if (message.equalsIgnoreCase("$vote")) {
-        	if (checkOp(sender) == true || checkVoice(sender) == true) {
-            sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
-        	} else  if (openVote == false){
-                sendMessage(channel, "y0u d0 n0t have permissi0n t0 d0 that " + sender);
-        	} else {
-                sendMessage(channel, "please v0te yes 0r n0 " + sender);
-        	}
-        } else if (message.startsWith("$vote ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-            	if (openVote == false) {
-            		if (checkOp(sender) == true || checkVoice(sender) == true) {
-            			sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
-            		} else {
-            			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
-            		}
-            	} else {
-                    sendMessage(channel, "please v0te yes 0r n0 " + sender);
-            	}
-            } else {
-                String[] in = input.split(" ");
-                if (in[0].equalsIgnoreCase("open")) {
-                	if (checkOp(sender) == true || checkVoice(sender) == true) {
-	                	if (openVote == true) {
-	                        sendMessage(channel, "there is already a p0ll 0pen " + sender);
-	                	} else {
-		                	openVote = true;
-		                    for (int i = 1; i < in.length; i++) {
-		                    	voteTitle += in[i];
-		                    	voteTitle += " ";
-		                    }
-	                        sendMessage(channel, sender + " has 0pened a p0ll with the t0pic: " + voteTitle);
-	                	}
-                	} else {
-            			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
-                	}
-                } else if (in[0].equalsIgnoreCase("close")) {
-                	if (checkOp(sender) == true || checkVoice(sender) == true) {
-	                	if (openVote == false) {
-	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
-	                	} else {
-	                		openVote = false;
-		                    sendMessage(channel, sender + " has cl0sed the p0ll: " + voteTitle);
-		                    sendMessage(channel, "the results were: " + voteYes + "/" + voteNo);
-	                		voteYes = 0;
-	                		voteNo = 0;
-	                		voterList.clear();
-	                		voteTitle = "";
-	                	}
-                	} else {
-            			sendMessage(channel, "y0ure n0t all0wed t0 d0 that " + sender);
-                	}
-                } else if (in[0].equalsIgnoreCase("yes") || in[0].equalsIgnoreCase("y")) {
-                	if (voterList.contains(sender) == false) {
-	                	if (openVote == true) {
-	                		voteYes++;
-	                		voterList.add(sender);
-	                        sendMessage(channel, voteYes + "/" + voteNo);
-	                	} else {
-	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
-	                	}
-                	} else {
-                        sendMessage(channel, "y0u have already v0ted " + sender);
-                	}
-                } else if (in[0].equalsIgnoreCase("no") || in[0].equalsIgnoreCase("n")) {
-                	if (voterList.contains(sender) == false) {
-	                	if (openVote == true) {
-	                		voteNo++;
-	                		voterList.add(sender);
-	                        sendMessage(channel, voteYes + "/" + voteNo);
-	                	} else {
-	                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
-	                	}
-                	} else {
-                        sendMessage(channel, "y0u have already v0ted " + sender);
-                	}
-                } else if (openVote == true && (!in[0].equalsIgnoreCase("yes") || !in[0].equalsIgnoreCase("y") || !in[0].equalsIgnoreCase("no") || !in[0].equalsIgnoreCase("n"))){
-                	if (voterList.contains(sender) == false) {
-	                		sendMessage(channel, "please v0te either yes 0r n0 " + sender);	
-                	} else {
-                        sendMessage(channel, "y0u have already v0ted " + sender);
-                	}
-                }
-            }
-            
-        //Quote Command
-        } else if (message.equalsIgnoreCase("$quote")) {
-				sendMessage(channel, "please specify a character " + sender);
-        } else if (message.startsWith("$quote ")) {
-            String input = message.substring(7);
-            if (input.equals("")){
-				sendMessage(channel, "please specify a character " + sender);
-            } else if (!input.contains(" ")){
-				try {
-					sendMessage(channel, getRandQuote(input));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-            } else {
-            	String[] in = input.split(" ");
-            	int num = Integer.parseInt(in[1]);
-                try {
-					sendMessage(channel, getQuote(in[0], num));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-            }
-            
-        //Page Command
-        } else if (message.equalsIgnoreCase("$page")) {
-				sendMessage(channel, sender + ": " + getRandPage());
-        } else if (message.startsWith("$page ")) {
-            String input = message.substring(6);
-            if (input.equals("")){
-				sendMessage(channel, sender + ": " + getRandPage());
-            } else {
-            	int pageNum = Integer.parseInt(input);
-					sendMessage(channel, sender + ": " + getPage(pageNum));
-            }
-       
-        //Shout Command
-        } else if (message.equalsIgnoreCase("$shout")) {
-        	if (checkOp(sender) == false || checkVoice(sender) == false) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else {
-                sendMessage(channel, "please use: $shout <message>");
-            }
-        } else if (message.startsWith("$shout ")) {
-        	if (checkOp(sender) || checkVoice(sender)) {
-            	String input = message.substring(7);
-            	sendMessage(channel, Colors.BOLD + Colors.RED + input);
-            } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            }
-            
-        //Announce Command
-        } else if (message.equalsIgnoreCase("$announce")) {
-        	if (checkOp(sender) == false || checkVoice(sender) == false) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-        	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-                    sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else {
-                sendMessage(channel, "please use: $announce <message>");
-            }
-        } else if (message.startsWith("$announce ")) {
-        	if (checkOp(sender)) {
-            	String input = message.substring(10);
-                for (int i = 0; i < chanList.length; i++) {
-                	sendMessage(chanList[i], Colors.BOLD + Colors.RED + "ANNOUNCEMENT: " + Colors.YELLOW + input);
-                }
-        	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            } else {
-                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-            }
-            	
-        //Request ON|OFF
-        } else if (message.equalsIgnoreCase("$reqon")) {
-            if (channel.equalsIgnoreCase("#ircstuck")) {
-                sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
-            } else {
-                if (checkOp(sender) == true) {
-                    req = true;
-                    for (int i = 0; i < chanList.length; i++) {
-                    sendMessage(chanList[i], Colors.BOLD + Colors.GREEN + "requests have been turn 0n by " + sender);
-                    }
-                } else {
-                    sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-                }
-            }
-        } else if (message.equalsIgnoreCase("$reqoff")) {
-            if (channel.equalsIgnoreCase("#ircstuck")) {
-                sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
-            } else {
-	            if (checkOp(sender) == true) {
-	                req = false;
-                    for (int i = 0; i < chanList.length; i++) {
-                    sendMessage(chanList[i], Colors.BOLD + Colors.RED + "requests have been turn 0ff by " + sender);
-                    }
-	            } else {
-	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-	            }
-            }
-      
-        //Request song
-        } else if (message.equalsIgnoreCase("$req")) {
-            if (req == true)
-                sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
-            else
-                sendMessage(channel, "requests are currently cl0sed");
-        } else if (message.startsWith("$req ")) {
-            String input = message.substring(5);
-            if (req == true) {
-            	try {
-					if (countReq(sender) < 3) {
-					    if (input.equals("")){
-					        sendMessage(channel, "please specify a s0ng " + sender);
-					    } else {
-					    	if (checkReq(input) == false) {
-						        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-						        writeToFile(SONG_LIST, sender, input);
-					    	} else {
-						        sendMessage(channel, "that s0ng has already been requested " + sender);
-					    	}
-					    }
-					} else {
-				        sendMessage(channel, "y0u have already made 3 requests " + sender);
+		        } else {
+		        	String[] in = input.split(" ");
+		        	int num = Integer.parseInt(in[1]);
+		            try {
+						sendMessage(channel, getQuote(in[0], num));
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-            } else {
-                sendMessage(channel, "requests are currently cl0sed " + sender);
-            }
-            
-        //Restart Winamp Command
-        } else if (message.equalsIgnoreCase("$restart")) {
-        	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
-                try {
-					restartWinamp();
-					email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + curSender);
-				} catch (Exception e) {
-					try {
-						email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to restart @ " + curTime);
-			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
-					} catch (MessagingException e1) {
-			            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-						e1.printStackTrace();
+		        }
+		        
+		    //Page Command
+		    } else if (message.equalsIgnoreCase("$page")) {
+					sendMessage(channel, sender + ": " + getRandPage());
+		    } else if (message.startsWith("$page ")) {
+		        String input = message.substring(6);
+		        if (input.equals("")){
+					sendMessage(channel, sender + ": " + getRandPage());
+		        } else {
+		        	int pageNum = Integer.parseInt(input);
+						sendMessage(channel, sender + ": " + getPage(pageNum));
+		        }
+		   
+		    //Shout Command
+		    } else if (message.equalsIgnoreCase("$shout")) {
+		    	if (checkOp(sender) == false || checkVoice(sender) == false) {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        } else {
+		            sendMessage(channel, "please use: $shout <message>");
+		        }
+		    } else if (message.startsWith("$shout ")) {
+		    	if (checkOp(sender) || checkVoice(sender)) {
+		        	String input = message.substring(7);
+		        	sendMessage(channel, Colors.BOLD + Colors.RED + input);
+		        } else {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        }
+		        
+		    //Announce Command
+		    } else if (message.equalsIgnoreCase("$announce")) {
+		    	if (checkOp(sender) == false || checkVoice(sender) == false) {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		    	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+		                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        } else {
+		            sendMessage(channel, "please use: $announce <message>");
+		        }
+		    } else if (message.startsWith("$announce ")) {
+		    	if (checkOp(sender)) {
+		        	String input = message.substring(10);
+		            for (int i = 0; i < chanList.length; i++) {
+		            	sendMessage(chanList[i], Colors.BOLD + Colors.RED + "ANNOUNCEMENT: " + Colors.YELLOW + input);
+		            }
+		    	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        } else {
+		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        }
+		        	
+		    //Request ON|OFF
+		    } else if (message.equalsIgnoreCase("$reqon")) {
+		        if (channel.equalsIgnoreCase("#ircstuck")) {
+		            sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
+		        } else {
+		            if (checkOp(sender) == true) {
+		                req = true;
+		                for (int i = 0; i < chanList.length; i++) {
+		                sendMessage(chanList[i], Colors.BOLD + Colors.GREEN + "requests have been turn 0n by " + sender);
+		                }
+		            } else {
+		                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+		            }
+		        }
+		    } else if (message.equalsIgnoreCase("$reqoff")) {
+		        if (channel.equalsIgnoreCase("#ircstuck")) {
+		            sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
+		        } else {
+		            if (checkOp(sender) == true) {
+		                req = false;
+		                for (int i = 0; i < chanList.length; i++) {
+		                sendMessage(chanList[i], Colors.BOLD + Colors.RED + "requests have been turn 0ff by " + sender);
+		                }
+		            } else {
+		                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+		            }
+		        }
+		  
+		    //Request song
+		    } else if (message.equalsIgnoreCase("$req")) {
+		        if (req == true)
+		            sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
+		        else
+		            sendMessage(channel, "requests are currently cl0sed");
+		    } else if (message.startsWith("$req ")) {
+		        String input = message.substring(5);
+		        if (req == true) {
+		        	try {
+						if (countReq(sender) < 3) {
+						    if (input.equals("")){
+						        sendMessage(channel, "please specify a s0ng " + sender);
+						    } else {
+						    	if (checkReq(input) == false) {
+							        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
+							        writeToFile(SONG_LIST, sender, input);
+						    	} else {
+							        sendMessage(channel, "that s0ng has already been requested " + sender);
+						    	}
+						    }
+						} else {
+					        sendMessage(channel, "y0u have already made 3 requests " + sender);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-					e.printStackTrace();
-				}
-        	} else {
-                sendMessage(channel, "im s0rry, y0u d0nt have permissi0n t0 d0 that - please c0ntact a m0d 0r admin");
-        	}
-        }
+		        } else {
+		            sendMessage(channel, "requests are currently cl0sed " + sender);
+		        }
+		        
+		    //Restart Winamp Command
+		    } else if (message.equalsIgnoreCase("$restart")) {
+		    	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
+		            try {
+						restartWinamp();
+						email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + curSender);
+					} catch (Exception e) {
+						try {
+							email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to restart @ " + curTime);
+				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
+				            logger.error("COULD NOT RESTART WINAMP");
+						} catch (MessagingException e1) {
+				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
+							e1.printStackTrace();
+						}
+						e.printStackTrace();
+					}
+		    	} else {
+		            sendMessage(channel, "im s0rry, y0u d0nt have permissi0n t0 d0 that - please c0ntact a m0d 0r admin");
+		    	}
+		    }
+    	}
     }
     
     //Get the time to wait for the reminder
@@ -944,19 +990,21 @@ public class IRCBot extends PircBot {
 	public void restartWinamp() throws Exception {
     	curTime = dateFormat.format(date);
     	
-        sendMessage(curChan, Colors.BOLD + "----- RESTARTING WINAMP -----");
-        System.out.println("----- RESTARTING WINAMP -----");
+        sendMessage(curChan, Colors.BOLD + "----------- RESTARTING WINAMP -----------");
+        logger.warning("RESTARTING WINAMP");
         numOfAttempts++;
 		try {
 			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
 		} catch (Exception e) {
 			if (numOfAttempts <= 3) {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp - Attempt " + numOfAttempts);
+	            logger.error("Could not kill Winamp - Attempt " + numOfAttempts);
 				restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
                 email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
+	            logger.error("Could not kill Winamp\n" + e);
 				e.printStackTrace();
 				return;
 			}
@@ -967,19 +1015,21 @@ public class IRCBot extends PircBot {
 		} catch (Exception e) {
 			if (numOfAttempts <= 3) {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp - Attempt " + numOfAttempts);
-				restartWinamp();
+	            logger.error("Could not start Winamp - Attempt " + numOfAttempts);
+	            restartWinamp();
 			} else {
 	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
         		email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
-				e.printStackTrace();
+	            logger.error("Could not start Winamp\n" + e);
+	            e.printStackTrace();
 				return;
 			}
 		};
         numOfAttempts = 0;
         sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
-        System.out.println("----- WINAMP RESTARTED SUCCESSFULLY -----");
-        sendMessage(curChan, "IAreKyleW00t has been notified via Email");
+        logger.notice("WINAMP RESTARTED SUCCESSFULLY");
+        sendMessage(curChan, " IAreKyleW00t has been notified via Email");
 
     }
     
@@ -2684,30 +2734,12 @@ public class IRCBot extends PircBot {
     	return false;
     }
     
-    private String getCurOnlineStaff() {
-    	User users[] = getUsers(curChan);
-    	String staff = "";
-    	boolean first = true;
-    	for (User user : users) {
-    		if (user.isOp() || user.hasVoice()) {
-    			if (first) {
-    			staff += user;
-    			first = false;
-    			} else {
-    				staff += ", " + user;
-    			}
-    		}
-    	}
-    	
-    	return staff;
-    }
-    
     private void setupEmail() {
         if (!emailAccount.equals("") || !emailPassword.equals("")) {
 		    try {
 				email = new EmailClient(emailAccount, emailPassword, "smtp.gmail.com", false);
 			} catch (Exception e) {
-				System.out.println("----- ERROR SETTING UP GMAIL CLIENT -----");
+				logger.error("ERROR SETTING UP GMAIL CLIENT");
 				e.printStackTrace();
 			}
         }
