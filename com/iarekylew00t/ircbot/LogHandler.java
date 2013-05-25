@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class LogHandler {
-	private String VER = "0.0.1.0";
+	private String VER = "0.0.1.2";
 	private File LOG_FILE;
 	private DateFormat logFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private Date date;
@@ -41,8 +41,9 @@ public class LogHandler {
 	public void log(String log) {
 		date = new Date();
 		logTime = logFormat.format(date) + " ";
-		System.out.println(logTime + log);
-		writeToFile(logTime + log);
+		String cleanLog = log.replace("[^\\x00-\\x7F]", "");
+		System.out.println(logTime + cleanLog);
+		writeToFile(logTime + cleanLog);
 	}
 	
 	public void debug(String log) {
@@ -63,7 +64,7 @@ public class LogHandler {
 		
 	}
 	
-    public void writeToFile(String message) {
+    private void writeToFile(String message) {
         try {
             Writer output = new BufferedWriter(new FileWriter(LOG_FILE, true));
             output.append(message + "\n");
