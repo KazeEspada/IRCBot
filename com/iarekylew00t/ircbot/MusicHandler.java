@@ -9,8 +9,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.mail.MessagingException;
-
 import org.jibble.pircbot.Colors;
 import org.jibble.pircbot.PircBot;
 
@@ -96,7 +94,11 @@ public class MusicHandler implements Runnable {
 		Process p = Runtime.getRuntime().exec("winamp.exe");
 		
         mainBot.sendMessage(channel, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
-		emailClient.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + sender);
+        try {
+        	emailClient.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + sender);
+        } catch (Exception e) {
+			mainBot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+        }
         logger.notice("WINAMP RESTARTED SUCCESSFULLY");
     }
     
@@ -110,18 +112,13 @@ public class MusicHandler implements Runnable {
     
     private void checkWinamp() {
     	if (curSong.contains("??????")) {
+    		logger.error("WINAMP ERROR DETECTED");
     		try {
 				restartWinamp();
 				updateCurSong();
 			} catch (Exception e) {
-				try {
-					mainBot.sendMessage("hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t");
-					emailClient.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to resatrt @ " + curTime);
-				} catch (MessagingException e1) {
-					mainBot.sendMessage("hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
-					logger.error("FAILED TO SEND EMAIL");
-					logger.error(e1);
-				}
+				mainBot.sendMessage("hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t");
+				emailClient.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to resatrt @ " + curTime);
 				logger.error("FAILED TO RESTART WINAMP");
 				logger.error(e);
 			}

@@ -12,7 +12,6 @@ import java.util.Random;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
-import javax.mail.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -21,7 +20,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.2a";
+    private static final String VER = "0.9.3.2b";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
@@ -127,20 +126,12 @@ public class IRCBot extends PircBot {
 			IRCBotMain.setupBot();
 		} catch (Exception e) {
 			logger.error("RECREATION/RECONNECT FAILED");
-			try {
-				email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Failed to Reconnect", "Aradiabot failed to reconnect to the server @ " + curTime + "\n" + e);
-			} catch (MessagingException e1) {
-				logger.error(e1);
-			}
+			email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Failed to Reconnect", "Aradiabot failed to reconnect to the server @ " + curTime + "\n" + e);
 			logger.error(e);
 			return;
 		}
 		logger.notice("SUCCESSFULLY RECONNECTED");
-		try {
-			email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
-		} catch (MessagingException e) {
-			logger.error(e);
-		}
+		email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
     }
     
     protected void onAction(String sender, String login, String hostname, String target, String action) {
@@ -266,13 +257,8 @@ public class IRCBot extends PircBot {
 		            if (input.equals("")){
 		        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
 		            } else {
-		            	try {
-							email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input);
-							sendMessage(channel, Colors.GREEN + "-- Email sent successfully --");
-						} catch (MessagingException e) {
-			        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
-			    			logger.error(e);
-						}
+		            	email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input, channel);
+						sendMessage(channel, Colors.GREEN + "-- Email sent successfully --");
 		            }
 		    	} else {
 		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
@@ -946,14 +932,8 @@ public class IRCBot extends PircBot {
 		    		try {
 						player.restartWinamp(channel, sender);
 					} catch (Exception e) {
-						try {
-							sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t");
-							email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to resatrt @ " + curTime);
-						} catch (MessagingException e1) {
-							sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
-							logger.error("FAILED TO SEND EMAIL");
-							logger.error(e1);
-						}
+						sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t");
+						email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to resatrt @ " + curTime, channel);
 						logger.error("FAILED TO RESTART WINAMP");
 						logger.error(e);
 					}
@@ -962,6 +942,10 @@ public class IRCBot extends PircBot {
 		    	}
 		    }
     	}
+    }
+    
+    public String getCurChan() {
+    	return curChan;
     }
     
     private static int countLines(String filename) throws IOException {
@@ -2470,7 +2454,7 @@ public class IRCBot extends PircBot {
     	return false;
     }
     
-    public boolean checkVoice(String sender) {
+    private boolean checkVoice(String sender) {
     	User users[] = getUsers(curChan);
     	User u = null;
     	for(User user:users){
@@ -2492,7 +2476,7 @@ public class IRCBot extends PircBot {
     private void setupEmail(String emailAcc, String password) {
         if (!emailAcc.equals("") || !password.equals("")) {
 		    try {
-				email = new EmailClient(emailAcc, password, "smtp.gmail.com", false);
+				email = new EmailClient(emailAcc, password, "smtp.gmail.com", false, this);
 			} catch (Exception e) {
 				logger.error("ERROR SETTING UP GMAIL CLIENT");
 				logger.error(e);
