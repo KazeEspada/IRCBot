@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.0";
+    private static final String VER = "0.9.3.0a";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
@@ -104,12 +104,10 @@ public class IRCBot extends PircBot {
     	}
     }
     
-    @Override
     protected void onConnect() {
     	logger.notice("SUCCESSFULLY CONNECTED TO SERVER");
     }
     
-    @Override
     protected void onDisconnect() {
 		logger.warning("DISCONNECTED FROM SERVER");
     	date = new Date();
@@ -137,39 +135,39 @@ public class IRCBot extends PircBot {
 		}
     }
     
-    public void onAction(String sender, String login, String hostname, String target, String action) {
+    protected void onAction(String sender, String login, String hostname, String target, String action) {
 		logger.log(sender + "!" + login + ": " + action);
     }
     
-    public void onJoin(String channel, String sender, String login, String hostname) {
+    protected void onJoin(String channel, String sender, String login, String hostname) {
     	logger.notice(sender + "!" + login + "@" + hostname + " JOINED " + channel);
     }
     
-    public void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
+    protected void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode) {
     	logger.notice(sourceNick + " SET MODE " + mode);
     }
     
-    public void onNickChange(String oldNick, String login, String hostname, String newNick) {
+    protected void onNickChange(String oldNick, String login, String hostname, String newNick) {
     	logger.notice(oldNick + "!" + login + " SET NICK " + newNick);
     }
     
-    public void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice) {
+    protected void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice) {
     	logger.notice(sourceNick + "!" + sourceLogin + " NOTICE " + target + ": " + notice);
     }
     
-    public void onPart(String channel, String sender, String login, String hostname) {
+    protected void onPart(String channel, String sender, String login, String hostname) {
     	logger.notice(sender + "!" + login + "@" + hostname + " PARTED " + channel);
     }
     
-    public void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue) {
+    protected void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue) {
     	logger.notice(sourceNick + "!" + sourceLogin + " PINGED " + target);
     }
     
-    public void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
+    protected void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason) {
     	logger.notice(sourceNick + "!" + sourceLogin + "@" + sourceHostname + " QUIT (" + reason + ")");
     }
     
-    public void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
+    protected void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason) {
     	logger.warning(kickerNick + "!" + kickerLogin + "@" + kickerHostname + "(" + channel + ")" + " KICKED " + recipientNick + "(" + reason + ")");
     }
     
