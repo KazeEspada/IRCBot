@@ -33,7 +33,7 @@ public class SongManager implements Runnable {
     		try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
     		updateCurSong();
     		updatePrevSong();
@@ -54,7 +54,7 @@ public class SongManager implements Runnable {
 		if (!curSong.equalsIgnoreCase(tempSong)) {
 			prevSong = tempSong;
 			tempSong = curSong;
-			logger.debug("SUCCESSFULLY CHANGED PREVIOUS SONG");
+			logger.debug("--- SUCCESSFULLY CHANGED PREVIOUS SONG ---");
 		}
     }
     
@@ -75,7 +75,7 @@ public class SongManager implements Runnable {
 			br.readLine(); //Skips first line
 			curSong = br.readLine();
 		} catch (Exception e) {
-			logger.error("" + e);
+			logger.error(e);
 		}
 		curSong = trimString(curSong, 9);
     }

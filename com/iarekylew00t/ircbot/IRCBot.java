@@ -7,7 +7,6 @@ import org.jibble.pircbot.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.*;
 import java.io.*;
 import java.util.Random;
 import java.net.URL;
@@ -23,7 +22,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.2.85";
+    private static final String VER = "0.9.3.0";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
@@ -80,8 +79,8 @@ public class IRCBot extends PircBot {
     private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
     private String curChan, curSender, curTime, voteTitle = "", emailAccount = IRCBotMain.getEmail(), emailPassword = IRCBotMain.getEmailPass();
-    private boolean req = false, openVote = false, isUpdate = false;;
-    private int voteYes, voteNo, latestPage, numOfAttempts = 0;
+    private boolean req = false, openVote = false;
+    private int voteYes, voteNo, numOfAttempts = 0;
     List<String> voterList = new ArrayList<String>();
     private EmailClient email;
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -89,11 +88,11 @@ public class IRCBot extends PircBot {
 	private LogHandler logger = new LogHandler();
 	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
 	private SongManager player = new SongManager("curSong.txt");
+	private HomestuckChecker updater = new HomestuckChecker(this, 30);
     
     public IRCBot(String name, String password) {
         setName(name);
         login(password);
-        checkUpdate();
         checkFile(SONG_LIST);
         checkFile(FEEDBACK_FILE);
         setupEmail();
@@ -125,16 +124,16 @@ public class IRCBot extends PircBot {
 			try {
 				email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Failed to Reconnect", "Aradiabot failed to reconnect to the server @ " + curTime + "\n" + e);
 			} catch (MessagingException e1) {
-				logger.error("" + e1);
+				logger.error(e1);
 			}
-			logger.error("" + e);
+			logger.error(e);
 			return;
 		}
 		logger.notice("SUCCESSFULLY RECONNECTED");
 		try {
 			email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
 		} catch (MessagingException e) {
-			logger.error("" + e);
+			logger.error(e);
 		}
     }
     
@@ -195,7 +194,7 @@ public class IRCBot extends PircBot {
 			//List All Commands
 			if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
 		        sendMessage(channel, "8ball, announce, bind, boner, commands, dict, expand, faq, feedback, gearup, google, " +
-		        		"gofast, gottagofast, heal, irc, kill, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, prevsong, reboot, " +
+		        		"gofast, gottagofast, heal, irc, kill, latest, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, prevsong, reboot, " +
 		        		"radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shorten, shout, slap, slay, " +
 		        		"song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
 		  
@@ -220,7 +219,7 @@ public class IRCBot extends PircBot {
 					try {
 						shortUrl = google.shortenUrl(input);
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 		            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not shrink URL");
 		            	return;
 					}
@@ -241,7 +240,7 @@ public class IRCBot extends PircBot {
 					try {
 						longUrl = google.expandUrl(input);
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 		            	sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not expand URL");
 		            	return;
 					}
@@ -264,10 +263,10 @@ public class IRCBot extends PircBot {
 		            } else {
 		            	try {
 							email.sendEmail("kyle10468@gmail.com", "Message from " + sender, "Sent @ " + curTime + ": " + input);
-							sendMessage(channel, Colors.GREEN + "- email sent successfully -");
+							sendMessage(channel, Colors.GREEN + "-- Email sent successfully --");
 						} catch (MessagingException e) {
 			        		sendMessage(channel, Colors.BOLD + Colors.RED + "ERROR: " + Colors.NORMAL + "Failed to send IAreKyleW00t the message");
-			    			logger.error("" + e);
+			    			logger.error(e);
 						}
 		            }
 		    	} else {
@@ -346,7 +345,7 @@ public class IRCBot extends PircBot {
 		        try {
 					sendMessage(channel, searchPage(input));
 				} catch (IOException e) {
-					logger.error("" + e);
+					logger.error(e);
 				}
 		        
 		    //8ball
@@ -598,9 +597,9 @@ public class IRCBot extends PircBot {
 					            logger.error("COULD NOT RESTART WINAMP");
 							} catch (MessagingException e1) {
 					            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-								logger.error("" + e1);
+								logger.error(e1);
 							}
-						logger.error("" + e);
+						logger.error(e);
 					}
 		    	} else {
 		    		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + player.getCurSong());
@@ -611,15 +610,15 @@ public class IRCBot extends PircBot {
 				
 			//Latest Homestuck Page
 		    } else if (message.equalsIgnoreCase("$latest")) {
-		                sendMessage(channel, sender + ": " + getLatestPage());
+		                sendMessage(channel, sender + ": http://www.mspaintadventures.com/?s=6&p=00" + updater.getLatestPage());
 		    	
 		    //MSPA Update Command
 		    } else if (message.equalsIgnoreCase("$update") || message.equalsIgnoreCase("$upd8")) {
-		    	checkUpdate();
-		    	if (isUpdate == true)
-		            sendMessage(channel, Colors.GREEN + "there is an update");
-		        else
-		            sendMessage(channel, "there is n0 update");
+		    	if (updater.manualCheck() == true) {
+		            sendMessage(channel, Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
+		    	} else {
+		            sendMessage(channel, "there is n0t an update");
+		    	}
 		        
 		    //Kill Command
 		    } else if (message.equalsIgnoreCase("$kill")) {
@@ -832,7 +831,7 @@ public class IRCBot extends PircBot {
 					try {
 						sendMessage(channel, getRandQuote(input));
 					} catch (IOException e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 		        } else {
 		        	String[] in = input.split(" ");
@@ -840,20 +839,24 @@ public class IRCBot extends PircBot {
 		            try {
 						sendMessage(channel, getQuote(in[0], num));
 					} catch (IOException e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 		        }
 		        
 		    //Page Command
 		    } else if (message.equalsIgnoreCase("$page")) {
-					sendMessage(channel, sender + ": " + getRandPage());
+					sendMessage(channel, sender + ": http://www.mspaintadventures.com/?s=6&p=00" + updater.getPage());
 		    } else if (message.startsWith("$page ")) {
 		        String input = message.substring(6);
 		        if (input.equals("")){
-					sendMessage(channel, sender + ": " + getRandPage());
+					sendMessage(channel, sender + ": http://www.mspaintadventures.com/?s=6&p=00" + updater.getPage());
 		        } else {
 		        	int pageNum = Integer.parseInt(input);
-						sendMessage(channel, sender + ": " + getPage(pageNum));
+		        	if (pageNum == 4299 || pageNum == 4938 || pageNum == 4988) {
+						sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "That page does not exist");
+		        	} else {
+						sendMessage(channel, sender + ": http://www.mspaintadventures.com/?s=6&p=00" + updater.getPage(pageNum));
+		        	}
 		        }
 		   
 		    //Shout Command
@@ -945,7 +948,7 @@ public class IRCBot extends PircBot {
 					        sendMessage(channel, "y0u have already made 3 requests " + sender);
 						}
 					} catch (IOException e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 		        } else {
 		            sendMessage(channel, "requests are currently cl0sed " + sender);
@@ -965,9 +968,9 @@ public class IRCBot extends PircBot {
 				            logger.error("COULD NOT RESTART WINAMP");
 						} catch (MessagingException e1) {
 				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-				            logger.error("" + e1);
+				            logger.error(e1);
 						}
-						logger.error("" + e);
+						logger.error(e);
 					}
 		    	} else {
 		            sendMessage(channel, "im s0rry, y0u d0nt have permissi0n t0 d0 that - please c0ntact a m0d 0r admin");
@@ -995,7 +998,7 @@ public class IRCBot extends PircBot {
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
                 email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 	            logger.error("Could not kill Winamp\n" + e);
-				logger.error("" + e);
+				logger.error(e);
 				return;
 			}
 		}
@@ -1012,7 +1015,7 @@ public class IRCBot extends PircBot {
                 sendMessage(curChan, "IAreKyleW00t has been notified via Email");
         		email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
 	            logger.error("Could not start Winamp\n" + e);
-				logger.error("" + e);
+				logger.error(e);
 				return;
 			}
 		};
@@ -1024,26 +1027,6 @@ public class IRCBot extends PircBot {
     
     private void pause(int ms) throws InterruptedException {
     	Thread.sleep(ms);
-    }
-    
-    private String getRandPage() {
-    	int pageNum = getLatestPageNum();
-		int randNum = new Random().nextInt(pageNum-1900);
-		while (randNum == 4299 || randNum == 4938 || randNum == 4988) {
-			randNum = new Random().nextInt(pageNum);
-		}
-    	return "http://www.mspaintadventures.com/?s=6&p=00" + (1900 + randNum);
-    }
-    
-    private String getPage(int page) {
-    	int pageNum = getLatestPageNum();
-    	if (page > latestPage || page <= 0) {
-    		return "please enter a number fr0m 1-" + (pageNum-1900);
-    	} else if (page == 4299 || page == 4938 || page == 4988) {
-    		return "that page d0es n0t exist";
-    	}
-    	
-    	return "http://www.mspaintadventures.com/?s=6&p=00" + (1900 + page);
     }
     
     private static int countLines(String filename) throws IOException {
@@ -1087,7 +1070,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("dave")) {
@@ -1102,7 +1085,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("dirk")) {
@@ -1117,7 +1100,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("rose")) {
@@ -1132,7 +1115,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("roxy")) {
@@ -1147,7 +1130,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("jane")) {
@@ -1162,7 +1145,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("aradia")) {
@@ -1177,7 +1160,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("aranea")) {
@@ -1192,7 +1175,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("arquius") || c.equalsIgnoreCase("arquiusprite")) {
@@ -1207,7 +1190,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("caliborn")) {
@@ -1222,7 +1205,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("calliope")) {
@@ -1237,7 +1220,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("calsprite") || c.equalsIgnoreCase("cal")) {
@@ -1252,7 +1235,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("cronus")) {
@@ -1267,7 +1250,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("damara")) {
@@ -1282,7 +1265,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("davesprite")) {
@@ -1297,7 +1280,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("dragon") || c.equalsIgnoreCase("dragonsprite")) {
@@ -1312,7 +1295,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("equius")) {
@@ -1327,7 +1310,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("eridan")) {
@@ -1342,7 +1325,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("erisol") || c.equalsIgnoreCase("erisolsprite")) {
@@ -1357,7 +1340,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("feferi")) {
@@ -1372,7 +1355,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("fefeta") || c.equalsIgnoreCase("fefetasprite")) {
@@ -1387,7 +1370,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("gamzee")) {
@@ -1402,7 +1385,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("horuss")) {
@@ -1417,7 +1400,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("jake")) {
@@ -1432,7 +1415,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("jasper") || c.equalsIgnoreCase("jaspersprite") || c.equalsIgnoreCase("jaspers")) {
@@ -1447,7 +1430,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("john")) {
@@ -1462,7 +1445,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("kanaya")) {
@@ -1477,7 +1460,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("kankri")) {
@@ -1492,7 +1475,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("karkat")) {
@@ -1507,7 +1490,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("kurloz")) {
@@ -1522,7 +1505,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("latula")) {
@@ -1537,7 +1520,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("meenah")) {
@@ -1552,7 +1535,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("meulin")) {
@@ -1567,7 +1550,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("mituna")) {
@@ -1582,7 +1565,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("nanna") || c.equalsIgnoreCase("nannasprite")) {
@@ -1597,7 +1580,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("nepeta")) {
@@ -1612,7 +1595,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("porrim")) {
@@ -1627,7 +1610,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("rufioh")) {
@@ -1642,7 +1625,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("sollux")) {
@@ -1657,7 +1640,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("tavros")) {
@@ -1672,7 +1655,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("terezi")) {
@@ -1687,7 +1670,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("vriska")) {
@@ -1702,7 +1685,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("doc") || c.equalsIgnoreCase("doc scratch")) {
@@ -1717,7 +1700,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("andrew") || c.equalsIgnoreCase("andrew hussie") || c.equalsIgnoreCase("hussie")) {
@@ -1732,7 +1715,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("jadesprite")) {
@@ -1747,7 +1730,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("squarewave")) {
@@ -1762,7 +1745,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("hic") || c.equalsIgnoreCase(")(ic")) {
@@ -1777,7 +1760,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else if (c.equalsIgnoreCase("tavris") || c.equalsIgnoreCase("tavrisprite")) {
@@ -1792,7 +1775,7 @@ public class IRCBot extends PircBot {
 						  br.readLine();
 						quote = br.readLine();
 					} catch (Exception e) {
-						logger.error("" + e);
+						logger.error(e);
 					}
 				}
 			} else {
@@ -1816,7 +1799,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("dave")) {
 			int lines = countLines(DAVE_QUOTES);
@@ -1829,7 +1812,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("rose")) {
 			int lines = countLines(ROSE_QUOTES);
@@ -1842,7 +1825,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("dirk")) {
 			int lines = countLines(DIRK_QUOTES);
@@ -1855,7 +1838,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("roxy")) {
 			int lines = countLines(ROXY_QUOTES);
@@ -1868,7 +1851,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote =  br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("jane")) {
 			int lines = countLines(JANE_QUOTES);
@@ -1881,7 +1864,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("aradia")) {
 			int lines = countLines(ARADIA_QUOTES);
@@ -1894,7 +1877,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("aranea")) {
 			int lines = countLines(ARANEA_QUOTES);
@@ -1907,7 +1890,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("arquius") || c.equalsIgnoreCase("arquiusprite")) {
 			int lines = countLines(ARQUIUS_QUOTES);
@@ -1920,7 +1903,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("caliborn")) {
 			int lines = countLines(CALIBORN_QUOTES);
@@ -1933,7 +1916,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("calliope")) {
 			int lines = countLines(CALLIOPE_QUOTES);
@@ -1946,7 +1929,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("calsprite") || c.equalsIgnoreCase("cal")) {
 			int lines = countLines(CALSPRITE_QUOTES);
@@ -1959,7 +1942,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("cronus")) {
 			int lines = countLines(CRONUS_QUOTES);
@@ -1972,7 +1955,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("damara")) {
 			int lines = countLines(DAMARA_QUOTES);
@@ -1985,7 +1968,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("davesprite")) {
 			int lines = countLines(DAVESPRITE_QUOTES);
@@ -1998,7 +1981,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("dragon") || c.equalsIgnoreCase("dragonsprite")) {
 			int lines = countLines(DRAGONSPRITE_QUOTES);
@@ -2011,7 +1994,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("equius")) {
 			int lines = countLines(EQUIUS_QUOTES);
@@ -2024,7 +2007,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("eridan")) {
 			int lines = countLines(ERIDAN_QUOTES);
@@ -2037,7 +2020,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("erisol") || c.equalsIgnoreCase("erisolsprite")) {
 			int lines = countLines(ERISOL_QUOTES);
@@ -2050,7 +2033,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("feferi")) {
 			int lines = countLines(FEFERI_QUOTES);
@@ -2063,7 +2046,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("fefeta") || c.equalsIgnoreCase("fefetasprite")) {
 			int lines = countLines(FEFETA_QUOTES);
@@ -2076,7 +2059,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("gamzee")) {
 			int lines = countLines(GAMZEE_QUOTES);
@@ -2089,7 +2072,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("horuss")) {
 			int lines = countLines(HORUSS_QUOTES);
@@ -2102,7 +2085,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("jake")) {
 			int lines = countLines(JAKE_QUOTES);
@@ -2115,7 +2098,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("jasper") || c.equalsIgnoreCase("jaspersprite") || c.equalsIgnoreCase("jaspers")) {
 			int lines = countLines(JASPER_QUOTES);
@@ -2128,7 +2111,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("john")) {
 			int lines = countLines(JOHN_QUOTES);
@@ -2141,7 +2124,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("kanaya")) {
 			int lines = countLines(KANAYA_QUOTES);
@@ -2154,7 +2137,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("kankri")) {
 			int lines = countLines(KANKRI_QUOTES);
@@ -2167,7 +2150,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("karkat")) {
 			int lines = countLines(KARKAT_QUOTES);
@@ -2180,7 +2163,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("kurloz")) {
 			int lines = countLines(KURLOZ_QUOTES);
@@ -2193,7 +2176,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("latula")) {
 			int lines = countLines(LATULA_QUOTES);
@@ -2206,7 +2189,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("meenah")) {
 			int lines = countLines(MEENAH_QUOTES);
@@ -2219,7 +2202,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("meulin")) {
 			int lines = countLines(MEULIN_QUOTES);
@@ -2232,7 +2215,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("mituna")) {
 			int lines = countLines(MITUNA_QUOTES);
@@ -2245,7 +2228,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("nanna") || c.equalsIgnoreCase("nannasprite")) {
 			int lines = countLines(NANNA_QUOTES);
@@ -2258,7 +2241,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("nepeta")) {
 			int lines = countLines(NEPETA_QUOTES);
@@ -2271,7 +2254,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("porrim")) {
 			int lines = countLines(PORRIM_QUOTES);
@@ -2284,7 +2267,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("rufioh")) {
 			int lines = countLines(RUFIOH_QUOTES);
@@ -2297,7 +2280,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("sollux")) {
 			int lines = countLines(SOLLUX_QUOTES);
@@ -2310,7 +2293,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("tavros")) {
 			int lines = countLines(TAVROS_QUOTES);
@@ -2323,7 +2306,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("terezi")) {
 			int lines = countLines(TEREZI_QUOTES);
@@ -2336,7 +2319,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("vriska")) {
 			int lines = countLines(VRISKA_QUOTES);
@@ -2349,7 +2332,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("doc") || c.equalsIgnoreCase("doc scratch")) {
 			int lines = countLines(DOC_QUOTES);
@@ -2362,7 +2345,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("andrew") || c.equalsIgnoreCase("andrew hussie") || c.equalsIgnoreCase("hussie")) {
 			int lines = countLines(ANDREW_QUOTES);
@@ -2375,7 +2358,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("jadesprite")) {
 			int lines = countLines(JADESPRITE_QUOTES);
@@ -2388,7 +2371,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("squarewave")) {
 			int lines = countLines(SQUAREWAVE_QUOTES);
@@ -2401,7 +2384,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("hic") || c.equalsIgnoreCase(")(ic")) {
 			int lines = countLines(HIC_QUOTES);
@@ -2414,7 +2397,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else if (c.equalsIgnoreCase("tavris") || c.equalsIgnoreCase("tavrisprite")) {
 			int lines = countLines(TAVRIS_QUOTES);
@@ -2427,7 +2410,7 @@ public class IRCBot extends PircBot {
 				  br.readLine();
 				quote = br.readLine();
 			} catch (Exception e) {
-				logger.error("" + e);
+				logger.error(e);
 			}
 		} else {
 			return "there are n0 qu0tes f0r that character right n0w. please d0uble check y0ur spelling as well";
@@ -2436,37 +2419,14 @@ public class IRCBot extends PircBot {
 		return Colors.TEAL + Colors.BOLD + "Quote #" + (quoteNum+1) + " - " + Colors.NORMAL + quote;
 	}
     
-    //Write user input to file
-	private void writeToFile(String file, String sender, String msg) {
-        try {
-            Writer output = new BufferedWriter(new FileWriter(file, true));
-            output.append(sender + ": " + msg + "\n");
-            output.close();
-        }
-        catch (Exception e) {
-        	logger.error("Error writing to file\n" + e);
-        }
-    }
-    
-    //Randomly choose 8ball outcome
     private static String getOutcome(String[] array) {
         int rnd = new Random().nextInt(array.length);
         return array[rnd];
     }    
     
-    //Randomly go fast
     private static String goFast(String[] array) {
         int rnd = new Random().nextInt(array.length);
         return array[rnd];
-    }
-    
-    public String getLink(String str) {
-    	if (str.toLowerCase().contains("cherubim")) {
-    		return " | DL: http://goo.gl/zxu1y";
-    	} else if (str.toLowerCase().contains("genesis frog")) {
-    		return " | DL: http://goo.gl/RZWOy";
-    	}
-    	return " [No Link]";
     }
     
     private String getWeather(String zip) {
@@ -2491,17 +2451,18 @@ public class IRCBot extends PircBot {
                     cond = eElement.getElementsByTagName("t").item(0).getTextContent();
                 }
         } catch (Exception e) {
-            logger.error("" + e);
+        	logger.error("Could not parse weather information from XML");
+            logger.error(e);
         }
         
         return Colors.NORMAL + Colors.BOLD + loc + " (" + zip + ")" + Colors.NORMAL + " - it is " + Colors.BOLD + tmp + "F " 
         + Colors.NORMAL + "0utside " + Colors.NORMAL + "(feels like " + Colors.BOLD + flik + "F" + Colors.NORMAL + ") and it is " 
         + Colors.BOLD + cond + Colors.NORMAL + ".";
     }
-    
+
+	@SuppressWarnings("resource")
     private boolean checkReq(String song) throws IOException {
     	String line;
-		@SuppressWarnings("resource")
 		BufferedReader br = new BufferedReader(new FileReader(SONG_LIST));
 		while ((line = br.readLine()) != null) {
 			if (line.toLowerCase().contains(song.toLowerCase())) {
@@ -2514,7 +2475,7 @@ public class IRCBot extends PircBot {
     @SuppressWarnings("unused")
 	private String searchPage(String search) throws IOException{
     	int curSearchPage = 0;
-    	String line, searchLine = "";;
+    	String line, searchLine = "";
     	String[] splitLine;
 		BufferedReader br = new BufferedReader(new FileReader(HS_LINKS));
 		while ((line = br.readLine()) != null) {
@@ -2532,86 +2493,18 @@ public class IRCBot extends PircBot {
 	    	return splitLine[1] + ": " + splitLine[0];
 		}
     }
-    
-    private String getLatestPage() {
-        String update = "";
+
+	private void writeToFile(String file, String sender, String msg) {
         try {
-            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
-            InputStream xml = mspaXml.openStream();
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xml);
-            doc.getDocumentElement().normalize();
-            NodeList nList = doc.getElementsByTagName("item");
-            for (int temp = 0; temp < 1; temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    update = eElement.getElementsByTagName("link").item(0).getTextContent();
-                }
-            }
-        } catch (Exception e) {
-            logger.error("" + e);
+            Writer output = new BufferedWriter(new FileWriter(file, true));
+            output.append(sender + ": " + msg + "\n");
+            output.close();
         }
-        
-        return update;
-    }
-    
-    private void checkUpdate() {
-        try {
-            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
-            InputStream xml = mspaXml.openStream();
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xml);
-            doc.getDocumentElement().normalize();
-            NodeList nList = doc.getElementsByTagName("item");
-            for (int temp = 0; temp < 1; temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    String update = eElement.getElementsByTagName("link").item(0).getTextContent();
-                    int tempPage = Integer.parseInt(update.substring(41));
-                    int tempPage1 = latestPage;
-                    latestPage = tempPage;
-                    if (latestPage > tempPage1) {
-                        isUpdate = true;
-                    } else {
-                        isUpdate = false;
-                    }
-                }
-                
-            }
-        } catch (Exception e) {
-            logger.error("" + e);
+        catch (Exception e) {
+        	logger.error("Error writing to file\n" + e);
         }
     }
-    
-    private int getLatestPageNum() {
-    	int pageNum = 0;
-        try {
-            URL mspaXml = new URL("http://mspaintadventures.com/rss/rss.xml");
-            InputStream xml = mspaXml.openStream();
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(xml);
-            doc.getDocumentElement().normalize();
-            NodeList nList = doc.getElementsByTagName("item");
-            for (int temp = 0; temp < 1; temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    String update = eElement.getElementsByTagName("link").item(0).getTextContent();
-                    pageNum = Integer.parseInt(update.substring(41));
-                }
-                
-            }
-        } catch (Exception e) {
-            logger.error("" + e);
-        }
-        return pageNum;
-    }
-    
+	
     private void checkFile(String fileLoc) {
         File file = new File(fileLoc);
         if (!file.exists()){
@@ -2667,7 +2560,7 @@ public class IRCBot extends PircBot {
 				email = new EmailClient(emailAccount, emailPassword, "smtp.gmail.com", false);
 			} catch (Exception e) {
 				logger.error("ERROR SETTING UP GMAIL CLIENT");
-				logger.error("" + e);
+				logger.error(e);
 			}
         }
     }

@@ -19,7 +19,7 @@ public class EmailClient {
 	private LogHandler logger = new LogHandler();
 
 	public EmailClient(String username, String password, String host, boolean debug) throws Exception {
-		logger.notice("SETTING UP EMAIL CLIENT");
+		logger.notice("*** SETTING UP EMAIL CLIENT ***");
         clientProps = System.getProperties();
         clientProps.put("mail.smtp.starttls.enable", true);
         clientProps.put("mail.smtp.host", host);
@@ -33,18 +33,18 @@ public class EmailClient {
         email.setFrom(new InternetAddress(username));
         transport = session.getTransport("smtp");
         transport.connect(host, username, password);
-        logger.notice("EMAIL CLIENT SETUP SUCCESSFULLY");
+        logger.notice("*** EMAIL CLIENT SETUP SUCCESSFULLY ***");
 
 	}
 	
 	public void sendEmail(String recipient, String subject, String message) throws MessagingException {
-		logger.notice("SENDING EMAIL");
+		logger.debug("--- SENDING EMAIL ---");
 		toAddress = new InternetAddress(recipient);
     	email.addRecipient(Message.RecipientType.TO, toAddress);
     	email.setSubject(subject);
     	email.setText(message);
         transport.sendMessage(email, email.getAllRecipients());
-        logger.notice("EMAIL SENT SUCCESSFULLY");
+        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
 	}
 	
 	public void closeClient() throws MessagingException {

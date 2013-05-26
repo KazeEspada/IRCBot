@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class LogHandler {
-	private String VER = "0.0.1.2";
 	private File LOG_FILE;
 	private DateFormat logFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private Date date;
@@ -46,8 +45,13 @@ public class LogHandler {
 		writeToFile(logTime + cleanLog);
 	}
 	
+	public void log(Exception e) {
+		System.out.println(e);
+		writeToFile("" + e);
+	}
+	
 	public void debug(String log) {
-		log("[DEBUG]: ----- " + log + " -----");
+		log("[DEBUG]: " + log);
 		
 	}
 	
@@ -57,6 +61,10 @@ public class LogHandler {
 	
 	public void error(String log) {
 		log("[ERROR]: ===== " + log + " =====");
+	}
+	
+	public void error(Exception e) {
+		log(e);
 	}
 	
 	public void notice(String log) {
@@ -79,9 +87,5 @@ public class LogHandler {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-	}
-	
-	public String getVersion() {
-		return VER;
 	}
 }
