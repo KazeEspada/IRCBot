@@ -19,10 +19,9 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.0a";
+    private static final String VER = "0.9.3.2a";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
@@ -78,16 +77,16 @@ public class IRCBot extends PircBot {
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
-    private String curChan, curSender, curTime, voteTitle = "", emailAccount = IRCBotMain.getEmail(), emailPassword = IRCBotMain.getEmailPass();
+    private String curChan, curTime, voteTitle = "";
     private boolean req = false, openVote = false;
-    private int voteYes, voteNo, numOfAttempts = 0;
+    private int voteYes, voteNo;
     List<String> voterList = new ArrayList<String>();
     private EmailClient email;
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private Date date;
 	private LogHandler logger = new LogHandler();
 	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
-	private SongManager player = new SongManager("curSong.txt");
+	private MusicHandler player;
 	private HomestuckChecker updater = new HomestuckChecker(this, 30);
     
     public IRCBot(String name, String password) {
@@ -95,7 +94,16 @@ public class IRCBot extends PircBot {
         login(password);
         checkFile(SONG_LIST);
         checkFile(FEEDBACK_FILE);
-        setupEmail();
+        player = new MusicHandler("curSong.txt", this, email);
+    }    
+    
+    public IRCBot(String name, String password, String emailAcc, String emailPass) {
+        setName(name);
+        login(password);
+        checkFile(SONG_LIST);
+        checkFile(FEEDBACK_FILE);
+        setupEmail(emailAcc, emailPass);
+        player = new MusicHandler("curSong.txt", this, email);
     }
     
     private final void login(String pass) {
@@ -185,7 +193,6 @@ public class IRCBot extends PircBot {
     	date = new Date();
     	curTime = dateFormat.format(date);
     	curChan = channel;
-    	curSender = sender;
     	
     	//Only check commands if it start's with command symbol ($)
     	if (message.startsWith("$")) {
@@ -580,26 +587,7 @@ public class IRCBot extends PircBot {
 		        
 		    //Current Song
 		    } else if (message.equalsIgnoreCase("$song")) {
-		    	player.updateCurSong();
-		    	if (player.getCurSong().contains("?????")) {
-		    		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + player.getCurSong());
-		    		sendMessage(channel, "it appears as th0ugh winamp is malfuncti0ning... ill attempt t0 fix it");
-		            try {
-						restartWinamp();
-						email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted automatically @ " + curTime);
-						sendMessage(channel, "IAreKyleW00t has been notified via email");
-		            	} catch (Exception e) {
-							try {
-								email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to automatically restart @ " + curTime);
-					            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
-					            logger.error("COULD NOT RESTART WINAMP");
-							} catch (MessagingException e1) {
-					            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-								logger.error(e1);
-							}
-						logger.error(e);
-					}
-		    	} else {
+		    	if (!player.getCurSong().startsWith("<Winamp")) {
 		    		sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + player.getCurSong());
 		    	}
 		    	
@@ -954,20 +942,19 @@ public class IRCBot extends PircBot {
 		        
 		    //Restart Winamp Command
 		    } else if (message.equalsIgnoreCase("$restart")) {
-		    	if (checkOp(sender) || checkVoice(sender) && !channel.equalsIgnoreCase("#ircstuck")) {
-		            try {
-						restartWinamp();
-						email.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime + " by: " + curSender);
-						sendMessage(channel, "IAreKyleW00t has been notified via email");
+		    	if (checkOp(sender) || checkVoice(sender)) {
+		    		try {
+						player.restartWinamp(channel, sender);
 					} catch (Exception e) {
 						try {
-							email.sendEmail("kyle10468@gmail.com", "ERROR: Winamp Failed to Restart", "Winamp failed to restart @ " + curTime);
-				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "InterruptedException - IAreKyleW00t has been notified via Email");
-				            logger.error("COULD NOT RESTART WINAMP");
+							sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t");
+							email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to resatrt @ " + curTime);
 						} catch (MessagingException e1) {
-				            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not send Email - Please contact IAreKyleW00t manually; http://iarekylew00t.tumblr.com/ask");
-				            logger.error(e1);
+							sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+							logger.error("FAILED TO SEND EMAIL");
+							logger.error(e1);
 						}
+						logger.error("FAILED TO RESTART WINAMP");
 						logger.error(e);
 					}
 		    	} else {
@@ -975,56 +962,6 @@ public class IRCBot extends PircBot {
 		    	}
 		    }
     	}
-    }
-    
-    @SuppressWarnings("unused")
-	public void restartWinamp() throws Exception {
-    	curTime = dateFormat.format(date);
-    	
-        sendMessage(curChan, Colors.BOLD + "----------- RESTARTING WINAMP -----------");
-        logger.warning("RESTARTING WINAMP");
-        numOfAttempts++;
-		try {
-			Runtime.getRuntime().exec("taskkill /IM winamp.exe");
-		} catch (Exception e) {
-			if (numOfAttempts <= 3) {
-	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp - Attempt " + numOfAttempts);
-	            logger.error("Could not kill Winamp - Attempt " + numOfAttempts);
-				restartWinamp();
-			} else {
-	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not kill Winamp");
-                sendMessage(curChan, "IAreKyleW00t has been notified via Email");
-                email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
-	            logger.error("Could not kill Winamp\n" + e);
-				logger.error(e);
-				return;
-			}
-		}
-		pause(1500);
-		try {
-			Process p = Runtime.getRuntime().exec("winamp.exe");
-		} catch (Exception e) {
-			if (numOfAttempts <= 3) {
-	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp - Attempt " + numOfAttempts);
-	            logger.error("Could not start Winamp - Attempt " + numOfAttempts);
-	            restartWinamp();
-			} else {
-	            sendMessage(curChan, Colors.RED + "ERROR: " + Colors.NORMAL + "Could not start Winamp");
-                sendMessage(curChan, "IAreKyleW00t has been notified via Email");
-        		email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp failed to restart after 3 attemped @ " + curTime);
-	            logger.error("Could not start Winamp\n" + e);
-				logger.error(e);
-				return;
-			}
-		};
-        numOfAttempts = 0;
-        sendMessage(curChan, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
-        logger.notice("WINAMP RESTARTED SUCCESSFULLY");
-
-    }
-    
-    private void pause(int ms) throws InterruptedException {
-    	Thread.sleep(ms);
     }
     
     private static int countLines(String filename) throws IOException {
@@ -2552,10 +2489,10 @@ public class IRCBot extends PircBot {
     	return false;
     }
     
-    private void setupEmail() {
-        if (!emailAccount.equals("") || !emailPassword.equals("")) {
+    private void setupEmail(String emailAcc, String password) {
+        if (!emailAcc.equals("") || !password.equals("")) {
 		    try {
-				email = new EmailClient(emailAccount, emailPassword, "smtp.gmail.com", false);
+				email = new EmailClient(emailAcc, password, "smtp.gmail.com", false);
 			} catch (Exception e) {
 				logger.error("ERROR SETTING UP GMAIL CLIENT");
 				logger.error(e);
