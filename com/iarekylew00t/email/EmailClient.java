@@ -22,7 +22,7 @@ public class EmailClient {
 	private PircBot mainBot;
 	private LogHandler logger = new LogHandler();
 
-	public EmailClient(String username, String password, String host, boolean debug, PircBot bot) throws Exception {
+	public EmailClient(String username, String password, String host, boolean debug, PircBot bot) {
 		logger.notice("*** SETTING UP EMAIL CLIENT ***");
 		mainBot = bot;
         clientProps = System.getProperties();
@@ -35,44 +35,61 @@ public class EmailClient {
         clientProps.put("mail.debug", debug);
         session = Session.getInstance(clientProps, new EmailAuthenticator(username, password));
         email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(username));
-        transport = session.getTransport("smtp");
-        transport.connect(host, username, password);
-        logger.notice("*** EMAIL CLIENT SETUP SUCCESSFULLY ***");
-
+        try {
+	        email.setFrom(new InternetAddress(username));
+	        transport = session.getTransport("smtp");
+	        transport.connect(host, username, password);
+	        logger.notice("*** EMAIL CLIENT SETUP SUCCESSFULLY ***");
+        } catch (Exception e) {
+        	logger.error("COULD NOT SETUP EMAIL CLIENT");
+        	logger.error(e);
+        }
 	}
 	
 	public void sendEmail(String recipient, String subject, String message) {
+		checkTransport();
 		try {
-		if (transport.isConnected() == false) {
-			transport.connect(clientProps.getProperty("mail.smtp.host"), clientProps.getProperty("mail.smtp.user"), clientProps.getProperty("mail.smtp.password"));
-		}
-		logger.debug("--- SENDING EMAIL ---");
-		toAddress = new InternetAddress(recipient);
-    	email.addRecipient(Message.RecipientType.TO, toAddress);
-    	email.setSubject(subject);
-    	email.setText(message);
-        transport.sendMessage(email, email.getAllRecipients());
-        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
+			logger.debug("--- SENDING EMAIL ---");
+			toAddress = new InternetAddress(recipient);
+	    	email.addRecipient(Message.RecipientType.TO, toAddress);
+	    	email.setSubject(subject);
+	    	email.setText(message);
+	        transport.sendMessage(email, email.getAllRecipients());
+	        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
 		} catch (Exception e) {
 			mainBot.sendMessage("#hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+			logger.error("FAILED TO SEND EMAIL");
+			logger.error(e);
 		}
 	}
 	
 	public void sendEmail(String recipient, String subject, String message, String channel) {
+		checkTransport();
 		try {
-		if (transport.isConnected() == false) {
-			transport.connect(clientProps.getProperty("mail.smtp.host"), clientProps.getProperty("mail.smtp.user"), clientProps.getProperty("mail.smtp.password"));
-		}
-		logger.debug("--- SENDING EMAIL ---");
-		toAddress = new InternetAddress(recipient);
-    	email.addRecipient(Message.RecipientType.TO, toAddress);
-    	email.setSubject(subject);
-    	email.setText(message);
-        transport.sendMessage(email, email.getAllRecipients());
-        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
+			logger.debug("--- SENDING EMAIL ---");
+			toAddress = new InternetAddress(recipient);
+	    	email.addRecipient(Message.RecipientType.TO, toAddress);
+	    	email.setSubject(subject);
+	    	email.setText(message);
+	        transport.sendMessage(email, email.getAllRecipients());
+	        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
 		} catch (Exception e) {
 			mainBot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
+			logger.error("FAILED TO SEND EMAIL");
+			logger.error(e);
+		}
+	}
+	
+	private void checkTransport() {
+		try {
+			logger.debug("transport.isConnected()=" + transport.isConnected());
+			if (transport.isConnected() == false) {
+					transport.connect(clientProps.getProperty("mail.smtp.host"), clientProps.getProperty("mail.smtp.user"), clientProps.getProperty("mail.smtp.password"));
+					logger.notice("TRANSPORT RECONNECTED SUCCESSFULLY");
+			}
+		} catch (Exception e) {
+			logger.error("FAILED TO RECONNECT TRANSPORT");
+			logger.error(e);
 		}
 	}
 	

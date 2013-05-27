@@ -154,7 +154,6 @@ public class MusicHandler implements Runnable {
         File file = new File(fileLoc);
         if (!file.exists()){
             try {
-            	//Create file if it's not there
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();

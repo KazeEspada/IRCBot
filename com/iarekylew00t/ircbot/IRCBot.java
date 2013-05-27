@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.2b";
+    private static final String VER = "0.9.3.3a";
     private static final String SONG_LIST = "songs.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
@@ -71,15 +71,12 @@ public class IRCBot extends PircBot {
     private static final String JANE_QUOTES = "./quotes/jane-quotes.txt";
     private static final String HIC_QUOTES = "./quotes/hic-quotes.txt";
     private static final String TAVRIS_QUOTES = "./quotes/tavrisprite-quotes.txt";
-    private static final String REQ_FILE = "songs.txt";
     private static final String HS_LINKS = "links.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
-    private static final String[] chanList = {"#hs_radio", "#hs_radio2", "#hs_radio3", "#hs_radio4"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
-    private String curChan, curTime, voteTitle = "";
+    private String curTime, voteTitle = "";
     private boolean req = false, openVote = false;
     private int voteYes, voteNo;
-    List<String> voterList = new ArrayList<String>();
     private EmailClient email;
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private Date date;
@@ -87,15 +84,8 @@ public class IRCBot extends PircBot {
 	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
 	private MusicHandler player;
 	private HomestuckChecker updater = new HomestuckChecker(this, 30);
-    
-    public IRCBot(String name, String password) {
-        setName(name);
-        login(password);
-        checkFile(SONG_LIST);
-        checkFile(FEEDBACK_FILE);
-        player = new MusicHandler("curSong.txt", this, email);
-    }    
-    
+	private ArrayList<String> hostList = new ArrayList<String>(), reqList = new ArrayList<String>(), voterList = new ArrayList<String>();
+	
     public IRCBot(String name, String password, String emailAcc, String emailPass) {
         setName(name);
         login(password);
@@ -112,17 +102,17 @@ public class IRCBot extends PircBot {
     }
     
     protected void onConnect() {
-    	logger.notice("SUCCESSFULLY CONNECTED TO SERVER");
+    	logger.notice("*** SUCCESSFULLY CONNECTED TO SERVER ***");
     }
     
     protected void onDisconnect() {
-		logger.warning("DISCONNECTED FROM SERVER");
+		logger.warning("*** DISCONNECTED FROM SERVER ***");
     	date = new Date();
     	curTime = dateFormat.format(date);
-		logger.notice("DISPOSING OF OLD BOT");
+		logger.debug("DISPOSING OF OLD BOT");
 		this.dispose();
 		try {
-			logger.notice("RECREATING BOT AND RECONNECTING");
+			logger.debug("RECREATING BOT AND RECONNECTING");
 			IRCBotMain.setupBot();
 		} catch (Exception e) {
 			logger.error("RECREATION/RECONNECT FAILED");
@@ -130,7 +120,6 @@ public class IRCBot extends PircBot {
 			logger.error(e);
 			return;
 		}
-		logger.notice("SUCCESSFULLY RECONNECTED");
 		email.sendEmail("kyle10468@gmail.com", "NOTICE: Aradiabot Reconnected Successfully", "Aradiabot successfully reconnected @ " + curTime);
     }
     
@@ -183,7 +172,6 @@ public class IRCBot extends PircBot {
 		logger.log(sender + "!" + login + " (" + channel + "): " + message);
     	date = new Date();
     	curTime = dateFormat.format(date);
-    	curChan = channel;
     	
     	//Only check commands if it start's with command symbol ($)
     	if (message.startsWith("$")) {
@@ -196,7 +184,7 @@ public class IRCBot extends PircBot {
 		  
 		    //Reboot Aradiabot (Disconnect, Dispose, Recreate and reconnect)
 		    } else if (message.equalsIgnoreCase("$reboot")) {
-		    	if (checkOp(sender) || checkVoice(sender)) {
+		    	if (checkOp(sender, channel) || checkVoice(sender, channel)) {
 		    		sendMessage(channel, Colors.BOLD + "REBOOTING ARADIABOT");
 		    		this.disconnect();
 		    	} else {
@@ -246,14 +234,14 @@ public class IRCBot extends PircBot {
 		    	
 		    //TellKyle Command (Email)
 		    } else if (message.equalsIgnoreCase("$tellkyle")) {
-		    	if (checkOp(sender) || checkVoice(sender)) {
+		    	if (checkOp(sender, channel) || checkVoice(sender, channel)) {
 		    		sendMessage(channel, "please add s0mething t0 tell him " + sender);
 		    	} else {
 		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
 		    	}
 		    } else if (message.startsWith("$tellkyle ")) {
 		        String input = message.substring(10);
-		    	if (checkOp(sender) || checkVoice(sender)) {
+		    	if (checkOp(sender, channel) || checkVoice(sender, channel)) {
 		            if (input.equals("")){
 		        		sendMessage(channel, "please add s0mething t0 tell him " + sender);
 		            } else {
@@ -390,7 +378,7 @@ public class IRCBot extends PircBot {
 		            sendMessage(channel, "please use: $feedback <resp0nse>");
 		        } else {
 		            sendMessage(channel, "thank y0u f0r y0ur feedback " + sender + ". kyle will read it s00n" );
-		            writeToFile(FEEDBACK_FILE, sender, input);
+		            writeToFile(FEEDBACK_FILE, sender + ": " + input);
 		        }
 		        
 		    //Shoosh Command
@@ -539,7 +527,7 @@ public class IRCBot extends PircBot {
 		    //Talk as Aradiabot
 		    } else if (message.equalsIgnoreCase("$talk")) {
 		        if (channel.equalsIgnoreCase("#hs_admin")) {
-		            if (checkOp(sender) == true) {
+		            if (checkOp(sender, channel) == true) {
 		                sendMessage(channel, "$talk <channel> <msg>");
 		            } else {
 		                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
@@ -549,7 +537,7 @@ public class IRCBot extends PircBot {
 		        }
 		    } else if (message.startsWith("$talk ")) {
 		        if (channel.equalsIgnoreCase("#hs_admin")) {
-		            if (checkOp(sender) == true) {
+		            if (checkOp(sender, channel) == true) {
 		                String input = message.substring(6);
 		                if (input.equals("")){
 		                    sendMessage(channel, "$talk <channel> <msg>");
@@ -707,7 +695,7 @@ public class IRCBot extends PircBot {
 		
 		    //Vote Command
 		    } else if (message.equalsIgnoreCase("$vote")) {
-		    	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		    	if (checkOp(sender, channel) == true || checkVoice(sender, channel) == true) {
 		        sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
 		    	} else  if (openVote == false){
 		            sendMessage(channel, "y0u d0 n0t have permissi0n t0 d0 that " + sender);
@@ -718,7 +706,7 @@ public class IRCBot extends PircBot {
 		        String input = message.substring(6);
 		        if (input.equals("")){
 		        	if (openVote == false) {
-		        		if (checkOp(sender) == true || checkVoice(sender) == true) {
+		        		if (checkOp(sender, channel) == true || checkVoice(sender, channel) == true) {
 		        			sendMessage(channel, "please specify what pe0ple are v0ting f0r " + sender);
 		        		} else {
 		        			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
@@ -729,7 +717,7 @@ public class IRCBot extends PircBot {
 		        } else {
 		            String[] in = input.split(" ");
 		            if (in[0].equalsIgnoreCase("open")) {
-		            	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		            	if (checkOp(sender, channel) == true || checkVoice(sender, channel) == true) {
 		                	if (openVote == true) {
 		                        sendMessage(channel, "there is already a p0ll 0pen " + sender);
 		                	} else {
@@ -744,7 +732,7 @@ public class IRCBot extends PircBot {
 		        			sendMessage(channel, "y0ure n0t all0wed t0 d0 that");
 		            	}
 		            } else if (in[0].equalsIgnoreCase("close")) {
-		            	if (checkOp(sender) == true || checkVoice(sender) == true) {
+		            	if (checkOp(sender, channel) == true || checkVoice(sender, channel) == true) {
 		                	if (openVote == false) {
 		                        sendMessage(channel, "there isnt a p0ll 0pen " + sender);
 		                	} else {
@@ -833,13 +821,13 @@ public class IRCBot extends PircBot {
 		   
 		    //Shout Command
 		    } else if (message.equalsIgnoreCase("$shout")) {
-		    	if (checkOp(sender) == false || checkVoice(sender) == false) {
+		    	if (checkOp(sender, channel) == false || checkVoice(sender, channel) == false) {
 		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
 		        } else {
 		            sendMessage(channel, "please use: $shout <message>");
 		        }
 		    } else if (message.startsWith("$shout ")) {
-		    	if (checkOp(sender) || checkVoice(sender)) {
+		    	if (checkOp(sender, channel) || checkVoice(sender, channel)) {
 		        	String input = message.substring(7);
 		        	sendMessage(channel, Colors.BOLD + Colors.RED + input);
 		        } else {
@@ -848,79 +836,62 @@ public class IRCBot extends PircBot {
 		        
 		    //Announce Command
 		    } else if (message.equalsIgnoreCase("$announce")) {
-		    	if (checkOp(sender) == false || checkVoice(sender) == false) {
+		    	if (checkOp(sender, channel) == false || checkVoice(sender, channel) == false) {
 		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
-		    	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-		                sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
 		        } else {
 		            sendMessage(channel, "please use: $announce <message>");
 		        }
 		    } else if (message.startsWith("$announce ")) {
-		    	if (checkOp(sender)) {
+		    	if (checkOp(sender, channel)) {
 		        	String input = message.substring(10);
-		            for (int i = 0; i < chanList.length; i++) {
-		            	sendMessage(chanList[i], Colors.BOLD + Colors.RED + "ANNOUNCEMENT: " + Colors.YELLOW + input);
-		            }
-		    	} else if (channel.equalsIgnoreCase("#ircstuck") && checkOp(sender)) {
-		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
+		        	sendToAll(Colors.BOLD + Colors.RED + "ANNOUNCEMENT: " + Colors.YELLOW + input);
 		        } else {
 		            sendMessage(channel, "y0u d0nt have permissi0n t0 d0 that");
 		        }
 		        	
 		    //Request ON|OFF
 		    } else if (message.equalsIgnoreCase("$reqon")) {
-		        if (channel.equalsIgnoreCase("#ircstuck")) {
-		            sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
-		        } else {
-		            if (checkOp(sender) == true) {
-		                req = true;
-		                for (int i = 0; i < chanList.length; i++) {
-		                sendMessage(chanList[i], Colors.BOLD + Colors.GREEN + "requests have been turn 0n by " + sender);
-		                }
-		            } else {
-		                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-		            }
-		        }
+	            if (checkOp(sender, channel) == true) {
+	                req = true;
+	                sendToAll(Colors.BOLD + Colors.GREEN + "requests have been turn 0n by " + sender);
+	            } else {
+	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+	            }
 		    } else if (message.equalsIgnoreCase("$reqoff")) {
-		        if (channel.equalsIgnoreCase("#ircstuck")) {
-		            sendMessage(channel, "y0u may n0t use that c0mmand in this channel");
-		        } else {
-		            if (checkOp(sender) == true) {
-		                req = false;
-		                for (int i = 0; i < chanList.length; i++) {
-		                sendMessage(chanList[i], Colors.BOLD + Colors.RED + "requests have been turn 0ff by " + sender);
-		                }
-		            } else {
-		                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
-		            }
-		        }
+	            if (checkOp(sender, channel) == true) {
+	            	hostList.clear();
+	            	reqList.clear();
+	                req = false;
+	                sendToAll(Colors.BOLD + Colors.RED + "requests have been turn 0ff by " + sender);
+	            } else {
+	                sendMessage(channel, "im n0t all0wed t0 let y0u d0 that " + sender);
+	            }
 		  
 		    //Request song
 		    } else if (message.equalsIgnoreCase("$req")) {
-		        if (req == true)
+		        if (req == true) {
 		            sendMessage(channel, "requests are currently 0pen; please use: $req <s0ngname>");
-		        else
-		            sendMessage(channel, "requests are currently cl0sed");
+		        } else {
+ 		            sendMessage(channel, "requests are currently cl0sed");
+		        }
 		    } else if (message.startsWith("$req ")) {
 		        String input = message.substring(5);
 		        if (req == true) {
-		        	try {
-						if (countReq(sender) < 3) {
-						    if (input.equals("")){
-						        sendMessage(channel, "please specify a s0ng " + sender);
-						    } else {
-						    	if (checkReq(input) == false) {
-							        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-							        writeToFile(SONG_LIST, sender, input);
-						    	} else {
-							        sendMessage(channel, "that s0ng has already been requested " + sender);
-						    	}
-						    }
-						} else {
-					        sendMessage(channel, "y0u have already made 3 requests " + sender);
-						}
-					} catch (IOException e) {
-						logger.error(e);
+		        	if (countReq(hostname) < 3) {
+					    if (input.equals("")){
+					        sendMessage(channel, "please specify a s0ng " + sender);
+					    } else {
+					    	if (checkReq(input) == false) {
+						        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
+						        writeToFile(SONG_LIST, sender + ": " + input);
+						        reqList.add(input);
+						        hostList.add(hostname);
+					    	} else {
+						        sendMessage(channel, "that s0ng has already been requested " + sender);
+					    	}
+					    }
+					} else {
+					    sendMessage(channel, "y0u have already made 3 requests " + sender);
 					}
 		        } else {
 		            sendMessage(channel, "requests are currently cl0sed " + sender);
@@ -928,7 +899,7 @@ public class IRCBot extends PircBot {
 		        
 		    //Restart Winamp Command
 		    } else if (message.equalsIgnoreCase("$restart")) {
-		    	if (checkOp(sender) || checkVoice(sender)) {
+		    	if (checkOp(sender, channel) || checkVoice(sender, channel)) {
 		    		try {
 						player.restartWinamp(channel, sender);
 					} catch (Exception e) {
@@ -943,10 +914,13 @@ public class IRCBot extends PircBot {
 		    }
     	}
     }
-    
-    public String getCurChan() {
-    	return curChan;
-    }
+	
+	private void sendToAll(String msg) {
+		String[] chanList = this.getChannels();
+		for (int i = 0; i < chanList.length; i++) {
+			sendMessage(chanList[i], msg);
+		}
+	}
     
     private static int countLines(String filename) throws IOException {
 	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
@@ -960,17 +934,14 @@ public class IRCBot extends PircBot {
 		return cnt;
 	}
     
-	private int countReq(String snd) throws IOException {
-		String line;
+	private int countReq(String host) {
+		int len = hostList.size();
         int count = 0;
-		BufferedReader br = new BufferedReader(new FileReader(REQ_FILE));
-        while ((line = br.readLine()) != null) {
-			if (line.startsWith(snd + ":")) {
-				count++;
-			}
-		}
-		br.close();
-		
+        for (int i = 0; i < len; i++) {
+        	if (hostList.get(i).equals(host)) {
+        		count++;
+        	}
+        }
 		return count;
     }
 	
@@ -2379,15 +2350,13 @@ public class IRCBot extends PircBot {
         + Colors.BOLD + cond + Colors.NORMAL + ".";
     }
 
-	@SuppressWarnings("resource")
-    private boolean checkReq(String song) throws IOException {
-    	String line;
-		BufferedReader br = new BufferedReader(new FileReader(SONG_LIST));
-		while ((line = br.readLine()) != null) {
-			if (line.toLowerCase().contains(song.toLowerCase())) {
-				return true;
-			}
-		}
+    private boolean checkReq(String song) {
+    	int len = reqList.size();
+    	for (int i = 0; i < len; i++) {
+    		if (reqList.get(i).equalsIgnoreCase(song)) {
+    			return true;
+    		}
+    	}
     	return false;
     }
     
@@ -2413,14 +2382,15 @@ public class IRCBot extends PircBot {
 		}
     }
 
-	private void writeToFile(String file, String sender, String msg) {
+	private void writeToFile(String file, String msg) {
         try {
             Writer output = new BufferedWriter(new FileWriter(file, true));
-            output.append(sender + ": " + msg + "\n");
+            output.append(msg + "\n");
             output.close();
         }
         catch (Exception e) {
-        	logger.error("Error writing to file\n" + e);
+        	logger.error("Could not write to file \"" + file + "\"");
+        	logger.error(e);
         }
     }
 	
@@ -2429,14 +2399,15 @@ public class IRCBot extends PircBot {
         if (!file.exists()){
             try {
                 file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e) {
+            	logger.error("Could not create file \"" + file + "\"");
+            	logger.error(e);
             }
         }
     }
     
-    private boolean checkOp(String sender) {
-    	User users[] = getUsers(curChan);
+    private boolean checkOp(String sender, String channel) {
+    	User users[] = getUsers(channel);
     	User u = null;
     	for(User user:users){
     	   if(sender.equals(user.getNick())){
@@ -2454,8 +2425,8 @@ public class IRCBot extends PircBot {
     	return false;
     }
     
-    private boolean checkVoice(String sender) {
-    	User users[] = getUsers(curChan);
+    private boolean checkVoice(String sender, String channel) {
+    	User users[] = getUsers(channel);
     	User u = null;
     	for(User user:users){
     	   if(sender.equals(user.getNick())){
@@ -2475,12 +2446,7 @@ public class IRCBot extends PircBot {
     
     private void setupEmail(String emailAcc, String password) {
         if (!emailAcc.equals("") || !password.equals("")) {
-		    try {
-				email = new EmailClient(emailAcc, password, "smtp.gmail.com", false, this);
-			} catch (Exception e) {
-				logger.error("ERROR SETTING UP GMAIL CLIENT");
-				logger.error(e);
-			}
+			email = new EmailClient(emailAcc, password, "smtp.gmail.com", false, this);
         }
     }
 }
