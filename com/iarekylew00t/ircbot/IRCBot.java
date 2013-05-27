@@ -20,9 +20,8 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.3b";
-    private static final String REQ_LIST = "songReq.txt";
-    private static final String FEEDBACK_FILE = "feedback.txt";
+    private static final String VER = "0.9.3.3d";
+    private static final String REQ_LIST = "songReq.txt", CURSONG_FILE = "curSong.txt", FEEDBACK_FILE = "feedback.txt", HS_LINKS = "links.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
     private static final String ARANEA_QUOTES = "./quotes/aranea-quotes.txt";
     private static final String ARQUIUS_QUOTES = "./quotes/arquiusprite-quotes.txt";
@@ -71,7 +70,6 @@ public class IRCBot extends PircBot {
     private static final String JANE_QUOTES = "./quotes/jane-quotes.txt";
     private static final String HIC_QUOTES = "./quotes/hic-quotes.txt";
     private static final String TAVRIS_QUOTES = "./quotes/tavrisprite-quotes.txt";
-    private static final String HS_LINKS = "links.txt";
     private static final String[] eightBall = {"it is certain", "it is decidedly s0", "yes - definitely", "y0u may rely 0n it", "as i see it, yes", "m0st likely", "0utl00k g00d", "yes", "signs p0int t0 yes", "reply hazy, try again", "ask again later", "better not tell y0u n0w", "cann0t predict n0w", "c0ncentrate and ask again", "d0nt c0unt 0n it", "my reply is n0", "my s0urces say n0", "very d0ubtful"};
     private static final String[] fastList = {"im g0ing s0 fast","g0in fast", "g0ggg--gg0g0g0g0 fast", "fastfsf than y0u", "t00 fast man", "g0tta g0 fasfters"};
     private String curTime, voteTitle = "";
@@ -92,7 +90,7 @@ public class IRCBot extends PircBot {
         checkFile(REQ_LIST);
         checkFile(FEEDBACK_FILE);
         setupEmail(emailAcc, emailPass);
-        player = new MusicHandler("curSong.txt", this, email);
+        player = new MusicHandler(CURSONG_FILE, this, email);
     }
     
     private final void login(String pass) {
@@ -921,15 +919,13 @@ public class IRCBot extends PircBot {
 			sendMessage(chanList[i], msg);
 		}
 	}
-    
-    private static int countLines(String filename) throws IOException {
-	    LineNumberReader reader  = new LineNumberReader(new FileReader(filename));
-		int cnt = 0;
-		@SuppressWarnings("unused")
-		String lineRead = "";
-		while ((lineRead = reader.readLine()) != null) {}
 	
-		cnt = reader.getLineNumber(); 
+	private static int countLines(String filename) throws IOException {
+		int cnt = 0;
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		while ((reader.readLine()) != null) {
+			cnt++;
+		}
 		reader.close();
 		return cnt;
 	}
@@ -944,8 +940,7 @@ public class IRCBot extends PircBot {
         }
 		return count;
     }
-	
-	@SuppressWarnings("resource")
+
 	private String getQuote(String c, int num) throws IOException {
 		String quote = "";
 		if (c.equalsIgnoreCase("jade")) {
@@ -959,6 +954,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -974,6 +971,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -989,6 +988,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1004,6 +1005,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1019,6 +1022,9 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1034,6 +1040,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1049,6 +1057,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1064,6 +1074,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1079,6 +1091,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1094,6 +1108,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1109,6 +1125,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1124,6 +1142,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1139,6 +1159,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1154,6 +1176,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1169,6 +1193,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1184,6 +1210,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1199,6 +1227,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1214,6 +1244,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1229,6 +1261,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1244,6 +1278,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1259,6 +1295,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1274,6 +1312,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1289,6 +1329,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1304,6 +1346,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1319,6 +1363,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1334,6 +1380,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1349,6 +1397,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1364,6 +1414,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1379,6 +1431,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1394,6 +1448,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1409,6 +1465,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1424,6 +1482,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1439,6 +1499,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1454,6 +1516,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1469,6 +1533,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1484,6 +1550,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1499,6 +1567,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1514,6 +1584,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1529,6 +1601,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1544,6 +1618,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1559,6 +1635,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1574,6 +1652,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1589,6 +1669,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1604,6 +1686,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1619,6 +1703,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1634,6 +1720,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1649,6 +1737,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1664,6 +1754,8 @@ public class IRCBot extends PircBot {
 						for(int i = 0; i < num-1; ++i)
 						  br.readLine();
 						quote = br.readLine();
+						br.close();
+				br.close();
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -1688,6 +1780,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1701,6 +1794,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1714,6 +1808,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1727,6 +1822,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1740,6 +1836,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote =  br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1753,6 +1850,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1766,6 +1864,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1779,6 +1878,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1792,6 +1892,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1805,6 +1906,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1818,6 +1920,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1831,6 +1934,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1844,6 +1948,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1857,6 +1962,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1870,6 +1976,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1883,6 +1990,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1896,6 +2004,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1909,6 +2018,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1922,6 +2032,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1935,6 +2046,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1948,6 +2060,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1961,6 +2074,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1974,6 +2088,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -1987,6 +2102,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2000,6 +2116,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2013,6 +2130,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2026,6 +2144,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2039,6 +2158,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2052,6 +2172,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2065,6 +2186,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2078,6 +2200,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2091,6 +2214,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2104,6 +2228,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2117,6 +2242,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2130,6 +2256,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2143,6 +2270,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2156,6 +2284,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2169,6 +2298,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2182,6 +2312,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2195,6 +2326,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2208,6 +2340,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2221,6 +2354,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2234,6 +2368,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2247,6 +2382,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2260,6 +2396,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2273,6 +2410,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2286,6 +2424,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2299,6 +2438,7 @@ public class IRCBot extends PircBot {
 				for(int i = 0; i < randNum; ++i)
 				  br.readLine();
 				quote = br.readLine();
+				br.close();
 			} catch (Exception e) {
 				logger.error(e);
 			}
@@ -2360,14 +2500,11 @@ public class IRCBot extends PircBot {
     	return false;
     }
     
-    @SuppressWarnings("unused")
 	private String searchPage(String search) throws IOException{
-    	int curSearchPage = 0;
     	String line, searchLine = "";
     	String[] splitLine;
 		BufferedReader br = new BufferedReader(new FileReader(HS_LINKS));
 		while ((line = br.readLine()) != null) {
-			curSearchPage++;
 			if (line.toLowerCase().contains(search.toLowerCase())) {
 				searchLine = line;
 				break;

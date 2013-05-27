@@ -17,7 +17,7 @@ import com.iarekylew00t.ircbot.LogHandler;
 
 public class MusicHandler implements Runnable {
 	private String curSong, prevSong = null, tempSong = null, curTime;
-	private String CURSONG_FILE;
+	private File CURSONG_FILE;
 	private LogHandler logger = new LogHandler();
 	private Thread songThread;
 	private PircBot mainBot;
@@ -27,16 +27,16 @@ public class MusicHandler implements Runnable {
 	public MusicHandler(PircBot bot, EmailClient email) {
 		mainBot = bot;
 		emailClient = email;
-		CURSONG_FILE = "curSong.txt";
+		CURSONG_FILE = new File("curSong.txt");
 		checkFile(CURSONG_FILE);
 		songThread = new Thread(this);
 		songThread.start();
 	}
 	
-	public MusicHandler(String fileLoc, PircBot bot, EmailClient email) {
+	public MusicHandler(String curSongFile, PircBot bot, EmailClient email) {
 		mainBot = bot;
 		emailClient = email;
-		CURSONG_FILE = fileLoc;
+		CURSONG_FILE = new File(curSongFile);
 		checkFile(CURSONG_FILE);
 		songThread = new Thread(this);
 		songThread.start();
@@ -65,7 +65,6 @@ public class MusicHandler implements Runnable {
         return s;
     }
 
-	@SuppressWarnings("unused")
 	private void restartWinamp() throws Exception {
 		Date date = new Date();
     	curTime = dateFormat.format(date);
@@ -75,14 +74,13 @@ public class MusicHandler implements Runnable {
         
 		Runtime.getRuntime().exec("taskkill /IM winamp.exe");
 		Thread.sleep(1500);
-		Process p = Runtime.getRuntime().exec("winamp.exe");
+		Runtime.getRuntime().exec("winamp.exe");
 		
         mainBot.sendMessage("#hs_radio", Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
 		emailClient.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime);
         logger.notice("WINAMP RESTARTED SUCCESSFULLY");
     }
 	
-	@SuppressWarnings("unused")
 	public void restartWinamp(String channel, String sender) throws Exception {
 		Date date = new Date();
     	curTime = dateFormat.format(date);
@@ -91,7 +89,7 @@ public class MusicHandler implements Runnable {
         
 		Runtime.getRuntime().exec("taskkill /IM winamp.exe");
 		Thread.sleep(1500);
-		Process p = Runtime.getRuntime().exec("winamp.exe");
+		Runtime.getRuntime().exec("winamp.exe");
 		
         mainBot.sendMessage(channel, Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
         try {
@@ -125,7 +123,7 @@ public class MusicHandler implements Runnable {
     	}
     	updateCurSong();
     }
-    
+
     public String getPrevSong() {
     	updatePrevSong();
     	return prevSong;
@@ -136,22 +134,19 @@ public class MusicHandler implements Runnable {
     	return curSong;
     }
     
-	@SuppressWarnings("resource")
 	private void updateCurSong() {
-        FileInputStream fs;
 		try {
-			fs = new FileInputStream(CURSONG_FILE);
-			BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(CURSONG_FILE)));
 			br.readLine(); //Skips first line
 			curSong = br.readLine();
+			br.close();
 		} catch (Exception e) {
 			logger.error(e);
 		}
 		curSong = trimString(curSong, 9);
     }
     
-	private void checkFile(String fileLoc) {
-        File file = new File(fileLoc);
+	private void checkFile(File file) {
         if (!file.exists()){
             try {
                 file.createNewFile();
