@@ -20,8 +20,8 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.3a";
-    private static final String SONG_LIST = "songs.txt";
+    private static final String VER = "0.9.3.3b";
+    private static final String REQ_LIST = "songReq.txt";
     private static final String FEEDBACK_FILE = "feedback.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
     private static final String ARANEA_QUOTES = "./quotes/aranea-quotes.txt";
@@ -89,7 +89,7 @@ public class IRCBot extends PircBot {
     public IRCBot(String name, String password, String emailAcc, String emailPass) {
         setName(name);
         login(password);
-        checkFile(SONG_LIST);
+        checkFile(REQ_LIST);
         checkFile(FEEDBACK_FILE);
         setupEmail(emailAcc, emailPass);
         player = new MusicHandler("curSong.txt", this, email);
@@ -883,7 +883,7 @@ public class IRCBot extends PircBot {
 					    } else {
 					    	if (checkReq(input) == false) {
 						        sendMessage(channel, "y0ur s0ng request has been added t0 the list " + sender);
-						        writeToFile(SONG_LIST, sender + ": " + input);
+						        writeToFile(REQ_LIST, sender + ": " + input);
 						        reqList.add(input);
 						        hostList.add(hostname);
 					    	} else {
