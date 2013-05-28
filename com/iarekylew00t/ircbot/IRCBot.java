@@ -1,5 +1,6 @@
 package com.iarekylew00t.ircbot;
 
+import com.iarekylew00t.chatbot.ChatBot;
 import com.iarekylew00t.email.EmailClient;
 import com.iarekylew00t.google.Google;
 import org.jibble.pircbot.*;
@@ -20,7 +21,7 @@ import org.w3c.dom.Element;
 
 public class IRCBot extends PircBot {
 
-    private static final String VER = "0.9.3.3d";
+    private static final String VER = "0.9.3.4d";
     private static final String REQ_LIST = "songReq.txt", CURSONG_FILE = "curSong.txt", FEEDBACK_FILE = "feedback.txt", HS_LINKS = "links.txt";
     private static final String ARADIA_QUOTES = "./quotes/aradia-quotes.txt";
     private static final String ARANEA_QUOTES = "./quotes/aranea-quotes.txt";
@@ -82,6 +83,7 @@ public class IRCBot extends PircBot {
 	private Google google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw");
 	private MusicHandler player;
 	private HomestuckChecker updater = new HomestuckChecker(this, 30);
+	private ChatBot chatBot = new ChatBot();
 	private ArrayList<String> hostList = new ArrayList<String>(), reqList = new ArrayList<String>(), voterList = new ArrayList<String>();
 	
     public IRCBot(String name, String password, String emailAcc, String emailPass) {
@@ -175,7 +177,7 @@ public class IRCBot extends PircBot {
     	if (message.startsWith("$")) {
 			//List All Commands
 			if (message.equalsIgnoreCase("$commands") || message.equalsIgnoreCase("$help")) {
-		        sendMessage(channel, "8ball, announce, bind, boner, commands, dict, expand, faq, feedback, gearup, google, " +
+		        sendMessage(channel, "8ball, announce, ask, bind, boner, commands, dict, expand, faq, feedback, gearup, google, " +
 		        		"gofast, gottagofast, heal, irc, kill, latest, lmtyahs, marco, mspa, mspawiki, page, pap, pin, ping, playflute, prevsong, reboot, " +
 		        		"radio, req, reqoff, reqon, restart, revive, search, serve, shoosh, shooshpap, shoot, shorten, shout, slap, slay, " +
 		        		"song, songlist, stab, submit, talk, tellkyle, time, udict, ver, weather, wiki, youtube");
@@ -187,6 +189,21 @@ public class IRCBot extends PircBot {
 		    		this.disconnect();
 		    	} else {
 		    		sendMessage(channel, "im s0rry but y0u d0nt have permiss0n t0 d0 that");
+		    	}
+		    	
+		    //Ask Aradiabot a question/talk to her through Cleverbot API	
+		    } else if (message.equalsIgnoreCase("$ask")) {
+		    	if (channel.equals("#hs_radio3")) {
+		    		sendMessage(channel, "y0u need t0 actually ask me a questi0n " + sender + "...");
+		    	} else {
+		    		sendMessage(channel, "please talk t0 me in channel #3");
+		    	}
+		    } else if (message.startsWith("$ask ")) {
+		    	String input = message.substring(5);
+		    	if (channel.equals("#hs_radio3")) {
+		    		sendMessage(channel, chatBot.think(input));
+		    	} else { 
+		    		sendMessage(channel, "please talk t0 me in channel #3");
 		    	}
 		
 		    } else if (message.equalsIgnoreCase("$shorten")) {
