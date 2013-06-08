@@ -9,21 +9,32 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.iarekylew00t.ircbot.LogHandler;
+import com.iarekylew00t.ircbot.handlers.LogHandler;
+import com.iarekylew00t.managers.DataManager;
 
 public class Google {
 	private static final String GOOGL_BASE = "https://www.googleapis.com/urlshortener/v1/url";
+	private static final String GOOGLE_BASE = "http://www.google.com/";
+	private static final String YOUTUBE_BASE = "http://www.youtube.com/";
 	private String apiKey;
-	private LogHandler logger = new LogHandler();
+	private LogHandler logger = DataManager.logHandler;
 	
 	public Google(String api) {
-		logger.notice("*** CHECKING GOOGLE APIKEY ***");
         if (api.isEmpty()) {
         	logger.error("ERROR: PLEASE USE A VALID APIKEY");
             throw new IllegalArgumentException("APIKey must be specified, see the Google URL Shortener API docs: http://goo.gl/2rfGn");
-    }
-        logger.notice("*** GOOGLE APIKEY VALID ***");
+        }
         apiKey = api;
+	}
+
+	public String googleSearch(String search) {
+		search = search.replace(' ','+');
+		return GOOGLE_BASE + "search?q=" + search;
+	}
+	
+	public String youtubeSearch(String search) {
+		search = search.replace(' ','+');
+		return YOUTUBE_BASE + "results?search_query=" + search;
 	}
 	
 	public String shortenUrl(String url) throws MalformedURLException, IOException, GooglException {
@@ -97,7 +108,6 @@ public class Google {
 		br.close();
 		
 		logger.debug("responseCode=" + connection.getResponseCode());
-		//logger.debug("response=" + response);
 		connection.disconnect();
 		
 		if (gotErrorResponse) {

@@ -2,98 +2,65 @@ package com.iarekylew00t.email;
 
 import java.util.Properties;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.jibble.pircbot.Colors;
-import org.jibble.pircbot.PircBot;
-
-import com.iarekylew00t.ircbot.LogHandler;
+import com.iarekylew00t.managers.DataManager;
 
 public class EmailClient {
-	private Properties clientProps;
-	private Session session;
-	private MimeMessage email;
-	private InternetAddress toAddress;
+	private static Properties props;
+	private static Session session;
+	private static MimeMessage email;
+	private static InternetAddress toAddress;
 	private static Transport transport;
-	private PircBot mainBot;
-	private LogHandler logger = new LogHandler();
 
-	public EmailClient(String username, String password, String host, boolean debug, PircBot bot) {
-		logger.notice("*** SETTING UP EMAIL CLIENT ***");
-		mainBot = bot;
-        clientProps = System.getProperties();
-        clientProps.put("mail.smtp.starttls.enable", true);
-        clientProps.put("mail.smtp.host", host);
-        clientProps.put("mail.smtp.user", username);
-        clientProps.put("mail.smtp.password", password);
-        clientProps.put("mail.smtp.port", "587");
-        clientProps.put("mail.smtp.auth", true);
-        clientProps.put("mail.debug", debug);
-        session = Session.getInstance(clientProps, new EmailAuthenticator(username, password));
+	public EmailClient() {}
+	
+	public void setupEmail(String emailAddress, String emailPassword) throws Exception {
+        props = System.getProperties();
+        props.put("mail.smtp.starttls.enable", true);
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.user", emailAddress);
+        props.put("mail.smtp.password", emailPassword);
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", true);
+        session = Session.getInstance(props, new EmailAuthenticator(emailAddress, emailPassword));
         email = new MimeMessage(session);
-        try {
-	        email.setFrom(new InternetAddress(username));
-	        transport = session.getTransport("smtp");
-	        transport.connect(host, username, password);
-	        logger.notice("*** EMAIL CLIENT SETUP SUCCESSFULLY ***");
-        } catch (Exception e) {
-        	logger.error("COULD NOT SETUP EMAIL CLIENT");
-        	logger.error(e);
-        }
+        email.setFrom(new InternetAddress(emailAddress));
+        transport = session.getTransport("smtp");
+        transport.connect("smtp.gmail.com", emailAddress, emailPassword);
 	}
-	
+
 	public void sendEmail(String recipient, String subject, String message) {
-		checkTransport();
 		try {
-			logger.debug("--- SENDING EMAIL ---");
+			connectTransport();
 			toAddress = new InternetAddress(recipient);
 	    	email.addRecipient(Message.RecipientType.TO, toAddress);
 	    	email.setSubject(subject);
 	    	email.setText(message);
 	        transport.sendMessage(email, email.getAllRecipients());
-	        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
 		} catch (Exception e) {
-			mainBot.sendMessage("#hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
-			logger.error("FAILED TO SEND EMAIL");
-			logger.error(e);
+			DataManager.logHandler.error("COULD NOT SEND EMAIL", e);
+			DataManager.exception = e;
 		}
 	}
 	
-	public void sendEmail(String recipient, String subject, String message, String channel) {
-		checkTransport();
-		try {
-			logger.debug("--- SENDING EMAIL ---");
-			toAddress = new InternetAddress(recipient);
-	    	email.addRecipient(Message.RecipientType.TO, toAddress);
-	    	email.setSubject(subject);
-	    	email.setText(message);
-	        transport.sendMessage(email, email.getAllRecipients());
-	        logger.debug("--- EMAIL SENT SUCCESSFULLY ---");
-		} catch (Exception e) {
-			mainBot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not send Email - please notify IAreKyleW00t: http://iarekylew00t.tumblr.com/ask");
-			logger.error("FAILED TO SEND EMAIL");
-			logger.error(e);
-		}
+	public void addRecipient(InternetAddress recipient) throws Exception {
+		email.addRecipient(Message.RecipientType.TO, recipient);
 	}
 	
-	private void checkTransport() {
-		try {
-			logger.debug("transport.isConnected()=" + transport.isConnected());
-			if (transport.isConnected() == false) {
-					transport.connect(clientProps.getProperty("mail.smtp.host"), clientProps.getProperty("mail.smtp.user"), clientProps.getProperty("mail.smtp.password"));
-					logger.notice("TRANSPORT RECONNECTED SUCCESSFULLY");
-			}
-		} catch (Exception e) {
-			logger.error("FAILED TO RECONNECT TRANSPORT");
-			logger.error(e);
+	public boolean isConnected() {
+		if (transport.isConnected()) {
+			return true;
 		}
+		return false;
 	}
 	
-	public void closeClient() throws MessagingException {
-		transport.close();
+	public void connectTransport() throws Exception {
+		if (!isConnected()) {
+			transport.connect(props.getProperty("mail.smtp.host"), props.getProperty("mail.smtp.user"), props.getProperty("mail.smtp.password"));
+		}
 	}
 }

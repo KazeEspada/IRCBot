@@ -13,6 +13,7 @@ public class EmailAuthenticator extends Authenticator {
 		this.pw = password;
 	}
 	
+	@Override
 	public PasswordAuthentication getPasswordAuthentication() {
 		return new PasswordAuthentication(user, pw);
 	}

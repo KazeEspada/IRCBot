@@ -1,28 +1,59 @@
 package com.iarekylew00t.ircbot;
 
-import java.util.*;
-import java.io.*;
+import java.nio.charset.Charset;
+
+import org.pircbotx.PircBotX;
+
+import com.iarekylew00t.email.EmailClient;
+import com.iarekylew00t.google.Google;
+import com.iarekylew00t.ircbot.handlers.LogHandler;
+import com.iarekylew00t.ircbot.listeners.BasicCommandListener;
+import com.iarekylew00t.ircbot.listeners.DisconnectListener;
+import com.iarekylew00t.ircbot.listeners.GoogleListener;
+import com.iarekylew00t.ircbot.listeners.HomestuckListener;
+import com.iarekylew00t.ircbot.listeners.LogListener;
+import com.iarekylew00t.ircbot.listeners.MusicListener;
+import com.iarekylew00t.ircbot.listeners.PermissionCommandListener;
+import com.iarekylew00t.ircbot.listeners.RequestListener;
+import com.iarekylew00t.ircbot.listeners.WebCommandListener;
+import com.iarekylew00t.managers.DataManager;
 
 public class IRCBotMain {
+	private static LogHandler logger = DataManager.logHandler;
 	
-    public static void main(String[] args) throws Exception {
-    	setupBot();
-    }
-    
-    public static void setupBot() throws Exception {        
-        Properties p = new Properties();
-        p.load(new FileInputStream(new File("./config.ini")));
-        
-        String server = p.getProperty("Server", "irc.esper.net");
-        String channel = p.getProperty("Channel", "#hs_radio,#hs_radio2,#hs_radio3,#hs_radio4,#hs_admin");
-        String nick = p.getProperty("Nick", "Aradiabot");
-        String pass = p.getProperty("Password", "");
-        String email = p.getProperty("Email", "example@gmail.com");
-        String emailPass = p.getProperty("EmailPassword", "abc123");
-        
-        IRCBot bot = new IRCBot(nick, pass, email, emailPass);
-        bot.setVerbose(true);
-        bot.connect(server);
-        bot.joinChannel(channel);
-    }
+	public static void main(String[] args) throws Exception{
+		if (!DataManager.googleAPIKey.isEmpty()) {
+			logger.info("SETTING UP GOOGLE CLIENT");
+			DataManager.google = new Google(DataManager.googleAPIKey);
+	        logger.info("GOOGLE CLIENT SETUP SUCCESSFULLY");
+        }
+		
+		EmailClient email = DataManager.emailClient;
+		if (!DataManager.emailAddress.isEmpty() || !DataManager.emailPassword.isEmpty()) {
+			logger.info("SETTING UP EMAIL CLIENT");
+        	email.setupEmail(DataManager.emailAddress, DataManager.emailPassword);
+        	logger.info("EMAIL CLIENT SETUP SUCCESSFULLY");
+        }
+		
+        PircBotX bot = DataManager.IRCbot;
+        bot.setName(DataManager.nick);
+        bot.setLogin("AA");
+        bot.setAutoNickChange(true);
+        bot.setEncoding(Charset.forName("UTF-8"));
+        bot.setVerbose(DataManager.debug);
+        bot.getListenerManager().addListener(new BasicCommandListener());
+        bot.getListenerManager().addListener(new PermissionCommandListener());
+        bot.getListenerManager().addListener(new MusicListener());
+        bot.getListenerManager().addListener(new GoogleListener());
+        bot.getListenerManager().addListener(new HomestuckListener());
+        bot.getListenerManager().addListener(new WebCommandListener());
+        bot.getListenerManager().addListener(new DisconnectListener());
+        bot.getListenerManager().addListener(new RequestListener());
+        bot.getListenerManager().addListener(new LogListener());
+        bot.connect(DataManager.server);
+        if (!DataManager.nickPassword.isEmpty()) {
+        	bot.identify(DataManager.nickPassword);
+        }
+        bot.joinChannel(DataManager.channel);
+	}
 }

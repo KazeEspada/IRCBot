@@ -1,0 +1,56 @@
+===================================
+===     ARADIABOT CHANGELOG     ===
+===================================
+KEY:
+	[+] Added
+	[-] Removed
+	[!] Improvement
+	[*] Change
+	[@] Fixes/Patches
+	[?] Known Issues
+	* = More at bottom of build change
+
+--- 1.0.0.0 ---
+[+] Full Support for Multi-Threading
+[+] Added EventListeners
+[+] Grouped all necessary commands and created Listeners for each one*
+[+] Added Listener Handlers to manage more complex commands**
+[+] $help command***
+[+] HTML Parser (Jsoup)
+[+] Google API for URL shortening/expanding
+[+] Created a working Email, LogHandler, Google, and ChatBot API's
+[+] Created a DataManager Utility Class to handle all Data that needs to be shared****
+[+] Created a StringHelper Utility Class and FileHlper Utility class to manage shared methods****
+[+] Created multiple Classes for Encryption, Encoding and Hash Generation*****
+[-] Removed: bind, boner, feedback, gofast, gottagofast, marco, pin, slay, talk, and submit
+[-] Removed unnecessary amount of code throughout
+[!] Passwords can now be encrypted in the Config File******
+[!] Moved to PircBotX (1.9) API
+[!] Command Checking/Handling
+[!] onMessage handling
+[!] Updated Command list
+[!] More accurate weather information
+[!] More accurate message input
+[!] Defition handling/grabbing
+[!] Winamp error checking
+[!] Improved Homestuck-related commands/handling
+[!] Grabbing Channel/User information
+[!] Much better $reboot/reconnect
+[*] Command Alias; cursong, prev, we, yt, g
+[*] Renamed $ask to $talk
+[*] PermissionHandling slightly
+[*] File locations
+[@] sendEmail() should no longer throw any errors
+[@] Bot hanging with multiple commands
+[@] Reconnecting Issues
+[$] Encryption salts and IVSpecs are stored in plaintext within the source*******
+[$] ConnectionTimedOut when retreving response from Cleverbot
+[$] Error when parsing HTML information sometimes
+
+*Created: BasicCommandListener, DisconnectListener, GoogleListener, HomestuckListener, MusicListener, PermissionCommandListener, and WebCommandListener.
+** Created: Definition Objects, DefinitionHandler, HomestuckHandler, Weather Objects, and WeatherHandler.
+***$help <command> - Outputs the information about that command through a Map<String, String> (HashMap).
+****DataHelper is an enum Class that has only ONE INSTANCE of itself. Holds all data needed between classes (eg: PircBotX, LogHandler, EmailClient, Google, Bot Information, etc). Holds methods that are shared between multiple classes.
+*****Supported Algorithms: AES, Blowfish, DES, 3DES, RC2, BASE64, MD2, MD5, SHA1, SHA-256, SHA-384, SHA-512
+****** Encryption Method: BASE64 > Blowfish > AES
+*******Will most likely have salts randomly generated when the bot is FIRST ran and saved in the Config File - IVSpecs will be set within the source.
