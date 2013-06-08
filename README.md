@@ -1,6 +1,6 @@
 Aradiabot
 =============
-A IRC bot written in Java using the pIRCbot API. 
+A IRC bot written in Java using the PircBotX API. https://code.google.com/p/pircbotx/
 
 
 Description
