@@ -10,6 +10,7 @@ import com.iarekylew00t.helpers.FileHelper;
 
 public class LogHandler {
 	private File LOG_FILE;
+	private File logDir = new File("./logs/");
 	private DateFormat logFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private DateFormat backupLog = new SimpleDateFormat("dd-MMM-yy_[hh-mm-ssSSS]");
 	private Date date;
@@ -23,6 +24,9 @@ public class LogHandler {
 		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
 		if (diff > 3 * 24 * 60 * 60 * 1000) {
 			date = new Date();
+			if (!logDir.exists()) {
+				logDir.mkdirs();
+			}
 			String fileNameTime = backupLog.format(date);
 			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
 			FileHelper.recreateFile(LOG_FILE);
