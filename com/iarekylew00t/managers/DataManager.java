@@ -32,7 +32,7 @@ public enum DataManager {
 	public static File ENCRYPT_FILE = new File("./files/.encrypted");
 	
     static {
-        if (!FileHelper.checkFile(CONFIG)) {
+        if (!CONFIG.exists()) {
         	FileHelper.createFile(CONFIG);
         	createDefaultConfig();
         } else {
@@ -60,14 +60,14 @@ public enum DataManager {
 		}
 		
 		if (encrypt) {
-			if (FileHelper.checkFile(ENCRYPT_FILE)) {
+			if (ENCRYPT_FILE.exists()) {
 				try {
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
 					emailPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(emailPassword)));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} else if (!FileHelper.checkFile(ENCRYPT_FILE)) {
+			} else if (!ENCRYPT_FILE.exists()) {
 				try {
 					logHandler.notice("*** ENCRYPTING PASSWORDS ***");
 					nickPassword = Encryptor.encryptAES(Encryptor.encryptBlowfish(Encoder.encodeBase64(nickPassword)));
@@ -86,7 +86,7 @@ public enum DataManager {
 				}
 			}
 		} else if (!encrypt) {
-			if (FileHelper.checkFile(ENCRYPT_FILE)) {
+			if (ENCRYPT_FILE.exists()) {
 				try {
 					logHandler.notice("*** DECRYPTING PASSWORDS ***");
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
@@ -96,7 +96,7 @@ public enum DataManager {
 				}
 				logHandler.notice("*** UPDATING CONFIG ***");
 				updateConfig();
-	    		FileHelper.deleteFile(ENCRYPT_FILE);
+	    		ENCRYPT_FILE.delete();
 			}
 		}
 		if (salt.isEmpty()) {
@@ -141,9 +141,7 @@ public enum DataManager {
     	commandList.put("reboot", "OP ONLY - Usage: $reboot");
     	commandList.put("radio", "Usage: $radio");
     	commandList.put("random", "Usage: $random [maxNum]");
-    	commandList.put("req", "Usage: $req || $req [songname]");
-    	commandList.put("reqoff", "KYLE ONLY - Usage: $reqoff");
-    	commandList.put("reqon", "KYLE ONLY - Usage: $reqon || $reqon [minutes]");
+    	commandList.put("req", "Usage: $req [args] || $req [songname]");
     	commandList.put("restart", "VOICE/OP ONLY - Usage: $restart");
     	commandList.put("revive", "Usage: $revive <user>");
     	commandList.put("rules", "Usage: $rules");

@@ -54,7 +54,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					if (hasOp) {
-						sendToAll(bot, Colors.RED + Colors.BOLD + "ANNOUNCEMENT: " + Colors.YELLOW + input);
+						sendToAll(bot, Colors.RED + Colors.BOLD + "ANNOUNCEMENT: " + Colors.OLIVE + input);
 						return;
 					}
 					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");

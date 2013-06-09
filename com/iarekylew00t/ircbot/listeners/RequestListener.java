@@ -24,58 +24,49 @@ public class RequestListener extends ListenerAdapter {
 
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if(message.startsWith("$")) {	
-
-			
-			/* --- REQ ON --- */
-			if (message.toLowerCase().startsWith("$reqon")) {
-				input = message.substring(6);
-				if (StringHelper.isEmpty(input)) {
-					if (hasOp) {
-						if (!requests.areOpen()) {
-							requests.turnOnRequests();
-							return;
-						}
-						event.respond("requests are already 0pen");
-						return;
-					}
-					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
-					return;
-				}
-				if (!input.startsWith(" ")) {
-					return;
-				}
-				event.respond(StringHelper.getCommand("reqon"));
-				return;
-			
-			/* --- REQ OFF --- */
-			} else if (message.toLowerCase().startsWith("$reqoff")) {
-				input = message.substring(7);
-				if (StringHelper.isEmpty(input)) {
-					if (hasOp) {
-						if (requests.areOpen()) {
-							requests.turnOffRequests();
-							return;
-						}
-						event.respond("requests are already cl0sed");
-						return;
-					}
-					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
-					return;
-				}
-				if (!input.startsWith(" ")) {
-					return;
-				}
-				event.respond(StringHelper.getCommand("reqoff"));
-				return;
 			
 			/* --- REQ --- */
-			} else if (message.toLowerCase().startsWith("$req") && !(message.toLowerCase().startsWith("$reqon") || message.toLowerCase().startsWith("$reqoff"))) {
+			if (message.toLowerCase().startsWith("$req")) {
 				input = message.substring(4);
 				if (!StringHelper.isEmpty(input)) {
 					if (!input.startsWith(" ")) {
 						return;
 					}
 					input = StringHelper.setString(input);
+					//Check for -on argument
+					if (input.equals("-on")) {
+						if (hasOp) {
+							if (!requests.areOpen()) {
+								requests.turnOnRequests();
+								return;
+							}
+							event.respond("requests are already 0pen");
+							return;
+						}
+						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
+						return;
+					//Check for -off argument
+					} else if (input.equals("-off")) {
+						if (hasOp) {
+							if (requests.areOpen()) {
+								requests.turnOffRequests();
+								return;
+							}
+							event.respond("requests are already cl0sed");
+							return;
+						}
+						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
+						return;
+					//Check for -clear argument
+					} else if (input.equals("-clear") || input.equals("-c")) {
+						if (hasOp) {
+							requests.clearRequests();
+							event.respond("all requests have been cleared");
+							return;
+						}
+						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
+						return;
+					}
 					if (requests.areOpen()) {
 						if (requests.countUserReqests(sender.getHostmask()) < 3) {
 							if (!requests.hasBeenRequested(input)) {

@@ -29,7 +29,7 @@ public class HomestuckHandler implements Runnable {
 	private File HS_LINKS = new File("./files/hs_links.txt");
 
 	public HomestuckHandler() {
-		if (!FileHelper.checkFile(HS_LINKS)) {
+		if (!HS_LINKS.exists()) {
 			FileHelper.createFile(HS_LINKS);
 		}
 		interval = 15;
@@ -39,7 +39,7 @@ public class HomestuckHandler implements Runnable {
 	}
 	
 	public HomestuckHandler(int min) {
-		if (!FileHelper.checkFile(HS_LINKS)) {
+		if (!HS_LINKS.exists()) {
 			FileHelper.createFile(HS_LINKS);
 		}
 		interval = min;

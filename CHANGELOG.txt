@@ -10,6 +10,13 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.6 ---
+[-] Removed unnecessary methods in FileHelper
+[!] Improved the $req command*
+[*] Changed FileHelper.checkFile() -> FILE_NAME.exists(); 
+	
+*$reqon and $reqoff have been condenced into the $req command. $req -on ; $req -off ; $req -clear (which deletes the REQ_FILE).
+	
 --- 1.0.1.4a ---
 [@] Added that Salt must be a min of 24 characters
 

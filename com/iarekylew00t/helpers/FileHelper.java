@@ -18,31 +18,22 @@ public final class FileHelper {
 	private FileHelper() {
 		throw new AssertionError();
 	}
-
-	public static boolean checkFile(File file) {
-		if (file.exists()) {
-			return true;
-		}
-		return false;
-	}
 	
 	public static void createFile(File file) {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
+			DataManager.exception = e;
 			e.printStackTrace();
 		}
 	}
 	
-	public static void deleteFile(File file) {
-		file.delete();
-	}
-	
 	public static void recreateFile(File file) {
-		file.delete();
 		try {
+			file.delete();
 			file.createNewFile();
 		} catch (IOException e) {
+			DataManager.exception = e;
 			e.printStackTrace();
 		}
 	}
@@ -69,7 +60,7 @@ public final class FileHelper {
 			in.close();
 			out.close();
 		} catch (Exception e) {
-			
+			DataManager.exception = e;
 			e.printStackTrace();
 		}
 	}

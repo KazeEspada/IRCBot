@@ -21,18 +21,12 @@ public class RequestHandler {
 
 	public RequestHandler() {
 		requests = false;
-		REQ_FILE = new File("./files/songReq.txt");
-		if (!FileHelper.checkFile(REQ_FILE)) {
-			FileHelper.createFile(REQ_FILE);
-		}
+		REQ_FILE = new File("songReq.txt");
 	}
 	
 	public RequestHandler(File reqFile) {
 		requests = false;
 		REQ_FILE = reqFile;
-		if (!FileHelper.checkFile(REQ_FILE)) {
-			FileHelper.createFile(REQ_FILE);
-		}
 	}
 
     private void sendToAllChannels(String message) {
@@ -43,6 +37,9 @@ public class RequestHandler {
     }
 	
 	public void turnOnRequests() {
+		if (!REQ_FILE.exists()) {
+			FileHelper.createFile(REQ_FILE);
+		}
 		requests = true;
 		logger.notice("REQUESTS HAVE BEEN SET TURNED ON");
 		sendToAllChannels(Colors.BOLD + Colors.GREEN + "--- REQUESTS HAVE BEEN TURNED ON ---");
@@ -85,4 +82,7 @@ public class RequestHandler {
 		return numOfReq;
 	}
 
+	public void clearRequests() {
+		REQ_FILE.delete();
+	}
 }

@@ -18,7 +18,7 @@ public class LogHandler {
 	
 	public LogHandler() {
 		LOG_FILE = new File("log.log");
-		if (!FileHelper.checkFile(LOG_FILE)) {
+		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
 		}
 		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
@@ -35,8 +35,7 @@ public class LogHandler {
 
 	public LogHandler(String fileLoc) {
 		LOG_FILE = new File(fileLoc);
-		FileHelper.checkFile(LOG_FILE);
-		if (!FileHelper.checkFile(LOG_FILE)) {
+		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
 		}
 	}

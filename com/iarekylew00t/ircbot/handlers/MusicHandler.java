@@ -24,10 +24,10 @@ public class MusicHandler implements Runnable {
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
 	
 	public MusicHandler() {
-		if (!FileHelper.checkFile(CURSONG_FILE)) {
+		if (!CURSONG_FILE.exists()) {
 			FileHelper.createFile(CURSONG_FILE);
 		}
-		if (!FileHelper.checkFile(PREVSONG_FILE)) {
+		if (!PREVSONG_FILE.exists()) {
 			FileHelper.createFile(PREVSONG_FILE);
 		}
 		tempSong = getCurSong();
