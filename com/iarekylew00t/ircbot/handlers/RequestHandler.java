@@ -66,8 +66,10 @@ public class RequestHandler {
 	}
 	
 	public boolean hasBeenRequested(String song) {
-		if (reqList.contains(song.toLowerCase())) {
-			return true;
+		for (int i = 0; i < reqList.size(); i++) {
+			if (reqList.get(i).toLowerCase().contains(song.toLowerCase())) {
+				return true;
+			}
 		}
 		return false;
 	}

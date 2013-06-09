@@ -10,6 +10,9 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.6a ---
+[!] Improved checking if a song was already requested (Whoops)
+	
 --- 1.0.1.6 ---
 [-] Removed unnecessary methods in FileHelper
 [!] Improved the $req command*
