@@ -10,6 +10,9 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.4a ---
+[@] Added that Salt must be a min of 24 characters
+
 --- 1.0.1.4 ---
 [-] Removed GoogleAPIKey field in config*
 [!] Improved Default config and config updating

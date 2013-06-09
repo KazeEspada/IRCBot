@@ -13,7 +13,7 @@ public final class Encryptor {
 	private static final byte[] IV = "7@>X,C=<;'ZS9$!k".getBytes();
 	private static final byte[] DESsalt = DataManager.salt.substring(0, 8).getBytes();
 	private static final byte[] DESIV = "7@>X,C=$".getBytes();
-	private static final byte[] DES3salt = DataManager.salt.getBytes();
+	private static final byte[] DES3salt = DataManager.salt.substring(0, 24).getBytes();
 
 	private Encryptor() {
 		throw new AssertionError();

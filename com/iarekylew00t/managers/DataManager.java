@@ -216,7 +216,7 @@ public enum DataManager {
     	
     	FileHelper.writeToFile(CONFIG, "#Securely Generated Salt\n" +
      			"#NOTE: This is generated the first time you run the bot\n" +
-    			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING\n" +
+    			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING (Min. 24 characters)\n" +
     			"Salt = " + salt, true);
     }
     
