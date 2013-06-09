@@ -127,6 +127,7 @@ public enum DataManager {
     	commandList.put("quote", "Usage: $quote <character> [number]");
     	commandList.put("reboot", "OP ONLY - Usage: $reboot");
     	commandList.put("radio", "Usage: $radio");
+    	commandList.put("random", "Usage: $random [maxNum]");
     	commandList.put("req", "Usage: $req || $req [songname]");
     	commandList.put("reqoff", "KYLE ONLY - Usage: $reqoff");
     	commandList.put("reqon", "KYLE ONLY - Usage: $reqon || $reqon [minutes]");
@@ -144,6 +145,7 @@ public enum DataManager {
     	commandList.put("song", "Usage: $song || $cursong");
     	commandList.put("songlist", "Usage: $songlist");
     	commandList.put("source", "Usage: $source || $github");
+    	commandList.put("srandom", "Usage: $srandom [bytes]");
     	commandList.put("stab", "Usage: $stab <user>");
     	commandList.put("talk", "Usage: $talk <message>");
     	commandList.put("tellkyle", "VOICE/OP ONLY - Usage: $tellkyle <message>");

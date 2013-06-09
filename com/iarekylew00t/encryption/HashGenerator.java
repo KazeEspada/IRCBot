@@ -13,7 +13,7 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
+		return ByteGenerator.toHex(hashValue);
 	}
 	
 	public static String hashMD5(String data) throws Exception { 
@@ -21,7 +21,7 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
+		return ByteGenerator.toHex(hashValue);
 	}
 	
 	public static String hashSHA1(String data) throws Exception { 
@@ -29,7 +29,7 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
+		return ByteGenerator.toHex(hashValue);
 	}
 	
 	public static String hashSHA256(String data) throws Exception { 
@@ -37,7 +37,7 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
+		return ByteGenerator.toHex(hashValue);
 	}
 	
 	public static String hashSHA384(String data) throws Exception { 
@@ -45,7 +45,7 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
+		return ByteGenerator.toHex(hashValue);
 	}
 	
 	public static String hashSHA512(String data) throws Exception { 
@@ -53,18 +53,6 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return toHex(hashValue);
-	}
-	
-	private static String toHex(byte[] digest) {
-		StringBuffer hexString = new StringBuffer();
-		for (int i = 0; i < digest.length; i++) {
-			String hex = Integer.toHexString(0xFF & digest[i]);
-			if (hex.length() == 1) {
-				hexString.append('0');
-			}
-			hexString.append(hex);
-		}
-		return hexString.toString();
+		return ByteGenerator.toHex(hashValue);
 	}
 }

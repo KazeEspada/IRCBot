@@ -39,7 +39,7 @@ public class MusicListener extends ListenerAdapter {
 			if (message.toLowerCase().startsWith("$prevsong")) {
 				input = message.substring(9);
 				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.YELLOW + Colors.BOLD + winamp.getPrevSong());
+					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -50,7 +50,7 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$prev")) {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.YELLOW + Colors.BOLD + winamp.getPrevSong());
+					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -77,7 +77,7 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$cursong")) {
 				input = message.substring(8);
 				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + winamp.getCurSong());
+					bot.sendMessage(channel, "the current s0ng is: " + Colors.BOLD + winamp.getCurSong());
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -88,7 +88,7 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$song")) {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the current s0ng is: " + Colors.YELLOW + Colors.BOLD + winamp.getCurSong());
+					bot.sendMessage(channel, "the current s0ng is: " + Colors.BOLD + winamp.getCurSong());
 					return;
 				}
 				if (!input.startsWith(" ")) {

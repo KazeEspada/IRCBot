@@ -10,6 +10,12 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.2 ---
+[+] $random and $srandom*
+[*] Moved toHex() into the ByteGenerator Class
+
+*$random will generate a number between 1-X (default is 1-10). $srandom will generate a Secure Random number of bytes (x) and convert it to a String (default 8)
+	
 --- 1.0.0.0 ---
 [+] Full Support for Multi-Threading
 [+] Added EventListeners

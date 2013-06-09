@@ -12,6 +12,7 @@ import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
+import com.iarekylew00t.encryption.ByteGenerator;
 import com.iarekylew00t.encryption.Encoder;
 import com.iarekylew00t.encryption.Encryptor;
 import com.iarekylew00t.encryption.HashGenerator;
@@ -512,8 +513,70 @@ public class BasicCommandListener extends ListenerAdapter {
 				event.respond(StringHelper.getCommand("radio"));
 				return;
 				
+			/* --- RANDOM --- */	
+			} else if (message.toLowerCase().startsWith("$random")) {
+				input = message.substring(7);
+				Random gen = new Random();
+				if (!StringHelper.isEmpty(input)) {
+					if (!input.startsWith(" ")) {
+						return;
+					}
+					input = StringHelper.setString(input);
+					int maxNum = 0;
+					try {
+						maxNum = Integer.parseInt(input);
+					} catch (ArithmeticException e) {
+						e.printStackTrace();
+						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Cannot handle numbers greater than 2,147,483,647");
+						return;
+					} catch (Exception e) {
+						e.printStackTrace();
+						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Please use valid numbers");
+						return;
+					}
+					if (maxNum <= 0 || maxNum > 2147483647) {
+						event.respond("please enter a number fr0m 1-2,147,483,647");
+						return;
+					}
+					int randNum = gen.nextInt(maxNum);
+					event.respond("" + randNum);
+					return;
+				}
+				event.respond("" + gen.nextInt(10));
+				return;
+				
+			/* --- SECURE RANDOM --- */	
+			} else if (message.toLowerCase().startsWith("$srandom")) {
+				input = message.substring(8);
+				if (!StringHelper.isEmpty(input)) {
+					if (!input.startsWith(" ")) {
+						return;
+					}
+					input = StringHelper.setString(input);
+					int bytes = 0;
+					try {
+						bytes = Integer.parseInt(input);
+					} catch (ArithmeticException e) {
+						e.printStackTrace();
+						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Cannot handle numbers greater than 2,147,483,647");
+						return;
+					} catch (Exception e) {
+						e.printStackTrace();
+						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Please use valid numbers");
+						return;
+					}
+					if (bytes <= 0 || bytes > 192) {
+						event.respond("please enter a number fr0m 1-192");
+						return;
+					}
+					event.respond(ByteGenerator.toHex(ByteGenerator.genRandomByte(bytes)));
+					return;
+				}
+				event.respond(ByteGenerator.toHex(ByteGenerator.genRandomByte(8)));
+				return;
+				
 			/* --- REVIVE --- */
-			} else if (message.toLowerCase().startsWith("$revive")) {
+			} else if (message.toLowerCase().startsWith("$random")) {
 				input = message.substring(7);
 				if (!StringHelper.isEmpty(input)) {
 					if (!input.startsWith(" ")) {
