@@ -10,6 +10,14 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.4 ---
+[-] Removed GoogleAPIKey field in config*
+[!] Improved Default config and config updating
+[*] Securely Generates a 24-character salt on first time boot**
+
+*GoogleAPIKey will now be set inside the source - using mine as a default. I don't want to limit someone from using it.
+**ONLY Generates that salt if the "Salt" field is completely blank (which it is the first time it starts up). It then saves that salt into the config file. the IVSpec(s) are set internally already and cannot be changed.
+	
 --- 1.0.1.2 ---
 [+] $random and $srandom*
 [*] Moved toHex() into the ByteGenerator Class

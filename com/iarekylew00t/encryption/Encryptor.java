@@ -6,12 +6,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.iarekylew00t.managers.DataManager;
+
 public final class Encryptor {
-	private static final byte[] salt = "$2ax0+bA6i{cAZJ%".getBytes();
+	private static final byte[] salt = DataManager.salt.substring(0, 16).getBytes();
 	private static final byte[] IV = "7@>X,C=<;'ZS9$!k".getBytes();
-	private static final byte[] DESsalt = "$2ax0+b!".getBytes();
+	private static final byte[] DESsalt = DataManager.salt.substring(0, 8).getBytes();
 	private static final byte[] DESIV = "7@>X,C=$".getBytes();
-	private static final byte[] DES3salt = "qo@4:joj!JPw= NM9<b!T/uM".getBytes();
+	private static final byte[] DES3salt = DataManager.salt.getBytes();
 
 	private Encryptor() {
 		throw new AssertionError();

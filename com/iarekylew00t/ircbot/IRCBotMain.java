@@ -22,11 +22,9 @@ public class IRCBotMain {
 	private static LogHandler logger = DataManager.logHandler;
 	
 	public static void main(String[] args) throws Exception{
-		if (!DataManager.googleAPIKey.isEmpty()) {
-			logger.info("SETTING UP GOOGLE CLIENT");
-			DataManager.google = new Google(DataManager.googleAPIKey);
-	        logger.info("GOOGLE CLIENT SETUP SUCCESSFULLY");
-        }
+		logger.info("SETTING UP GOOGLE CLIENT");
+		DataManager.google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw#");
+        logger.info("GOOGLE CLIENT SETUP SUCCESSFULLY");
 		
 		EmailClient email = DataManager.emailClient;
 		if (!DataManager.emailAddress.isEmpty() || !DataManager.emailPassword.isEmpty()) {
