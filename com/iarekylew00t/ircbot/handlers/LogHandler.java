@@ -12,8 +12,8 @@ import com.iarekylew00t.managers.DataManager;
 public class LogHandler {
 	private File LOG_FILE;
 	private File logDir = new File("./logs/");
-	private DateFormat logFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	private DateFormat backupLog = new SimpleDateFormat("dd-MMM-yy_[hh-mm-ssSSS]");
+	private DateFormat logFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssSSS");
+	private DateFormat backupLog = new SimpleDateFormat("dd_MMM_yy[HH-mm-ssSSS]");
 	private Date date;
 	private String logTime;
 	private boolean debug;
@@ -30,7 +30,7 @@ public class LogHandler {
 			if (!logDir.exists()) {
 				logDir.mkdirs();
 			}
-			String fileNameTime = backupLog.format(date);
+			String fileNameTime = backupLog.format(date).toUpperCase();
 			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
 			FileHelper.recreateFile(LOG_FILE);
 		}

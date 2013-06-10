@@ -10,6 +10,9 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.7b ---
+[*] Changed Date Format in logs (yyyy-MM-dd HH:mm:ssSSS)
+	
 --- 1.0.1.7a ---
 [+] A proper debugging option to output all useful information
 [!] Improved debugging overall
