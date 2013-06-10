@@ -34,7 +34,11 @@ public class LogHandler {
 			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
 			FileHelper.recreateFile(LOG_FILE);
 		}
-	}
+		if (logDir.list().length >= 10) {
+			warning("You currently have " + logDir.listFiles().length + " log backups.");
+			warning("Please consider cleaning them out to save space if you no longer need them.");
+		}
+	} 
 
 	public LogHandler(String fileLoc) {
 		debug = false;

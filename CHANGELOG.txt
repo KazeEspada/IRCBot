@@ -11,6 +11,7 @@ KEY:
 	* = More at bottom of build change
 
 --- 1.0.1.7b ---
+[+] Checks how many log backups you have and warns you if you have > 10
 [*] Changed Date Format in logs (yyyy-MM-dd HH:mm:ssSSS)
 	
 --- 1.0.1.7a ---
