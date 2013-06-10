@@ -11,8 +11,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.iarekylew00t.managers.DataManager;
+
 public class WeatherHandler {
 	private String UNITS = "f";
+	private LogHandler logger = DataManager.logHandler;
 
 	public WeatherHandler() {}
 	public WeatherHandler(String unit) {
@@ -46,7 +49,9 @@ public class WeatherHandler {
             Node nNode = nList.item(0);
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
-                return eElement.getElementsByTagName("dnam").item(0).getTextContent();
+                String response = eElement.getElementsByTagName("dnam").item(0).getTextContent();
+                logger.debug("getLocation()=" + response);
+                return response;
             }
 		return null;
 	}
@@ -62,7 +67,9 @@ public class WeatherHandler {
             Node nNode = nList.item(0);
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
-                return Integer.parseInt(eElement.getElementsByTagName("tmp").item(0).getTextContent());
+                int response = Integer.parseInt(eElement.getElementsByTagName("tmp").item(0).getTextContent());
+                logger.debug("getTemperature()=" + response);
+                return response;
             }
 		return -1;
 	}
@@ -78,7 +85,9 @@ public class WeatherHandler {
             Node nNode = nList.item(0);
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
-                return Integer.parseInt(eElement.getElementsByTagName("flik").item(0).getTextContent());
+                int response = Integer.parseInt(eElement.getElementsByTagName("flik").item(0).getTextContent());
+                logger.debug("getFeelsLikeTemp()=" + response);
+                return response;
             }
 		return -1;
 	}
@@ -94,7 +103,9 @@ public class WeatherHandler {
             Node nNode = nList.item(0);
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
-                return eElement.getElementsByTagName("t").item(0).getTextContent();
+                String response = eElement.getElementsByTagName("t").item(0).getTextContent();
+                logger.debug("getCondition()=" + response);
+                return response;
             }
 		return null;
 	}

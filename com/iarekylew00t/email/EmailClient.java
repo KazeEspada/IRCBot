@@ -7,6 +7,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.managers.DataManager;
 
 public class EmailClient {
@@ -15,6 +16,7 @@ public class EmailClient {
 	private static MimeMessage email;
 	private static InternetAddress toAddress;
 	private static Transport transport;
+	private static LogHandler logger = DataManager.logHandler;
 
 	public EmailClient() {}
 	
@@ -26,6 +28,7 @@ public class EmailClient {
         props.put("mail.smtp.password", emailPassword);
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", true);
+        logger.debug("host=" + props.getProperty("mail.smtp.host") + " ; login=" + emailAddress + " ; emailPassword=" + emailPassword);
         session = Session.getInstance(props, new EmailAuthenticator(emailAddress, emailPassword));
         email = new MimeMessage(session);
         email.setFrom(new InternetAddress(emailAddress));
@@ -40,10 +43,12 @@ public class EmailClient {
 	    	email.addRecipient(Message.RecipientType.TO, toAddress);
 	    	email.setSubject(subject);
 	    	email.setText(message);
+	    	logger.debug("recipient=" + recipient);
+	    	logger.debug("subject=" + subject);
+	    	logger.debug("message=" + message);
 	        transport.sendMessage(email, email.getAllRecipients());
 		} catch (Exception e) {
 			DataManager.logHandler.error("COULD NOT SEND EMAIL", e);
-			DataManager.exception = e;
 		}
 	}
 	
@@ -53,8 +58,10 @@ public class EmailClient {
 	
 	public boolean isConnected() {
 		if (transport.isConnected()) {
+			logger.debug("isConnected()=true");
 			return true;
 		}
+		logger.debug("isConnected()=false");
 		return false;
 	}
 	

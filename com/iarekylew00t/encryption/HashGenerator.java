@@ -2,7 +2,11 @@ package com.iarekylew00t.encryption;
 
 import java.security.MessageDigest;
 
+import com.iarekylew00t.ircbot.handlers.LogHandler;
+import com.iarekylew00t.managers.DataManager;
+
 public final class HashGenerator {
+	private static LogHandler logger = DataManager.logHandler;
 
 	private HashGenerator() {
 		throw new AssertionError();
@@ -13,7 +17,10 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 	
 	public static String hashMD5(String data) throws Exception { 
@@ -21,7 +28,10 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 	
 	public static String hashSHA1(String data) throws Exception { 
@@ -29,7 +39,10 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 	
 	public static String hashSHA256(String data) throws Exception { 
@@ -37,7 +50,10 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 	
 	public static String hashSHA384(String data) throws Exception { 
@@ -45,7 +61,10 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 	
 	public static String hashSHA512(String data) throws Exception { 
@@ -53,6 +72,9 @@ public final class HashGenerator {
 		digest.update(data.getBytes());
 		byte[] bytes = digest.digest();
 		byte[] hashValue = digest.digest(bytes);
-		return ByteGenerator.toHex(hashValue);
+		String hashVal = ByteGenerator.toHex(hashValue);
+		logger.debug("data=" + data);
+		logger.debug("hashVal=" + hashVal);
+		return hashVal;
 	}
 }

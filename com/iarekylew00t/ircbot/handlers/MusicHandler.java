@@ -87,7 +87,6 @@ public class MusicHandler implements Runnable {
 				logger.error("FAILED TO RESTART WINAMP", e);
 				bot.sendMessage("#hs_radio", "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.tumblr.com/ask");
 				emailClient.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to restart @ " + curTime);
-				DataManager.exception = e;
 			}
     	}
     	updateCurSong();
@@ -102,8 +101,7 @@ public class MusicHandler implements Runnable {
     	try {
 			prevSong = FileHelper.readLine(PREVSONG_FILE, 1);
 		} catch (Exception e) {
-			logger.error(e);
-			DataManager.exception = e;
+			logger.error("COULD NOT READ 'PREVSONG_FILE'", e);
 		}
     }
     
@@ -111,8 +109,7 @@ public class MusicHandler implements Runnable {
 		try {
 			curSong = FileHelper.readLine(CURSONG_FILE, 2);
 		} catch (Exception e) {
-			logger.error(e);
-			DataManager.exception = e;
+			logger.error("COULD NOT READ 'CURSONG_FILE'", e);
 		}
 		curSong = trimString(curSong, 9);
     }

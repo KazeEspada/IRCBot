@@ -38,7 +38,7 @@ public class IRCBotMain {
         bot.setLogin("AA");
         bot.setAutoNickChange(true);
         bot.setEncoding(Charset.forName("UTF-8"));
-        bot.setVerbose(DataManager.debug);
+        bot.setVerbose(true);
         bot.getListenerManager().addListener(new BasicCommandListener());
         bot.getListenerManager().addListener(new PermissionCommandListener());
         bot.getListenerManager().addListener(new MusicListener());

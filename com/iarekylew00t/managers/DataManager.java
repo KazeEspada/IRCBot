@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import com.iarekylew00t.email.EmailClient;
 import com.iarekylew00t.encryption.ByteGenerator;
@@ -30,6 +31,7 @@ public enum DataManager {
 	public static Exception exception;
 	public static File CONFIG = new File("config.ini");
 	public static File ENCRYPT_FILE = new File("./files/.encrypted");
+	public static String ERROR = Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL;
 	
     static {
         if (!CONFIG.exists()) {
@@ -53,7 +55,8 @@ public enum DataManager {
 		emailPassword = props.getProperty("EmailPassword", "");
 		salt = props.getProperty("Salt", "");
 		try {
-			debug = Boolean.parseBoolean(props.getProperty("Debug", "true"));
+			debug = Boolean.parseBoolean(props.getProperty("Debug", "false"));
+			logHandler.enableDebug(debug);
 			encrypt = Boolean.parseBoolean(props.getProperty("Encrypt", "false"));
 		} catch (Exception e) {
 			logHandler.error("COULD NOT PARSE BOOLEAN VALUE - ONLY USE \"TRUE\" or \"FALSE\"", e);
@@ -65,7 +68,7 @@ public enum DataManager {
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
 					emailPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(emailPassword)));
 				} catch (Exception e) {
-					e.printStackTrace();
+					logHandler.error("COULD NOT DECRYPT PASSWORDS", e);
 				}
 			} else if (!ENCRYPT_FILE.exists()) {
 				try {
@@ -73,7 +76,7 @@ public enum DataManager {
 					nickPassword = Encryptor.encryptAES(Encryptor.encryptBlowfish(Encoder.encodeBase64(nickPassword)));
 					emailPassword = Encryptor.encryptAES(Encryptor.encryptBlowfish(Encoder.encodeBase64(emailPassword)));
 				} catch (Exception e) {
-					e.printStackTrace();
+					logHandler.error("COULD NOT ENCRYPT PASSWORDS", e);
 				}
 				logHandler.notice("*** UPDATING CONFIG ***");
 				updateConfig();
@@ -82,7 +85,7 @@ public enum DataManager {
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
 					emailPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(emailPassword)));
 				} catch (Exception e) {
-					e.printStackTrace();
+					logHandler.error("COULD NOT DECRYPT PASSWORDS", e);
 				}
 			}
 		} else if (!encrypt) {
@@ -92,7 +95,7 @@ public enum DataManager {
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
 					emailPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(emailPassword)));
 				} catch (Exception e) {
-					e.printStackTrace();
+					logHandler.error("COULD NOT DECRYPT PASSWORDS", e);
 				}
 				logHandler.notice("*** UPDATING CONFIG ***");
 				updateConfig();
@@ -219,6 +222,7 @@ public enum DataManager {
     }
     
     private static void createDefaultConfig() {
+    	logHandler.notice("NO CONFIGURATION FOUND - CREATING DEFAULT");
     	FileHelper.writeToFile(CONFIG, "#======================================================\n" +
  		   	   "#===   Configuration File for Aradiabot (Rev. 1A)   ===\n" +
  			   "#======================================================\n", false);
@@ -251,8 +255,8 @@ public enum DataManager {
      			"EmailPassword =\n", true);
      	
      	FileHelper.writeToFile(CONFIG, "#Enable or Disable Debugging\n" +
-     			"#Default: true\n" +
-     			"Debug = true\n", true);
+     			"#Default: false\n" +
+     			"Debug = false\n", true);
      	
      	FileHelper.writeToFile(CONFIG, "#Enable to disable Password Encryption\n" +
      			"#Default: false\n" +

@@ -21,8 +21,8 @@ public class Google {
 	
 	public Google(String api) {
         if (api.isEmpty()) {
-        	logger.error("ERROR: PLEASE USE A VALID APIKEY");
-            throw new IllegalArgumentException("APIKey must be specified, see the Google URL Shortener API docs: http://goo.gl/2rfGn");
+        	logger.error("PLEASE USE A VALID APIKEY");
+            throw new IllegalArgumentException("APIKey must be specified, see the Google API docs: http://goo.gl/2rfGn");
         }
         apiKey = api;
 	}
@@ -38,7 +38,6 @@ public class Google {
 	}
 	
 	public String shortenUrl(String url) throws MalformedURLException, IOException, GooglException {
-		logger.debug("--- SHORTENING URL ---");
 		if (!url.startsWith("http://")) {
 			url = "http://" + url;
 		}
@@ -70,7 +69,6 @@ public class Google {
 	}
 	
 	public String expandUrl(String url) throws MalformedURLException, IOException, GooglException {
-		logger.debug("--- EXPANDING URL ---");
 		if (!url.startsWith("http://")) {
 			url = "http://" + url;
 		}
@@ -83,12 +81,12 @@ public class Google {
 		con.connect();
 		
 		GooglResponse response = new GooglResponse(getResponse(con));
+		logger.debug("longUrl=" + response.getLongUrl());
 		con.disconnect();
 		return response.getLongUrl();
 	}
 	
 	private String getResponse(HttpURLConnection connection) throws IOException, GooglException {
-		logger.debug("--- FETCHING RESPONSE ---");
 		boolean gotErrorResponse = false;
 		String line;
 		InputStream in = null;

@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.iarekylew00t.helpers.FileHelper;
+import com.iarekylew00t.managers.DataManager;
 
 
 public class LogHandler {
@@ -15,8 +16,10 @@ public class LogHandler {
 	private DateFormat backupLog = new SimpleDateFormat("dd-MMM-yy_[hh-mm-ssSSS]");
 	private Date date;
 	private String logTime;
+	private boolean debug;
 	
 	public LogHandler() {
+		debug = false;
 		LOG_FILE = new File("log.log");
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
@@ -34,9 +37,20 @@ public class LogHandler {
 	}
 
 	public LogHandler(String fileLoc) {
+		debug = false;
 		LOG_FILE = new File(fileLoc);
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
+		}
+		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
+		if (diff > 3 * 24 * 60 * 60 * 1000) {
+			date = new Date();
+			if (!logDir.exists()) {
+				logDir.mkdirs();
+			}
+			String fileNameTime = backupLog.format(date);
+			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
+			FileHelper.recreateFile(LOG_FILE);
 		}
 	}
 	
@@ -54,13 +68,18 @@ public class LogHandler {
 	}
 	
 	public void log(Exception e) {
-		e.printStackTrace();
-		FileHelper.writeToFile(LOG_FILE, "" + e, true);
+		if (debug) {
+			System.out.println();
+			e.printStackTrace();
+			FileHelper.writeToFile(LOG_FILE, "" + e, true);
+			DataManager.exception = e;
+		}
 	}
 	
 	public void debug(String log) {
-		log("[DEBUG]: --- " + log + " ---");
-		
+		if (debug) {
+			log("[DEBUG]: --- " + log + " ---");
+		}
 	}
 	
 	public void info(String log) {
@@ -77,6 +96,7 @@ public class LogHandler {
 	}
 
 	public void error(Exception e) {
+		System.out.println();
 		log(e);
 	}
 	
@@ -88,5 +108,9 @@ public class LogHandler {
 	public void notice(String log) {
 		log("[NOTICE]: " + log);
 		
+	}
+	
+	public void enableDebug(boolean value) {
+		debug = value;
 	}
 }

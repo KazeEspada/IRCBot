@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Random;
 
 import org.pircbotx.Channel;
-import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -17,6 +16,7 @@ import com.iarekylew00t.encryption.Encoder;
 import com.iarekylew00t.encryption.Encryptor;
 import com.iarekylew00t.encryption.HashGenerator;
 import com.iarekylew00t.helpers.StringHelper;
+import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.managers.DataManager;
 
 public class BasicCommandListener extends ListenerAdapter {
@@ -26,6 +26,7 @@ public class BasicCommandListener extends ListenerAdapter {
     private final String[] blockRemarks = {"deflects attack", "m0ves", "slaps y0u", "ign0res it", "glares at y0u"};
     private final String[] pokeRemarks = {"p0kes herself", "p0kes y0u instead", "ign0res it", "why w0uld i p0ke myself?", "0_0"};
     private String[] cmdList = DataManager.commandList.keySet().toArray(new String[0]);
+    private LogHandler logger = DataManager.logHandler;
     
 	@Override
 	public void onMessage(MessageEvent event) {
@@ -145,9 +146,8 @@ public class BasicCommandListener extends ListenerAdapter {
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not encrypt data");
-							e.printStackTrace();
-							DataManager.exception = e;
+							event.respond(DataManager.ERROR + "Could not encrypt data");
+							logger.error("COULD NOT ENCRYPT DATA", e);
 							return;
 						}
 					}
@@ -195,9 +195,8 @@ public class BasicCommandListener extends ListenerAdapter {
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not decrypt data");
-							e.printStackTrace();
-							DataManager.exception = e;
+							event.respond(DataManager.ERROR + "Could not decrypt data");
+							logger.error("COULD NOT DECRYPT DATA", e);
 							return;
 						}
 					}
@@ -233,9 +232,8 @@ public class BasicCommandListener extends ListenerAdapter {
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not encode data");
-							e.printStackTrace();
-							DataManager.exception = e;
+							event.respond(DataManager.ERROR + "Could not encode data");
+							logger.error("COULD NOT ENCODE DATA", e);
 							return;
 						}
 					}
@@ -271,9 +269,8 @@ public class BasicCommandListener extends ListenerAdapter {
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not decode data");
-							e.printStackTrace();
-							DataManager.exception = e;
+							event.respond(DataManager.ERROR + "Could not decode data");
+							logger.error("COULD NOT DECODE DATA", e);
 							return;
 						}
 					}
@@ -324,9 +321,8 @@ public class BasicCommandListener extends ListenerAdapter {
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not generate hash");
-							e.printStackTrace();
-							DataManager.exception = e;
+							event.respond(DataManager.ERROR + "Could not generate hash");
+							logger.error("COULD NOT GENERATE HASH", e);
 							return;
 						}
 					}
@@ -384,7 +380,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$irc")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://goo.gl/dIfQu");
+					event.respond("http://goo.gl/dIfQu || http://goo.gl/h4m3C");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -525,13 +521,9 @@ public class BasicCommandListener extends ListenerAdapter {
 					int maxNum = 0;
 					try {
 						maxNum = Integer.parseInt(input);
-					} catch (ArithmeticException e) {
-						e.printStackTrace();
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Cannot handle numbers greater than 2,147,483,647");
-						return;
 					} catch (Exception e) {
-						e.printStackTrace();
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Please use valid numbers");
+						bot.sendMessage(channel, DataManager.ERROR + "I cannot handle numbers like that");
+						logger.error("CANNOT HANDLE HANDLE THOSE KIND OF NUMBERS", e);
 						return;
 					}
 					if (maxNum <= 0 || maxNum > 2147483647) {
@@ -556,13 +548,9 @@ public class BasicCommandListener extends ListenerAdapter {
 					int bytes = 0;
 					try {
 						bytes = Integer.parseInt(input);
-					} catch (ArithmeticException e) {
-						e.printStackTrace();
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Cannot handle numbers greater than 2,147,483,647");
-						return;
 					} catch (Exception e) {
-						e.printStackTrace();
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Please use valid numbers");
+						bot.sendMessage(channel, DataManager.ERROR + "I cannot handle numbers like that");
+						logger.error("CANNOT HANDLE HANDLE THOSE KIND OF NUMBERS", e);
 						return;
 					}
 					if (bytes <= 0 || bytes > 192) {
@@ -576,7 +564,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				return;
 				
 			/* --- REVIVE --- */
-			} else if (message.toLowerCase().startsWith("$random")) {
+			} else if (message.toLowerCase().startsWith("$revive")) {
 				input = message.substring(7);
 				if (!StringHelper.isEmpty(input)) {
 					if (!input.startsWith(" ")) {

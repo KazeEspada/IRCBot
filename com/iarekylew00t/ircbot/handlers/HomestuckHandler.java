@@ -55,7 +55,7 @@ public class HomestuckHandler implements Runnable {
 				Thread.sleep(1000 * 60 * interval);
 			} catch (InterruptedException e) {
 				logger.error(e);
-				DataManager.exception = e;
+	
 			}
 			if (checkUpdate()) {
 				sendToAllChannels(Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
@@ -99,7 +99,6 @@ public class HomestuckHandler implements Runnable {
             }
         } catch (Exception e) {
 			logger.error("COULD NOT GRAB LATEST PAGE", e);
-			DataManager.exception = e;
         }
         
         return Integer.parseInt(update.substring(41));

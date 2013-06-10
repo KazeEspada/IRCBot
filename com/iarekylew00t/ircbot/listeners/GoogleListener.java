@@ -1,7 +1,6 @@
 package com.iarekylew00t.ircbot.listeners;
 
 import org.pircbotx.Channel;
-import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -28,19 +27,20 @@ public class GoogleListener extends ListenerAdapter {
 			/* --- EXPAND URL --- */
 			if (message.toLowerCase().startsWith("$expand")) {
 				input = message.substring(7);
-				if (!StringHelper.isEmpty(input) && (input.startsWith("goo.gl/") || input.startsWith("http://goo.gl/"))) {
+				if (!StringHelper.isEmpty(input)) {
 					if (!input.startsWith(" ")) {
 						return;
 					}
 					input = StringHelper.setString(input);
-					try {
-						event.respond(google.expandUrl(input));
-						return;
-					} catch (Exception e) {
-						logger.error("COULD NOT EXPAND URL", e);
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not expand URL");
-						DataManager.exception = e;
-						return;
+					if (input.startsWith("goo.gl/") || input.startsWith("http://goo.gl/")) {
+						try {
+							event.respond(google.expandUrl(input));
+							return;
+						} catch (Exception e) {
+							logger.error("COULD NOT EXPAND URL", e);
+							bot.sendMessage(channel, DataManager.ERROR + "Could not expand URL");
+							return;
+						}
 					}
 				}
 				event.respond(StringHelper.getCommand("expand"));
@@ -59,8 +59,7 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					} catch (Exception e) {
 						logger.error("COULD NOT SHORTEN URL", e);
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not shorten URL");
-						DataManager.exception = e;
+						bot.sendMessage(channel, DataManager.ERROR + "Could not shorten URL");
 						return;
 					}
 				}

@@ -4,11 +4,14 @@ import com.google.code.chatterbotapi.ChatterBot;
 import com.google.code.chatterbotapi.ChatterBotFactory;
 import com.google.code.chatterbotapi.ChatterBotSession;
 import com.google.code.chatterbotapi.ChatterBotType;
+import com.iarekylew00t.ircbot.handlers.LogHandler;
+import com.iarekylew00t.managers.DataManager;
 
 public class ChatBot {
 	private ChatterBotFactory factory;
 	private ChatterBotSession session;
 	private ChatterBot bot;
+	private LogHandler logger = DataManager.logHandler;
 	
 	public ChatBot() {
 		factory  = new ChatterBotFactory();
@@ -24,6 +27,9 @@ public class ChatBot {
 		String response;
 		response = session.think(input);
 		response = response.toLowerCase().replace("o", "0").replace("O", "0");
-		return response.replace("cleverb0t", "Aradiabot");
+		response = response.replace("cleverb0t", "Aradiabot");
+		logger.debug("input=" + input);
+		logger.debug("response=" + response);
+		return response;
 	}
 }

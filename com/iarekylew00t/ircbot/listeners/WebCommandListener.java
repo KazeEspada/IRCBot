@@ -10,6 +10,7 @@ import com.iarekylew00t.chatbot.ChatBot;
 import com.iarekylew00t.helpers.StringHelper;
 import com.iarekylew00t.ircbot.handlers.Definition;
 import com.iarekylew00t.ircbot.handlers.DefinitionHandler;
+import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.ircbot.handlers.Weather;
 import com.iarekylew00t.ircbot.handlers.WeatherHandler;
 import com.iarekylew00t.managers.DataManager;
@@ -19,6 +20,7 @@ public class WebCommandListener extends ListenerAdapter {
 	private DefinitionHandler dictionary = new DefinitionHandler(); 
 	private WeatherHandler forecast = new WeatherHandler();
 	private ChatBot chatbot = new ChatBot();
+	private LogHandler logger = DataManager.logHandler;
 	
 	@Override
 	public void onMessage(MessageEvent event) throws Exception {
@@ -84,9 +86,8 @@ public class WebCommandListener extends ListenerAdapter {
 							bot.sendMessage(channel, chatbot.think(input));
 							return;
 						} catch (Exception e) {
-							bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not think of a response");
-							e.printStackTrace();
-							DataManager.exception = e;
+							bot.sendMessage(channel, DataManager.ERROR + "Could not think of a response");
+							logger.error("COULD NOT THINK OF RESPONSE", e);
 							return;
 						}
 					}
@@ -112,7 +113,8 @@ public class WebCommandListener extends ListenerAdapter {
 													") and the c0ndit0ns are: " + Colors.BOLD + weather.getCondition());
 						return;
 					} catch (Exception e) {
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not parse data from XML");
+						bot.sendMessage(channel, DataManager.ERROR + "Could not parse data from XML");
+						logger.error("COULD NOT PARSE DATA FROM XML", e);
 						return;
 					}
 				}
@@ -133,7 +135,8 @@ public class WebCommandListener extends ListenerAdapter {
 													") and the c0ndit0ns are: " + Colors.BOLD + weather.getCondition());
 						return;
 					} catch (Exception e) {
-						bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Could not parse data from XML");
+						bot.sendMessage(channel, DataManager.ERROR + "Could not parse data from XML");
+						logger.error("COULD NOT PARSE DATA FROM XML", e);
 						return;
 					}
 				}

@@ -111,10 +111,9 @@ public class MusicListener extends ListenerAdapter {
 							return;
 				        } catch (Exception e) {
 				        	logger.error("COULD NOT RESTART WINAMP", e);
-				        	bot.sendMessage(channel, Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t...");
+				        	bot.sendMessage(channel, DataManager.ERROR + "Failed to restart Winamp - Notifying IAreKyleW00t...");
 							bot.sendMessage(channel, "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.tumblr.com/ask");
 				        	email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to restart @ " + curTime);
-							DataManager.exception = e;
 							return;
 				        }
 					}

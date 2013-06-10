@@ -10,6 +10,12 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.1.7a ---
+[+] A proper debugging option to output all useful information
+[!] Improved debugging overall
+[!] Improved error handling
+[*] PrintStackTrace() will only show if Debugging is on
+	
 --- 1.0.1.6a ---
 [!] Improved checking if a song was already requested (Whoops)
 	
