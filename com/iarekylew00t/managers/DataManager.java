@@ -28,6 +28,7 @@ public enum DataManager {
 	public static Map<String, String> commandList = new HashMap<>();
 	public static String VER, server, channel, nick, nickPassword, login, emailAddress, emailPassword, salt;
 	public static boolean debug, encrypt;
+	public static int backups;
 	public static Exception exception;
 	public static File CONFIG = new File("config.ini");
 	public static File ENCRYPT_FILE = new File("./files/.encrypted");
@@ -54,6 +55,11 @@ public enum DataManager {
 		emailAddress = props.getProperty("Email", "");
 		emailPassword = props.getProperty("EmailPassword", "");
 		salt = props.getProperty("Salt", "");
+		try {
+			backups = Integer.parseInt(props.getProperty("Backups", "10"));
+		} catch (Exception e) {
+			logHandler.error("COULD NOT PARSE INTEGER VALUE", e);
+		}
 		try {
 			debug = Boolean.parseBoolean(props.getProperty("Debug", "false"));
 			logHandler.enableDebug(debug);
@@ -203,6 +209,10 @@ public enum DataManager {
     	FileHelper.writeToFile(CONFIG, "#The Email Password for the Email Client\n" +
     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
     			"EmailPassword = " + emailPassword + "\n", true);
+
+    	FileHelper.writeToFile(CONFIG, "#Number of Backup Logs to keep\n" +
+    			"#Default: 10\n" +
+    			"Backups = " + backups + "\n", true);
     	
     	FileHelper.writeToFile(CONFIG, "#Enable or Disable Debugging\n" +
     			"#Default: true\n" +
@@ -257,6 +267,10 @@ public enum DataManager {
      	FileHelper.writeToFile(CONFIG, "#Enable or Disable Debugging\n" +
      			"#Default: false\n" +
      			"Debug = false\n", true);
+     	
+     	FileHelper.writeToFile(CONFIG, "#Number of Backup Logs to keep\n" +
+     			"#Default: 10\n" +
+     			"Backups = 10\n", true);
      	
      	FileHelper.writeToFile(CONFIG, "#Enable to disable Password Encryption\n" +
      			"#Default: false\n" +

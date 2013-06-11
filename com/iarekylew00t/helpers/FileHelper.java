@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.*;
+import java.util.Date;
 
 import com.iarekylew00t.managers.DataManager;
 
@@ -46,6 +47,20 @@ public final class FileHelper {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static File getOldestFile(File[] files) {
+		long creationTime = Long.MIN_VALUE;
+		Date date = new Date();
+		File oldestFile = null;
+		for (File file : files) {
+			long diff = date.getTime() - FileHelper.checkFileCreation(file).toMillis();
+			if (diff > creationTime) {
+				oldestFile = file;
+				creationTime = diff;
+			}
+		}
+		return oldestFile;
 	}
 	
 	public static void copyFile(File copyFrom, File copyTo) {

@@ -26,6 +26,12 @@ public class LogHandler {
 		}
 		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
 		if (diff > 3 * 24 * 60 * 60 * 1000) {
+			if (logDir.listFiles().length >= DataManager.backups) {
+				File[] files = logDir.listFiles();
+				File oldestFile = FileHelper.getOldestFile(files);
+				debug("oldestFile=\"" + oldestFile.getName() + "\"");
+				oldestFile.delete();
+			}
 			date = new Date();
 			if (!logDir.exists()) {
 				logDir.mkdirs();
@@ -33,10 +39,8 @@ public class LogHandler {
 			String fileNameTime = backupLog.format(date).toUpperCase();
 			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
 			FileHelper.recreateFile(LOG_FILE);
-		}
-		if (logDir.list().length >= 10) {
-			warning("You currently have " + logDir.listFiles().length + " log backups.");
-			warning("Please consider cleaning them out to save space if you no longer need them.");
+			debug("backupLog=\"" + fileNameTime + LOG_FILE.getName() + "\"");
+			notice("SUCCESSFULLY CREATED BACKUP LOG");
 		}
 	} 
 
