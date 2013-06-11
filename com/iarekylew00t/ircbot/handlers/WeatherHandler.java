@@ -18,6 +18,7 @@ public class WeatherHandler {
 	private LogHandler logger = DataManager.logHandler;
 
 	public WeatherHandler() {}
+	
 	public WeatherHandler(String unit) {
 		if (!unit.equalsIgnoreCase("f") || !unit.equalsIgnoreCase("c"))
 			throw new IllegalArgumentException("ERROR: Can only accept \"f\" or \"c\"");

@@ -8,7 +8,8 @@ import com.iarekylew00t.helpers.Downloader;
 import com.iarekylew00t.helpers.FileHelper;
 import com.iarekylew00t.ircbot.handlers.LogHandler;
 
-public final class FileManager {
+public enum FileManager {
+	INSTANCE;
 	private static String endFile = "-quotes.txt";
 	private static String FILE_BASE = "https://raw.github.com/IAreKyleW00t/IRCBot/master/files/";
 	private static File _ROOT = new File("./files/");
@@ -64,7 +65,7 @@ public final class FileManager {
 		 new File("./files/quotes/terezi" + endFile),
 		 new File("./files/quotes/vriska" + endFile)};
 	private static LogHandler logger = DataManager.logHandler;
-    
+	
     public static void checkFiles() throws MalformedURLException {
     	if (!_QUOTE.exists()) {
     		_QUOTE.mkdirs();

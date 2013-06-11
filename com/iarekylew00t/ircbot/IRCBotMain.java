@@ -1,5 +1,6 @@
 package com.iarekylew00t.ircbot;
 
+import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 
 import org.pircbotx.PircBotX;
@@ -23,7 +24,11 @@ public class IRCBotMain {
 	private static LogHandler logger = DataManager.logHandler;
 	
 	public static void main(String[] args) throws Exception {
-		FileManager.checkFiles();
+		try {
+			FileManager.checkFiles();
+		} catch (MalformedURLException e) {
+			logger.error("COULD NOT UPDATE FILES", e);
+		}
 		logger.info("SETTING UP GOOGLE CLIENT");
 		DataManager.google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw#");
         logger.info("GOOGLE CLIENT SETUP SUCCESSFULLY");

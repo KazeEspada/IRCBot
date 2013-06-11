@@ -20,7 +20,7 @@ public final class Downloader {
 	public static void downloadFile(URL url, File saveAs) {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
-		logger.notice("Downloading: \"" + url + "\"");
+		logger.notice("Downloading: \"" + url + "\"...");
 		try {
 			in = new BufferedInputStream(url.openStream());
 			out = new FileOutputStream(saveAs);
@@ -29,7 +29,7 @@ public final class Downloader {
 			while ((count = in.read(data, 0, data.length)) > 0) {
 				out.write(data, 0, count);
 			}
-			System.out.println();
+			logger.notice("Download Complete!");
 			in.close();
 			out.close();
 		} catch (IOException e) {

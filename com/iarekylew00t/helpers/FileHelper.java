@@ -7,9 +7,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.managers.DataManager;
 
 public final class FileHelper {
+	private static LogHandler logger = DataManager.logHandler;
 
 	private FileHelper() {
 		throw new AssertionError();
@@ -19,8 +21,7 @@ public final class FileHelper {
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
-			DataManager.exception = e;
-			e.printStackTrace();
+			logger.error("COULD NOT CREATE FILE \"" + file.getName() + "\"", e);
 		}
 	}
 	
@@ -31,8 +32,7 @@ public final class FileHelper {
         	writer.close();
         }
         catch (Exception e) {
-        	e.printStackTrace();
-			DataManager.exception = e;
+			logger.error("COULD NOT WRITE TO FILE \"" + file.getName() + "\"", e);
         }
     }	
     
@@ -45,8 +45,7 @@ public final class FileHelper {
 			}
 			reader.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			DataManager.exception = e;
+			logger.error("COULD NOT COUNT LINES IN FILE \"" + file.getName() + "\"", e);
 		}
 		return lines;
 	}
@@ -65,8 +64,7 @@ public final class FileHelper {
 			text = reader.readLine();
 			reader.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			DataManager.exception = e;
+			logger.error("COULD NOT READ LINE " + line + " IN FILE \"" + file.getName() + "\"", e);
 		}
 		return text;
 	}
@@ -84,8 +82,7 @@ public final class FileHelper {
 			}
 			reader.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			DataManager.exception = e;
+			logger.error("COULD NOT SEARCH IN FILE \"" + file.getName() + "\"", e);
 		}
 		return searchLine;
 	}

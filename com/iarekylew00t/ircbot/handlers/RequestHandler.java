@@ -16,8 +16,8 @@ public class RequestHandler {
 	private PircBotX bot = DataManager.IRCbot;
 	private boolean requests = false;
 	private File REQ_FILE;
-	private ArrayList<String> reqList = new ArrayList<>();
-	private ArrayList<String> userList = new ArrayList<>();
+	private ArrayList<String> reqList = new ArrayList<String>();
+	private ArrayList<String> userList = new ArrayList<String>();
 
 	public RequestHandler() {
 		requests = false;

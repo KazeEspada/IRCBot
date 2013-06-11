@@ -25,7 +25,7 @@ public enum DataManager {
 	public static PircBotX IRCbot = new IRCBot();
 	public static Google google;
 	public static Properties props = new Properties();
-	public static Map<String, String> commandList = new HashMap<>();
+	public static Map<String, String> commandList = new HashMap<String, String>();
 	public static String VER, server, channel, nick, nickPassword, login, emailAddress, emailPassword, salt;
 	public static boolean debug, encrypt;
 	public static Exception exception;

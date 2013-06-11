@@ -41,7 +41,7 @@ public class MusicHandler implements Runnable {
     		try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				logger.error(e);
+				logger.error("THREAD INTERRUPTED", e);
 			}
     		updateCurSong();
     		checkWinamp();

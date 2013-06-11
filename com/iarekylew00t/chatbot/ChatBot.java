@@ -8,10 +8,10 @@ import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.managers.DataManager;
 
 public class ChatBot {
-	private ChatterBotFactory factory;
-	private ChatterBotSession session;
-	private ChatterBot bot;
-	private LogHandler logger = DataManager.logHandler;
+	private static ChatterBotFactory factory;
+	private static ChatterBotSession session;
+	private static ChatterBot bot;
+	private static LogHandler logger = DataManager.logHandler;
 	
 	public ChatBot() {
 		factory  = new ChatterBotFactory();

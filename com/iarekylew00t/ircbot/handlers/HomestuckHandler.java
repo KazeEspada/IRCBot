@@ -2,6 +2,7 @@ package com.iarekylew00t.ircbot.handlers;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
 
@@ -16,21 +17,27 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.iarekylew00t.helpers.Downloader;
 import com.iarekylew00t.helpers.FileHelper;
 import com.iarekylew00t.managers.DataManager;
 
 
 public class HomestuckHandler implements Runnable {
-	private Thread updateThread;
-	private PircBotX bot = DataManager.IRCbot;
-	private LogHandler logger = DataManager.logHandler;
 	private int curPage, interval = 15;
 	private String MSPAWIKI_SEARCH = "http://mspaintadventures.wikia.com/wiki/index.php?search=";
+	private String FILE_BASE = "https://raw.github.com/IAreKyleW00t/IRCBot/master/files/";
 	private File HS_LINKS = new File("./files/hs_links.txt");
+	private static Thread updateThread;
+	private static PircBotX bot = DataManager.IRCbot;
+	private static LogHandler logger = DataManager.logHandler;
 
 	public HomestuckHandler() {
 		if (!HS_LINKS.exists()) {
-			FileHelper.createFile(HS_LINKS);
+			try {
+				Downloader.downloadFile(new URL(FILE_BASE + HS_LINKS.getName()), HS_LINKS);
+			} catch (MalformedURLException e) {
+				logger.error("COULD NOT DOWNLOAD HS_LINKS FROM \"" + FILE_BASE + HS_LINKS.getName() + "\"", e);
+			}
 		}
 		interval = 15;
 		checkUpdate();
@@ -40,7 +47,11 @@ public class HomestuckHandler implements Runnable {
 	
 	public HomestuckHandler(int min) {
 		if (!HS_LINKS.exists()) {
-			FileHelper.createFile(HS_LINKS);
+			try {
+				Downloader.downloadFile(new URL(FILE_BASE + HS_LINKS.getName()), HS_LINKS);
+			} catch (MalformedURLException e) {
+				logger.error("COULD NOT DOWNLOAD HS_LINKS FROM \"" + FILE_BASE + HS_LINKS.getName() + "\"", e);
+			}
 		}
 		interval = min;
 		checkUpdate();
@@ -54,8 +65,7 @@ public class HomestuckHandler implements Runnable {
 			try {
 				Thread.sleep(1000 * 60 * interval);
 			} catch (InterruptedException e) {
-				logger.error(e);
-	
+				logger.error("THREAD INTERRUPTED", e);
 			}
 			if (checkUpdate()) {
 				sendToAllChannels(Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
@@ -130,6 +140,13 @@ public class HomestuckHandler implements Runnable {
 	}
 	
 	public String searchPage(String search) {
+		if (!HS_LINKS.exists()) {
+			try {
+				Downloader.downloadFile(new URL(FILE_BASE + HS_LINKS.getName()), HS_LINKS);
+			} catch (MalformedURLException e) {
+				logger.error("COULD NOT DOWNLOAD HS_LINKS FROM \"" + FILE_BASE + HS_LINKS.getName() + "\"", e);
+			}
+		}
     	String line = FileHelper.searchFile(HS_LINKS, search);
     	if (line.equals(null)) {
     		return "c0uld n0t find any page with \"" + search + "\" in it";

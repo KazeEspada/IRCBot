@@ -45,12 +45,10 @@ public class LogHandler {
 	}
 	
 	public void log(Exception e) {
-		if (debug) {
-			System.out.println();
-			e.printStackTrace();
-			FileHelper.writeToFile(LOG_FILE, "" + e, true);
-			DataManager.exception = e;
-		}
+		System.out.println();
+		e.printStackTrace();
+		FileHelper.writeToFile(LOG_FILE, "" + e, true);
+		DataManager.exception = e;
 	}
 	
 	public void debug(String log) {

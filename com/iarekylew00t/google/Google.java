@@ -17,7 +17,7 @@ public class Google {
 	private static final String GOOGLE_BASE = "http://www.google.com/";
 	private static final String YOUTUBE_BASE = "http://www.youtube.com/";
 	private String apiKey;
-	private LogHandler logger = DataManager.logHandler;
+	private static LogHandler logger = DataManager.logHandler;
 	
 	public Google(String api) {
         if (api.isEmpty()) {
