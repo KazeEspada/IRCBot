@@ -20,13 +20,13 @@ public final class Downloader {
 	public static void downloadFile(URL url, File saveAs) {
 		BufferedInputStream in = null;
 		FileOutputStream out = null;
-		logger.notice("DOWNLOADING FILE: \"" + url + "\"");
+		logger.notice("Downloading: \"" + url + "\"");
 		try {
 			in = new BufferedInputStream(url.openStream());
 			out = new FileOutputStream(saveAs);
 			byte[] data = new byte[2048];
 			int count;
-			while ((count = in.read(data, 0, 2048)) > 0) {
+			while ((count = in.read(data, 0, data.length)) > 0) {
 				out.write(data, 0, count);
 			}
 			System.out.println();
@@ -41,8 +41,6 @@ public final class Downloader {
 		HttpURLConnection conn = null;
 		try {
 			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("HEAD");
-			conn.getInputStream();
 			int size = conn.getContentLength();
 			conn.disconnect();
 			return size;
