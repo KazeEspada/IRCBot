@@ -28,7 +28,6 @@ public enum DataManager {
 	public static Map<String, String> commandList = new HashMap<>();
 	public static String VER, server, channel, nick, nickPassword, login, emailAddress, emailPassword, salt;
 	public static boolean debug, encrypt;
-	public static int backups;
 	public static Exception exception;
 	public static File CONFIG = new File("config.ini");
 	public static File ENCRYPT_FILE = new File("./files/.encrypted");
@@ -37,7 +36,7 @@ public enum DataManager {
     static {
         if (!CONFIG.exists()) {
         	FileHelper.createFile(CONFIG);
-        	createDefaultConfig();
+        	FileManager.createDefaultConfig();
         } else {
 			try {
 				props.load(new FileInputStream(CONFIG));
@@ -55,11 +54,6 @@ public enum DataManager {
 		emailAddress = props.getProperty("Email", "");
 		emailPassword = props.getProperty("EmailPassword", "");
 		salt = props.getProperty("Salt", "");
-		try {
-			backups = Integer.parseInt(props.getProperty("Backups", "10"));
-		} catch (Exception e) {
-			logHandler.error("COULD NOT PARSE INTEGER VALUE", e);
-		}
 		try {
 			debug = Boolean.parseBoolean(props.getProperty("Debug", "false"));
 			logHandler.enableDebug(debug);
@@ -85,7 +79,7 @@ public enum DataManager {
 					logHandler.error("COULD NOT ENCRYPT PASSWORDS", e);
 				}
 				logHandler.notice("*** UPDATING CONFIG ***");
-				updateConfig();
+				FileManager.updateConfig();
 	    		FileHelper.createFile(ENCRYPT_FILE);
 				try {
 					nickPassword = Encoder.decodeBase64(Encryptor.decryptBlowfish(Encryptor.decryptAES(nickPassword)));
@@ -104,13 +98,13 @@ public enum DataManager {
 					logHandler.error("COULD NOT DECRYPT PASSWORDS", e);
 				}
 				logHandler.notice("*** UPDATING CONFIG ***");
-				updateConfig();
+				FileManager.updateConfig();
 	    		ENCRYPT_FILE.delete();
 			}
 		}
 		if (salt.isEmpty()) {
 			salt = ByteGenerator.toHex(ByteGenerator.genRandomByte(12));
-			updateConfig();
+			FileManager.updateConfig();
 		}
 		
 		setupCommandList();
@@ -176,112 +170,5 @@ public enum DataManager {
     	commandList.put("weather", "Usage: $weather <zipcode> || $we <zipcode>");
     	commandList.put("wiki", "Usage: $wiki <search>");
     	commandList.put("youtube", "Usage: $youtube <search> || $yt <search>");
-    }
-    
-    private static void updateConfig() {
-    	FileHelper.writeToFile(CONFIG, "#======================================================\n" +
-		   	   "#===   Configuration File for Aradiabot (Rev. 1A)   ===\n" +
-			   "#======================================================\n", false);
-    	
-    	FileHelper.writeToFile(CONFIG, "# The Version of your bot\n" +
-    			"Version = " + VER + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#The Nickname for your bot\n" +
-    			"Nick = " + nick + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Your NickServ Password\n" +
-    			"#LEAVE BLANK FOR NO PASSWORD\n" +
-    			"Password = " + nickPassword + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Your Login Name\n" +
-    			"Login = " + login + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Server to connect to\n" +
-    			"Server = " + server + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Channel(s) to connect to\n" +
-    			"Channel = " + channel + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#The Email Address to use for the Email Client\n" +
-    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-    			"Email = " + emailAddress + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#The Email Password for the Email Client\n" +
-    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-    			"EmailPassword = " + emailPassword + "\n", true);
-
-    	FileHelper.writeToFile(CONFIG, "#Number of Backup Logs to keep\n" +
-    			"#Default: 10\n" +
-    			"Backups = " + backups + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Enable or Disable Debugging\n" +
-    			"#Default: true\n" +
-    			"Debug = " + debug + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Enable to disable Password Encryption\n" +
-    			"#Default: false\n" +
-    			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\n" +
-    			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\n" +
-    			"#decrypt to an empty space like before.\n" +
-    			"Encrypt = " + encrypt + "\n", true);
-    	
-    	FileHelper.writeToFile(CONFIG, "#Securely Generated Salt\n" +
-     			"#NOTE: This is generated the first time you run the bot\n" +
-    			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING (Min. 24 characters)\n" +
-    			"Salt = " + salt, true);
-    }
-    
-    private static void createDefaultConfig() {
-    	logHandler.notice("NO CONFIGURATION FOUND - CREATING DEFAULT");
-    	FileHelper.writeToFile(CONFIG, "#======================================================\n" +
- 		   	   "#===   Configuration File for Aradiabot (Rev. 1A)   ===\n" +
- 			   "#======================================================\n", false);
-     	
-     	FileHelper.writeToFile(CONFIG, "# The Version of your bot\n" +
-     			"Version = 1.0.0.0\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#The Nickname for your bot\n" +
-     			"Nick = Aradiabot\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Your NickServ Password\n" +
-     			"#LEAVE BLANK FOR NO PASSWORD\n" +
-     			"Password =\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Your Login Name\n" +
-     			"Login = AA\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Server to connect to\n" +
-     			"Server = irc.esper.net\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Channel(s) to connect to\n" +
-     			"Channel = #channel1,#channel2,#channel3\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#The Email Address to use for the Email Client\n" +
-     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-     			"Email =\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#The Email Password for the Email Client\n" +
-     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-     			"EmailPassword =\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Enable or Disable Debugging\n" +
-     			"#Default: false\n" +
-     			"Debug = false\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Number of Backup Logs to keep\n" +
-     			"#Default: 10\n" +
-     			"Backups = 10\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Enable to disable Password Encryption\n" +
-     			"#Default: false\n" +
-     			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\n" +
-     			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\n" +
-     			"#decrypt to an empty space like before.\n" +
-     			"Encrypt = false\n", true);
-     	
-     	FileHelper.writeToFile(CONFIG, "#Securely Generated Salt\n" +
-     			"#NOTE: This is generated the first time you run the bot\n" +
-     			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING\n" +
-     			"Salt =",true);
     }
 }

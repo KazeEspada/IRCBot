@@ -8,12 +8,9 @@ import java.util.Date;
 import com.iarekylew00t.helpers.FileHelper;
 import com.iarekylew00t.managers.DataManager;
 
-
 public class LogHandler {
 	private File LOG_FILE;
-	private File logDir = new File("./logs/");
 	private DateFormat logFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssSSS");
-	private DateFormat backupLog = new SimpleDateFormat("dd_MMM_yy[HH-mm-ssSSS]");
 	private Date date;
 	private String logTime;
 	private boolean debug;
@@ -24,24 +21,6 @@ public class LogHandler {
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
 		}
-		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
-		if (diff > 3 * 24 * 60 * 60 * 1000) {
-			if (logDir.listFiles().length >= DataManager.backups) {
-				File[] files = logDir.listFiles();
-				File oldestFile = FileHelper.getOldestFile(files);
-				debug("oldestFile=\"" + oldestFile.getName() + "\"");
-				oldestFile.delete();
-			}
-			date = new Date();
-			if (!logDir.exists()) {
-				logDir.mkdirs();
-			}
-			String fileNameTime = backupLog.format(date).toUpperCase();
-			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
-			FileHelper.recreateFile(LOG_FILE);
-			debug("backupLog=\"" + fileNameTime + LOG_FILE.getName() + "\"");
-			notice("SUCCESSFULLY CREATED BACKUP LOG");
-		}
 	} 
 
 	public LogHandler(String fileLoc) {
@@ -49,16 +28,6 @@ public class LogHandler {
 		LOG_FILE = new File(fileLoc);
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
-		}
-		long diff = new Date().getTime() - FileHelper.checkFileCreation(LOG_FILE).toMillis();
-		if (diff > 3 * 24 * 60 * 60 * 1000) {
-			date = new Date();
-			if (!logDir.exists()) {
-				logDir.mkdirs();
-			}
-			String fileNameTime = backupLog.format(date);
-			FileHelper.copyFile(LOG_FILE, new File("./logs/" + fileNameTime + LOG_FILE.getName()));
-			FileHelper.recreateFile(LOG_FILE);
 		}
 	}
 	

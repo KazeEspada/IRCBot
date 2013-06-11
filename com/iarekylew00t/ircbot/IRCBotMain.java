@@ -17,11 +17,13 @@ import com.iarekylew00t.ircbot.listeners.PermissionCommandListener;
 import com.iarekylew00t.ircbot.listeners.RequestListener;
 import com.iarekylew00t.ircbot.listeners.WebCommandListener;
 import com.iarekylew00t.managers.DataManager;
+import com.iarekylew00t.managers.FileManager;
 
 public class IRCBotMain {
 	private static LogHandler logger = DataManager.logHandler;
 	
-	public static void main(String[] args) throws Exception{
+	public static void main(String[] args) throws Exception {
+		FileManager.checkFiles();
 		logger.info("SETTING UP GOOGLE CLIENT");
 		DataManager.google = new Google("AIzaSyCBCyKYkO3zcMrBAVsOkyBr5C0GhoGyDXw#");
         logger.info("GOOGLE CLIENT SETUP SUCCESSFULLY");

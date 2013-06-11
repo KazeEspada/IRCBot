@@ -10,6 +10,11 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 
+--- 1.0.2.0 ---
+[+] Added a DownloadHandler (Downloader)
+[+] Automatically downloads missing files
+[-] Removed log backups due to unknown errors
+	
 --- 1.0.1.71 ---
 [+] Ability to keep X number of logs and automatically remove old ones
 [!] Improved Debugging
