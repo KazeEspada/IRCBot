@@ -10,6 +10,11 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 	
+--- 1.0.2.2 ---
+[+] Added Log backups again*
+
+*Creates a backup if the file is >5MB and keeps total of 10 backups (Should work with Java 1.6?)
+	
 --- 1.0.2.1 ---
 [!] Improved FileChecking
 [!] Improved logging/debugging

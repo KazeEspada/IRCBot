@@ -9,8 +9,9 @@ import com.iarekylew00t.helpers.FileHelper;
 import com.iarekylew00t.managers.DataManager;
 
 public class LogHandler {
-	private File LOG_FILE;
+	private File LOG_FILE, LOG_DIR = new File("./logs/");
 	private DateFormat logFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssSSS");
+	private DateFormat logBackup = new SimpleDateFormat("dd-MMM-yy_[hh-mm-ssSSS]");
 	private Date date;
 	private String logTime;
 	private boolean debug;
@@ -21,6 +22,21 @@ public class LogHandler {
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
 		}
+		date = new Date();
+		long fileSize = LOG_FILE.length() / (1024);
+		String backupName = logBackup.format(date).toUpperCase() + ".log";
+		if (fileSize > 5120) {
+			notice("CREATING BACKUP LOG");
+			if(!LOG_DIR.exists()) {
+				LOG_DIR.mkdirs();
+			}
+			if(LOG_DIR.listFiles().length >= 10) {
+				File oldestFile = FileHelper.getOldestFile(LOG_DIR.listFiles());
+				oldestFile.delete();
+			}
+			FileHelper.copyFile(LOG_FILE, new File("./logs/" + backupName));
+			FileHelper.writeToFile(LOG_FILE, "## Automatic Log created on: " + logFormat.format(date) + " ##", false);
+		}
 	} 
 
 	public LogHandler(String fileLoc) {
@@ -28,6 +44,21 @@ public class LogHandler {
 		LOG_FILE = new File(fileLoc);
 		if (!LOG_FILE.exists()) {
 			FileHelper.createFile(LOG_FILE);
+		}
+		date = new Date();
+		long fileSize = LOG_FILE.length() / (1024);
+		String backupName = logBackup.format(date).toUpperCase() + ".log";
+		if (fileSize > 5120) {
+			notice("CREATING BACKUP LOG");
+			if(!LOG_DIR.exists()) {
+				LOG_DIR.mkdirs();
+			}
+			if(LOG_DIR.listFiles().length >= 10) {
+				File oldestFile = FileHelper.getOldestFile(LOG_DIR.listFiles());
+				oldestFile.delete();
+			}
+			FileHelper.copyFile(LOG_FILE, new File("./logs/" + backupName));
+			FileHelper.writeToFile(LOG_FILE, "## Automatic Log created on: " + logFormat.format(date) + " ##", false);
 		}
 	}
 	
