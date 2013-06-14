@@ -19,6 +19,7 @@ public class RequestListener extends ListenerAdapter {
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
 		String message = event.getMessage();
+		String nick = sender.getNick();
 		String input = "";
 		boolean hasOp = channel.isOp(sender);
 
@@ -34,7 +35,28 @@ public class RequestListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					//Check for -on argument
-					if (input.equals("-on")) {
+					if (input.toLowerCase().startsWith("-on")) {
+						//Check if a time is specified
+						if (input.contains(" ")) {
+							String[] args = input.split(" ");
+							int time = 1;
+							if (hasOp) {
+								try {
+									time = Integer.parseInt(args[1]);
+								} catch (Exception e) {
+									bot.sendMessage(channel, "please give me valid numbers " + nick);
+									return;
+								}
+								if (!requests.areOpen()) {
+									requests.turnOnRequests(time);
+									return;
+								}
+								event.respond("requests are already 0pen");
+								return;
+							}
+							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
+							return;
+						}
 						if (hasOp) {
 							if (!requests.areOpen()) {
 								requests.turnOnRequests();
@@ -46,7 +68,28 @@ public class RequestListener extends ListenerAdapter {
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 						return;
 					//Check for -off argument
-					} else if (input.equals("-off")) {
+					} else if (input.toLowerCase().startsWith("-off")) {
+						//Check if a time is specified
+						if (input.contains(" ")) {
+							String[] args = input.split(" ");
+							int time = 1;
+							if (hasOp) {
+								try {
+									time = Integer.parseInt(args[1]);
+								} catch (Exception e) {
+									bot.sendMessage(channel, "please give me valid numbers " + nick);
+									return;
+								}
+								if (requests.areOpen()) {
+									requests.turnOffRequests(time);
+									return;
+								}
+								event.respond("requests are already cl0sed");
+								return;
+							}
+							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
+							return;
+						}
 						if (hasOp) {
 							if (requests.areOpen()) {
 								requests.turnOffRequests();

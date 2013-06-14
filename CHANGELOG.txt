@@ -10,6 +10,13 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 	
+--- 1.0.2.6 ---
+[+] Added the option to open requests for X amount of time before turning off*
+[+] Added the option to close requests in X amount of time*
+
+*Command: $req -on [time] ; It will also provide warnings (30, 15, and 5 minute) before requests close.
+*Command: $req -off [time] ; It will also provide warnings (30, 15, and 5 minute) before requests close.
+	
 --- 1.0.2.2 ---
 [+] Added Log backups again*
 

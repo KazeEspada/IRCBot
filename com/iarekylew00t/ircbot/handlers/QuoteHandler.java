@@ -13,7 +13,7 @@ import com.iarekylew00t.managers.DataManager;
 
 public class QuoteHandler {
 	private String FILE_BASE = "https://raw.github.com/IAreKyleW00t/IRCBot/master/files/";
-	private Random rand;
+	private static Random rand;
 	private static LogHandler logger = DataManager.logHandler;
 	
 	public QuoteHandler() {}

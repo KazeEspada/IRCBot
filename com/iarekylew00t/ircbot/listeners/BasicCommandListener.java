@@ -754,7 +754,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
 					String timeStamp = new SimpleDateFormat("hh:mm aa").format(Calendar.getInstance().getTime());
-					bot.sendMessage(channel, "the current time is: " + timeStamp);
+					bot.sendMessage(channel, "the current time is: " + timeStamp + " EST");
 					return;
 				}
 				if (!input.startsWith(" ")) {
