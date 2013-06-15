@@ -10,6 +10,14 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 	
+--- 1.0.2.61 ---
+[!] Improved Request Timers*
+
+*You cannot turn requests on/off in X amount of minutes if they're already scheduled to end. This prevents overlapping.
+
+--- 1.0.2.6a ---
+[@] Fixed timers when calculating the time left for requests.
+	
 --- 1.0.2.6 ---
 [+] Added the option to open requests for X amount of time before turning off*
 [+] Added the option to close requests in X amount of time*

@@ -14,6 +14,7 @@ import com.iarekylew00t.managers.DataManager;
 public class RequestHandler implements Runnable{
 	private boolean requests = false;
 	private boolean running = false;
+	private boolean isTimed = false;
 	private File REQ_FILE;
 	private int interval;
 	private ArrayList<String> reqList = new ArrayList<String>();
@@ -41,15 +42,15 @@ public class RequestHandler implements Runnable{
 				if (interval > 30) {
 					Thread.sleep(1000 * 60 * (interval-30));
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE OPEN FOR 30 MORE MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-15));
+					Thread.sleep(1000 * 60 * 15);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE OPEN FOR 15 MORE MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-5));
+					Thread.sleep(1000 * 60 * 10);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE OPEN FOR 5 MORE MINUTES ---");
 					Thread.sleep(1000 * 60 * 5);
 				} else if (interval > 15) {
 					Thread.sleep(1000 * 60 * (interval-15));
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE OPEN FOR 15 MORE MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-5));
+					Thread.sleep(1000 * 60 * 10);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE OPEN FOR 5 MORE MINUTES ---");
 					Thread.sleep(1000 * 60 * 5);
 				} else if (interval > 5) {
@@ -68,15 +69,15 @@ public class RequestHandler implements Runnable{
 				if (interval > 30) {
 					Thread.sleep(1000 * 60 * (interval-30));
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE TURNED OFF IN 30 MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-15));
+					Thread.sleep(1000 * 60 * 15);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE TURNED OFF IN 15 MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-5));
+					Thread.sleep(1000 * 60 * 10);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE TURNED OFF IN 5 MINUTES ---");
 					Thread.sleep(1000 * 60 * 5);
 				} else if (interval > 15) {
 					Thread.sleep(1000 * 60 * (interval-15));
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE TURNED OFF IN 15 MINUTES ---");
-					Thread.sleep(1000 * 60 * (interval-5));
+					Thread.sleep(1000 * 60 * 10);
 					sendToAllChannels(Colors.BOLD + Colors.OLIVE + "--- REQUESTS WILL BE TURNED OFF IN 5 MINUTES ---");
 					Thread.sleep(1000 * 60 * 5);
 				} else if (interval > 5) {
@@ -91,6 +92,14 @@ public class RequestHandler implements Runnable{
 			}
 			turnOffRequests();
 		}
+	}
+	
+	public boolean isRunning() {
+		return running;
+	}
+	
+	public boolean isGoingToEnd() {
+		return isTimed;
 	}
 
     private void sendToAllChannels(String message) {
@@ -117,6 +126,7 @@ public class RequestHandler implements Runnable{
 		}
 		requests = true;
 		running = true;
+		isTimed = true;
 		logger.notice("REQUESTS HAVE BEEN SET TURNED ON FOR " + time + " MIUNTES");
 		sendToAllChannels(Colors.BOLD + Colors.GREEN + "--- REQUESTS HAVE BEEN TURNED ON FOR " + time + " MINUTES ---");
 		reqThread.start();
@@ -125,6 +135,7 @@ public class RequestHandler implements Runnable{
 	public void turnOffRequests() {
 		running = false;
 		requests = false;
+		isTimed = false;
 		reqList.clear();
 		userList.clear();
 		logger.notice("REQUESTS HAVE BEEN SET TURNED OFF");
@@ -134,6 +145,7 @@ public class RequestHandler implements Runnable{
 	public void turnOffRequests(int time) {
 		interval = time;
 		running = false;
+		isTimed = true;
 		logger.notice("REQUESTS HAVE BEEN SET TURNED OFF IN " + time + " MINUTES");
 		sendToAllChannels(Colors.BOLD + Colors.RED + "--- REQUESTS WILL BE TURNED OFF IN " + time + " MINUTES ---");
 		reqThread.start();

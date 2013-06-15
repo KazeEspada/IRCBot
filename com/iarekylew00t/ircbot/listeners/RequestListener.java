@@ -41,17 +41,22 @@ public class RequestListener extends ListenerAdapter {
 							String[] args = input.split(" ");
 							int time = 1;
 							if (hasOp) {
-								try {
-									time = Integer.parseInt(args[1]);
-								} catch (Exception e) {
-									bot.sendMessage(channel, "please give me valid numbers " + nick);
+								//Only do it if requests are scheduled to end
+								if (!requests.isGoingToEnd()) {
+									try {
+										time = Integer.parseInt(args[1]);
+									} catch (Exception e) {
+										bot.sendMessage(channel, "please give me valid numbers " + nick);
+										return;
+									}
+									if (!requests.areOpen()) {
+										requests.turnOnRequests(time);
+										return;
+									}
+									event.respond("requests are already 0pen");
 									return;
 								}
-								if (!requests.areOpen()) {
-									requests.turnOnRequests(time);
-									return;
-								}
-								event.respond("requests are already 0pen");
+								event.respond("requests are already scheduled t0 end");
 								return;
 							}
 							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -74,17 +79,22 @@ public class RequestListener extends ListenerAdapter {
 							String[] args = input.split(" ");
 							int time = 1;
 							if (hasOp) {
-								try {
-									time = Integer.parseInt(args[1]);
-								} catch (Exception e) {
-									bot.sendMessage(channel, "please give me valid numbers " + nick);
+								//Only do it if requests are scheduled to end
+								if(!requests.isGoingToEnd()) {
+									try {
+										time = Integer.parseInt(args[1]);
+									} catch (Exception e) {
+										bot.sendMessage(channel, "please give me valid numbers " + nick);
+										return;
+									}
+									if (requests.areOpen()) {
+										requests.turnOffRequests(time);
+										return;
+									}
+									event.respond("requests are already cl0sed");
 									return;
 								}
-								if (requests.areOpen()) {
-									requests.turnOffRequests(time);
-									return;
-								}
-								event.respond("requests are already cl0sed");
+								event.respond("requests are already scheduled t0 end");
 								return;
 							}
 							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -111,7 +121,7 @@ public class RequestListener extends ListenerAdapter {
 						return;
 					}
 					if (requests.areOpen()) {
-						if (requests.countUserReqests(sender.getHostmask()) < 3) {
+						if (requests.countUserReqests(sender.getHostmask()) < 5) {
 							if (!requests.hasBeenRequested(input)) {
 								requests.addRequest(input, sender);
 								event.respond("y0ur request has been added t0 the list");
