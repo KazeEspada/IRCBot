@@ -36,11 +36,15 @@ public class RequestListener extends ListenerAdapter {
 					input = StringHelper.setString(input);
 					//Check for -on argument
 					if (input.toLowerCase().startsWith("-on")) {
+						if (hasOp) {
 						//Check if a time is specified
 						if (input.contains(" ")) {
 							String[] args = input.split(" ");
 							int time = 1;
-							if (hasOp) {
+								if (!args[0].equals("-on")) {
+									event.respond(args[0] + " is n0t a valid argument");
+									return;
+								}
 								//Only do it if requests are scheduled to end
 								if (!requests.isGoingToEnd()) {
 									try {
@@ -58,27 +62,30 @@ public class RequestListener extends ListenerAdapter {
 								}
 								event.respond("requests are already scheduled t0 end");
 								return;
-							}
-							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
-							return;
-						}
-						if (hasOp) {
-							if (!requests.areOpen()) {
-								requests.turnOnRequests();
+							} else if (input.equals("-on")) {
+								if (!requests.areOpen()) {
+									requests.turnOnRequests();
+									return;
+								}
+								event.respond("requests are already 0pen");
 								return;
 							}
-							event.respond("requests are already 0pen");
+							event.respond(input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 						return;
 					//Check for -off argument
 					} else if (input.toLowerCase().startsWith("-off")) {
-						//Check if a time is specified
-						if (input.contains(" ")) {
-							String[] args = input.split(" ");
-							int time = 1;
-							if (hasOp) {
+						if (hasOp) {
+							//Check if a time is specified
+							if (input.contains(" ")) {
+								String[] args = input.split(" ");
+								int time = 1;
+								if (!args[0].equals("-off")) {
+									event.respond(args[0] + " is n0t a valid argument");
+									return;
+								}
 								//Only do it if requests are scheduled to end
 								if(!requests.isGoingToEnd()) {
 									try {
@@ -96,25 +103,52 @@ public class RequestListener extends ListenerAdapter {
 								}
 								event.respond("requests are already scheduled t0 end");
 								return;
-							}
-							bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
-							return;
-						}
-						if (hasOp) {
-							if (requests.areOpen()) {
-								requests.turnOffRequests();
+							} else if (input.equals("-off")) {
+								if (requests.areOpen()) {
+									requests.turnOffRequests();
+									return;
+								}
+								event.respond("requests are already cl0sed");
 								return;
 							}
-							event.respond("requests are already cl0sed");
+							event.respond(input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 						return;
 					//Check for -clear argument
-					} else if (input.equals("-clear") || input.equals("-c")) {
+					} else if (input.toLowerCase().startsWith("-clear") || input.toLowerCase().startsWith("-c")) {
 						if (hasOp) {
-							requests.clearRequests();
-							event.respond("all requests have been cleared");
+							//Check if a time is specified
+							if (input.contains(" ")) {
+								String[] args = input.split(" ");
+								if (!args[0].equals("-clear") || args[0].equals("-c")) {
+									event.respond(args[0] + " is n0t a valid argument");
+									return;
+								}
+								if (args[1].equals("all")) {
+									requests.clearRequests();
+									requests.clearUsers();
+									event.respond("all requests have been cleared");
+									return;
+								} else if (args[1].equals("songs")) {
+									requests.clearRequests();
+									event.respond("all songs have been cleared");
+									return;
+								} else if (args[1].equals("users")) {
+									requests.clearUsers();
+									event.respond("all users have been cleared");
+									return;
+								}
+								event.respond(args[1] + " is n0t a valid argument");
+								return;
+							} else if (input.equals("-clear") || input.equals("-c")) {
+								requests.clearRequests();
+								requests.clearUsers();
+								event.respond("all requests have been cleared");
+								return;
+							}
+							event.respond(input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");

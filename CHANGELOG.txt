@@ -9,6 +9,9 @@ KEY:
 	[@] Fixes/Patches
 	[?] Known Issues
 	* = More at bottom of build change
+
+--- 1.0.2.63 ---
+[!] Improved command checking (only for $req)
 	
 --- 1.0.2.61 ---
 [!] Improved Request Timers*

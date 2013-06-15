@@ -101,6 +101,15 @@ public class RequestHandler implements Runnable{
 	public boolean isGoingToEnd() {
 		return isTimed;
 	}
+	
+	public void clearUsers() {
+		userList.clear();
+	}
+	
+	public void clearRequests() {
+		REQ_FILE.delete();
+		reqList.clear();
+	}
 
     private void sendToAllChannels(String message) {
     	Channel[] channels = bot.getChannels().toArray(new Channel[0]);
@@ -180,9 +189,5 @@ public class RequestHandler implements Runnable{
 			}
 		}
 		return numOfReq;
-	}
-
-	public void clearRequests() {
-		REQ_FILE.delete();
 	}
 }
