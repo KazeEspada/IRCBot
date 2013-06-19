@@ -64,7 +64,7 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$songlist")) {
 				input = message.substring(9);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://iarekylew00t.tumblr.com/song-list");
+					event.respond("http://iarekylew00t.me/song-list");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -112,7 +112,7 @@ public class MusicListener extends ListenerAdapter {
 				        } catch (Exception e) {
 				        	logger.error("COULD NOT RESTART WINAMP", e);
 				        	bot.sendMessage(channel, DataManager.ERROR + "Failed to restart Winamp - Notifying IAreKyleW00t...");
-							bot.sendMessage(channel, "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.tumblr.com/ask");
+							bot.sendMessage(channel, "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.me/ask");
 				        	email.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to restart @ " + curTime);
 							return;
 				        }

@@ -336,7 +336,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$faq")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://goo.gl/BTctR");
+					event.respond("http://iarekylew00t.me/faq");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -589,7 +589,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$rules")) {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://goo.gl/rb0RS (y0u better read these)");
+					event.respond("http://iarekylew00t.me/rules");
 					return;
 				}
 				if (!input.startsWith(" ")) {

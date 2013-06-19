@@ -68,22 +68,22 @@ public class HomestuckHandler implements Runnable {
 				logger.error("THREAD INTERRUPTED", e);
 			}
 			if (checkUpdate()) {
-				sendToAllChannels(Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
-				logger.notice("THERE IS AND UPDATE");
+				notifyAllChannels();
 			}
 		}
 	}
 
-    private void sendToAllChannels(String message) {
+    public void notifyAllChannels() {
     	Channel[] channels = bot.getChannels().toArray(new Channel[0]);
     	for (int i = 0; i < channels.length; i++) {
-    		bot.sendMessage(channels[i], message);
+    		bot.sendMessage(channels[i], Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
     	}
     }
 	
     public boolean checkUpdate() {
 		int latestPage = getLatestPage();
 		if (latestPage > curPage) {
+			logger.notice("THERE IS AND UPDATE");
 	    	curPage = latestPage;
 	        return true;
 		}
@@ -148,7 +148,7 @@ public class HomestuckHandler implements Runnable {
 			}
 		}
     	String line = FileHelper.searchFile(HS_LINKS, search);
-    	if (line.equals(null)) {
+    	if (line.isEmpty()) {
     		return "c0uld n0t find any page with \"" + search + "\" in it";
     	}
     	String[] lineSplit;

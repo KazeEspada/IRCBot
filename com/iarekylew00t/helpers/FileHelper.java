@@ -117,7 +117,7 @@ public final class FileHelper {
 	}
 	
 	public static String searchFile(File file, String search) {
-		String line, searchLine = null;
+		String line, searchLine = "";
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			while ((line = reader.readLine()) != null) {

@@ -85,7 +85,7 @@ public class MusicHandler implements Runnable {
 			} catch (Exception e) {
 				bot.sendMessage("#hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t...");
 				logger.error("FAILED TO RESTART WINAMP", e);
-				bot.sendMessage("#hs_radio", "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.tumblr.com/ask");
+				bot.sendMessage("#hs_radio", "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.me/ask");
 				emailClient.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to restart @ " + curTime);
 			}
     	}

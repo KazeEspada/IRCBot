@@ -1,7 +1,6 @@
 package com.iarekylew00t.ircbot.listeners;
 
 import org.pircbotx.Channel;
-import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -392,7 +391,7 @@ public class HomestuckListener extends ListenerAdapter {
 				input = message.substring(7);
 				if (StringHelper.isEmpty(input)) {
 					if (hsHandler.checkUpdate()) {
-						bot.sendMessage(channel, Colors.GREEN + Colors.BOLD + "-- THERE IS AN UPDATE --");
+						hsHandler.notifyAllChannels();
 						return;
 					}
 					bot.sendMessage(channel, "there is n0 update"); 
