@@ -3579,3 +3579,5 @@ JOHN: where IS everyone?
 JOHN: this sucks.
 JOHN: ...
 JOHN: sigh.
+JOHN: hi dave! 
+JOHN: what's so funny?
