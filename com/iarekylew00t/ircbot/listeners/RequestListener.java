@@ -164,7 +164,7 @@ public class RequestListener extends ListenerAdapter {
 							event.respond("that s0ng has already been requested");
 							return;
 						}
-						event.respond("y0u have already made 3 requests ");
+						event.respond("y0u have already made 5 requests ");
 						return;
 					}
 					bot.sendMessage(channel, "requests are currenly " + Colors.BOLD + Colors.RED + "CLOSED");
