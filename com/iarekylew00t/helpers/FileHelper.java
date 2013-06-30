@@ -35,7 +35,7 @@ public final class FileHelper {
     public static void writeToFile(File file, String message, boolean append) {
         try {
         	BufferedWriter writer = new BufferedWriter(new FileWriter(file, append));
-        	writer.write(message + "\n");
+        	writer.write(message + "\r\n");
         	writer.close();
         }
         catch (Exception e) {

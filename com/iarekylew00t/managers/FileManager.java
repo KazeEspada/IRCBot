@@ -84,101 +84,101 @@ public enum FileManager {
     }
     
     public static void updateConfig() {
-    	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\n" +
-		   	   "#===   DataManager.CONFIGuration File for Aradiabot (Rev. 1A)   ===\n" +
-			   "#======================================================\n", false);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\r\n" +
+		   	   "#===  Configuration File for Aradiabot (Rev. 1.1C)  ===\r\n" +
+			   "#======================================================\r\n", false);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\n" +
-    			"Version = " + DataManager.VER + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\r\n" +
+    			"Version = " + DataManager.VER + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\n" +
-    			"Nick = " + DataManager.nick + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\r\n" +
+    			"Nick = " + DataManager.nick + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Your NickServ Password\n" +
-    			"#LEAVE BLANK FOR NO PASSWORD\n" +
-    			"Password = " + DataManager.nickPassword + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Your NickServ Password\r\n" +
+    			"#LEAVE BLANK FOR NO PASSWORD\r\n" +
+    			"Password = " + DataManager.nickPassword + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Your Login Name\n" +
-    			"Login = " + DataManager.login + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Your Login Name\r\n" +
+    			"Login = " + DataManager.login + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Server to connect to\n" +
-    			"Server = " + DataManager.server + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Server to connect to\r\n" +
+    			"Server = " + DataManager.server + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Channel(s) to connect to\n" +
-    			"Channel = " + DataManager.channel + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Channel(s) to connect to\r\n" +
+    			"Channel = " + DataManager.channel + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Address to use for the Email Client\n" +
-    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-    			"Email = " + DataManager.emailAddress + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Address to use for the Email Client\r\n" +
+    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\r\n" +
+    			"Email = " + DataManager.emailAddress + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Password for the Email Client\n" +
-    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-    			"EmailPassword = " + DataManager.emailPassword + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Password for the Email Client\r\n" +
+    			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\r\n" +
+    			"EmailPassword = " + DataManager.emailPassword + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Enable or Disable Debugging\n" +
-    			"#Default: true\n" +
-    			"Debug = " + DataManager.debug + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Enable or Disable Debugging\r\n" +
+    			"#Default: true\r\n" +
+    			"Debug = " + DataManager.debug + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Enable to disable Password Encryption\n" +
-    			"#Default: false\n" +
-    			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\n" +
-    			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\n" +
-    			"#decrypt to an empty space like before.\n" +
-    			"Encrypt = " + DataManager.encrypt + "\n", true);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Enable to disable Password Encryption\r\n" +
+    			"#Default: false\r\n" +
+    			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\r\n" +
+    			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\r\n" +
+    			"#decrypt to an empty space like before.\r\n" +
+    			"Encrypt = " + DataManager.encrypt + "\r\n", true);
     	
-    	FileHelper.writeToFile(DataManager.CONFIG, "#Securely Generated Salt\n" +
-     			"#NOTE: This is generated the first time you run the bot\n" +
-    			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING (Min. 24 characters)\n" +
+    	FileHelper.writeToFile(DataManager.CONFIG, "#Securely Generated Salt\r\n" +
+     			"#NOTE: This is generated the first time you run the bot\r\n" +
+    			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING (Min. 24 characters)\r\n" +
     			"Salt = " + DataManager.salt, true);
     }
     
     public static void createDefaultConfig() {
     	logger.notice("NO DataManager.CONFIGURATION FOUND - CREATING DEFAULT");
-    	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\n" +
- 		   	   "#===   DataManager.CONFIGuration File for Aradiabot (Rev. 1A)   ===\n" +
- 			   "#======================================================\n", false);
+    	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\r\n" +
+ 		   	   "#===  Configuration File for Aradiabot (Rev. 1.1C)  ===\r\n" +
+ 			   "#======================================================\r\n", false);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\n" +
-     			"Version = 1.0.0.0\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\r\n" +
+     			"Version = 1.0.0.0\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\n" +
-     			"Nick = Aradiabot\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\r\n" +
+     			"Nick = Aradiabot\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Your NickServ Password\n" +
-     			"#LEAVE BLANK FOR NO PASSWORD\n" +
-     			"Password =\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Your NickServ Password\r\n" +
+     			"#LEAVE BLANK FOR NO PASSWORD\r\n" +
+     			"Password =\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Your Login Name\n" +
-     			"Login = AA\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Your Login Name\r\n" +
+     			"Login = AA\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Server to connect to\n" +
-     			"Server = irc.esper.net\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Server to connect to\r\n" +
+     			"Server = irc.esper.net\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Channel(s) to connect to\n" +
-     			"Channel = #channel1,#channel2,#channel3\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Channel(s) to connect to\r\n" +
+     			"Channel = #channel1,#channel2,#channel3\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Address to use for the Email Client\n" +
-     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-     			"Email =\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Address to use for the Email Client\r\n" +
+     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\r\n" +
+     			"Email =\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Password for the Email Client\n" +
-     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\n" +
-     			"EmailPassword =\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#The Email Password for the Email Client\r\n" +
+     			"#LEAVE BLANK TO NOT USE THE EMAIL CLIENT\r\n" +
+     			"EmailPassword =\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Enable or Disable Debugging\n" +
-     			"#Default: false\n" +
-     			"Debug = false\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Enable or Disable Debugging\r\n" +
+     			"#Default: false\r\n" +
+     			"Debug = false\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Enable to disable Password Encryption\n" +
-     			"#Default: false\n" +
-     			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\n" +
-     			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\n" +
-     			"#decrypt to an empty space like before.\n" +
-     			"Encrypt = false\n", true);
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Enable to disable Password Encryption\r\n" +
+     			"#Default: false\r\n" +
+     			"#NOTE: This will encrypt your NickServ and Email Address password (regardless if they're blank or not).\r\n" +
+     			"#It will still encrypt the blank space. DON'T TOUCH IT. It won't activate anything since it'll still\r\n" +
+     			"#decrypt to an empty space like before.\r\n" +
+     			"Encrypt = false\r\n", true);
      	
-     	FileHelper.writeToFile(DataManager.CONFIG, "#Securely Generated Salt\n" +
-     			"#NOTE: This is generated the first time you run the bot\n" +
-     			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING\n" +
+     	FileHelper.writeToFile(DataManager.CONFIG, "#Securely Generated Salt\r\n" +
+     			"#NOTE: This is generated the first time you run the bot\r\n" +
+     			"#DO NOT CHANGE THIS UNLESS YOU KNOW WHAT YOU'RE DOING\r\n" +
      			"Salt =",true);
     }
 }
