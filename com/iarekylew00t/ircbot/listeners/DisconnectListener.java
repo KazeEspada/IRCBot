@@ -32,7 +32,8 @@ public class DisconnectListener extends ListenerAdapter {
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
 		Date date = new Date();
     	String curTime = dateFormat.format(date);
-        if (!DataManager.nickPassword.equals("") || !DataManager.nickPassword.equals(null)) {
+        event.getBot().startIdentServer();
+        if (!DataManager.nickPassword.isEmpty()) {
         	event.getBot().identify(DataManager.nickPassword);
         }
         event.getBot().joinChannel(DataManager.channel);

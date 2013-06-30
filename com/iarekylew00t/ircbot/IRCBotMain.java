@@ -55,6 +55,7 @@ public class IRCBotMain {
         bot.getListenerManager().addListener(new DisconnectListener());
         bot.getListenerManager().addListener(new RequestListener());
         bot.getListenerManager().addListener(new LogListener());
+        bot.startIdentServer();
         bot.connect(DataManager.server);
         if (!DataManager.nickPassword.isEmpty()) {
         	bot.identify(DataManager.nickPassword);
