@@ -1358,4 +1358,8 @@ JANE: I...
 JANE: Yes.
 JANE: Yes.
 JANE: :|
-JANE: OBEY.
+JANE: #RED#OBEY.
+JANE: #RED#. 
+JANE: #RED#. 
+JANE: #RED#. 
+JANE: #RED#SUBMIT. 
