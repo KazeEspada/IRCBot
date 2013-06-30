@@ -10,6 +10,11 @@ KEY:
 	[?] Known Issues
 	* = More at bottom of build change
 	
+--- 1.0.2.65 ---
+[+] Added the ability to use the Color RED in Janes quotes*
+
+*Used only with Jane - it'll change #RED# to Colors.RED
+	
 --- 1.0.2.64 ---
 [!] Improved some command Listeners
 [*] Changed/Updated links

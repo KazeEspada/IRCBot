@@ -1,6 +1,7 @@
 package com.iarekylew00t.ircbot.listeners;
 
 import org.pircbotx.Channel;
+import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -124,7 +125,7 @@ public class HomestuckListener extends ListenerAdapter {
 							bot.sendMessage(channel, quote.getJadeQuote(quoteNum));
 							return;
 						} else if (args[0].equalsIgnoreCase("Jane") || args[0].equalsIgnoreCase("gutsyGumshoe")) {
-							bot.sendMessage(channel, quote.getJaneQuote(quoteNum));
+							bot.sendMessage(channel, quote.getJaneQuote(quoteNum).replace("#RED#", Colors.RED));
 							return;
 						} else if (args[0].equalsIgnoreCase("Roxy") || args[0].equalsIgnoreCase("tipsyGnostalgic")) {
 							bot.sendMessage(channel, quote.getRoxyQuote(quoteNum));
@@ -260,7 +261,7 @@ public class HomestuckListener extends ListenerAdapter {
 						bot.sendMessage(channel, quote.getJadeQuote());
 						return;
 					} else if (input.equalsIgnoreCase("Jane") || input.equalsIgnoreCase("gutsyGumshoe")) {
-						bot.sendMessage(channel, quote.getJaneQuote());
+						bot.sendMessage(channel, quote.getJaneQuote().replace("#RED#", Colors.RED));
 						return;
 					} else if (input.equalsIgnoreCase("Roxy") || input.equalsIgnoreCase("tipsyGnostalgic")) {
 						bot.sendMessage(channel, quote.getRoxyQuote());
