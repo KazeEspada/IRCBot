@@ -64,7 +64,7 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$songlist")) {
 				input = message.substring(9);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://iarekylew00t.me/song-list");
+					event.respond("http://skaianet.net/songlist");
 					return;
 				}
 				if (!input.startsWith(" ")) {

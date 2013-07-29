@@ -147,6 +147,7 @@ public enum DataManager {
     	commandList.put("req", "Usage: $req [args] || $req [songname]");
     	commandList.put("restart", "VOICE/OP ONLY - Usage: $restart");
     	commandList.put("revive", "Usage: $revive <user>");
+    	commandList.put("rss", "Usage: $rss");
     	commandList.put("rules", "Usage: $rules");
     	commandList.put("search", "Usage: $search <homestuck page>");
     	commandList.put("serve", "Usage: $serve <something>");
@@ -161,6 +162,7 @@ public enum DataManager {
     	commandList.put("source", "Usage: $source || $github");
     	commandList.put("srandom", "Usage: $srandom [bytes]");
     	commandList.put("stab", "Usage: $stab <user>");
+    	commandList.put("status", "Usage: $status");
     	commandList.put("talk", "Usage: $talk <message>");
     	commandList.put("tellkyle", "VOICE/OP ONLY - Usage: $tellkyle <message>");
     	commandList.put("time", "Usage: $time");

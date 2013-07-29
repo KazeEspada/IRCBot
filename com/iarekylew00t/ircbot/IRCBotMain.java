@@ -2,6 +2,9 @@ package com.iarekylew00t.ircbot;
 
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.pircbotx.PircBotX;
 
@@ -22,6 +25,7 @@ import com.iarekylew00t.managers.FileManager;
 
 public class IRCBotMain {
 	private static LogHandler logger = DataManager.logHandler;
+	private static DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
 	
 	public static void main(String[] args) throws Exception {
 		try {
@@ -39,27 +43,48 @@ public class IRCBotMain {
         	email.setupEmail(DataManager.emailAddress, DataManager.emailPassword);
         	logger.info("EMAIL CLIENT SETUP SUCCESSFULLY");
         }
-		
-        PircBotX bot = DataManager.IRCbot;
-        bot.setName(DataManager.nick);
-        bot.setLogin("AA");
-        bot.setAutoNickChange(true);
-        bot.setEncoding(Charset.forName("UTF-8"));
-        bot.setVerbose(true);
-        bot.getListenerManager().addListener(new BasicCommandListener());
-        bot.getListenerManager().addListener(new PermissionCommandListener());
-        bot.getListenerManager().addListener(new MusicListener());
-        bot.getListenerManager().addListener(new GoogleListener());
-        bot.getListenerManager().addListener(new HomestuckListener());
-        bot.getListenerManager().addListener(new WebCommandListener());
-        bot.getListenerManager().addListener(new DisconnectListener());
-        bot.getListenerManager().addListener(new RequestListener());
-        bot.getListenerManager().addListener(new LogListener());
-        bot.startIdentServer();
-        bot.connect(DataManager.server);
-        if (!DataManager.nickPassword.isEmpty()) {
-        	bot.identify(DataManager.nickPassword);
-        }
-        bot.joinChannel(DataManager.channel);
+		try {
+			PircBotX dummyBot = new IRCBot();
+			dummyBot.setName("DummyB0t");
+			dummyBot.setLogin("SN");
+			dummyBot.setAutoNickChange(true);
+	        dummyBot.setEncoding(Charset.forName("UTF-8"));
+	        dummyBot.setVerbose(true);
+	        dummyBot.startIdentServer();
+	        dummyBot.connect("irc.esper.net", 6667);
+	        dummyBot.joinChannel("#hs_radio,#hs_radio2,#hs_radio3,#hs_radio4,#hs_admin");
+		} catch (Exception e) {
+			Date date = new Date();
+			String time = dateFormat.format(date);
+			email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Encountered an Error", "DummyBot has encountered a fatal error @ " + time);
+		}
+		try {
+			PircBotX bot = DataManager.IRCbot;
+	        bot.setName(DataManager.nick);
+	        bot.setLogin("AA");
+	        bot.setAutoNickChange(true);
+	        bot.setEncoding(Charset.forName("UTF-8"));
+	        bot.setVerbose(true);
+	        bot.getListenerManager().addListener(new BasicCommandListener());
+	        bot.getListenerManager().addListener(new PermissionCommandListener());
+	        bot.getListenerManager().addListener(new MusicListener());
+	        bot.getListenerManager().addListener(new GoogleListener());
+	        bot.getListenerManager().addListener(new HomestuckListener());
+	        bot.getListenerManager().addListener(new WebCommandListener());
+	        bot.getListenerManager().addListener(new DisconnectListener());
+	        bot.getListenerManager().addListener(new RequestListener());
+	        bot.getListenerManager().addListener(new LogListener());
+	        bot.startIdentServer();
+	        bot.connect(DataManager.server);
+	        if (!DataManager.nickPassword.isEmpty()) {
+	        	bot.identify(DataManager.nickPassword);
+	        }
+	        bot.joinChannel(DataManager.channel);
+		} catch (Exception e) {
+			Date date = new Date();
+			String time = dateFormat.format(date);
+			email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Encountered an Error", "Aradiabot has encountered a fatal error @ " + time);
+			DataManager.IRCbot.disconnect();
+		}
 	}
 }

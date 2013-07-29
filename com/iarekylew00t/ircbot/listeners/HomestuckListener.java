@@ -12,7 +12,7 @@ import com.iarekylew00t.ircbot.handlers.HomestuckHandler;
 import com.iarekylew00t.ircbot.handlers.QuoteHandler;
 
 public class HomestuckListener extends ListenerAdapter {
-	private HomestuckHandler hsHandler = new HomestuckHandler(1);
+	private HomestuckHandler hsHandler = new HomestuckHandler(5);
 	private QuoteHandler quote = new QuoteHandler();
 	private String PAGE_BASE = "?s=6&p=00";
 	private String MSPA_BASE = "http://www.mspaintadventures.com/";

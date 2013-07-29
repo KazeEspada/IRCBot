@@ -65,13 +65,13 @@ public class MusicHandler implements Runnable {
 	private void restartWinamp() throws Exception {
 		Date date = new Date();
     	curTime = dateFormat.format(date);
-        bot.sendMessage("#hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Winamp appears to be malfunctioning - Attempting repair");
-        bot.sendMessage("#hs_radio", Colors.BOLD + "----------- RESTARTING WINAMP -----------");
+        bot.sendMessage("#skaianet_chat", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Winamp appears to be malfunctioning - Attempting repair");
+        bot.sendMessage("#skaianet_chat", Colors.BOLD + "----------- RESTARTING WINAMP -----------");
         logger.warning("RESTARTING WINAMP");
 		Runtime.getRuntime().exec("taskkill /IM winamp.exe");
 		Thread.sleep(1500);
 		Runtime.getRuntime().exec("winamp.exe");
-        bot.sendMessage("#hs_radio", Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
+        bot.sendMessage("#skaianet_chat", Colors.BOLD + Colors.GREEN + "----- WINAMP RESTARTED SUCCESSFULLY -----");
         logger.warning("WINAMP RESTARTED SUCCESSFULLY");
         emailClient.sendEmail("kyle10468@gmail.com", "NOTICE: Winamp Restarted", "Winamp restarted succesfully @ " + curTime);
     }
@@ -83,9 +83,9 @@ public class MusicHandler implements Runnable {
 				restartWinamp();
 				updateCurSong();
 			} catch (Exception e) {
-				bot.sendMessage("#hs_radio", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t...");
+				bot.sendMessage("#skaianet_chat", Colors.RED + Colors.BOLD + "ERROR: " + Colors.NORMAL + "Failed to restart Winamp - Notifying IAreKyleW00t...");
 				logger.error("FAILED TO RESTART WINAMP", e);
-				bot.sendMessage("#hs_radio", "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.me/ask");
+				bot.sendMessage("#skaianet_chat", "Please notify IAreKyleW00t manually to make sure he knows: http://iarekylew00t.me/ask");
 				emailClient.sendEmail("kyle10468@gmail.com", "WARNING: Winamp Failed to Restart", "Winamp FAILED to restart @ " + curTime);
 			}
     	}

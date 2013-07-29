@@ -11,6 +11,8 @@ import com.iarekylew00t.helpers.StringHelper;
 import com.iarekylew00t.ircbot.handlers.Definition;
 import com.iarekylew00t.ircbot.handlers.DefinitionHandler;
 import com.iarekylew00t.ircbot.handlers.LogHandler;
+import com.iarekylew00t.ircbot.handlers.RssHandler;
+import com.iarekylew00t.ircbot.handlers.StatusHandler;
 import com.iarekylew00t.ircbot.handlers.Weather;
 import com.iarekylew00t.ircbot.handlers.WeatherHandler;
 import com.iarekylew00t.managers.DataManager;
@@ -18,8 +20,10 @@ import com.iarekylew00t.managers.DataManager;
 public class WebCommandListener extends ListenerAdapter {
 	private String WIKI_BASE = "http://en.wikipedia.org/wiki/";
 	private DefinitionHandler dictionary = new DefinitionHandler(); 
+	private RssHandler rss = new RssHandler("http://skaianet.net/rss", 15);
 	private WeatherHandler forecast = new WeatherHandler();
 	private ChatBot chatbot = new ChatBot();
+	private StatusHandler status = new StatusHandler();
 	private LogHandler logger = DataManager.logHandler;
 	
 	@Override
@@ -72,6 +76,65 @@ public class WebCommandListener extends ListenerAdapter {
 				event.respond(StringHelper.getCommand("udefine"));
 				return;
 				
+			/* --- RSS --- */
+			} else if (message.toLowerCase().startsWith("$rss")) {
+				input = message.substring(4);
+				if (StringHelper.isEmpty(input)) {
+					try {
+						bot.sendMessage(channel, rss.getLatest());
+						return;
+					} catch (Exception e) { 
+						bot.sendMessage(channel, DataManager.ERROR + "Could not parse data from XML");
+						logger.error("COULD NOT PARSE DATA FROM XML", e);
+						return;
+					}
+				}
+				if (!input.startsWith(" ")) {
+					return;
+				}
+				event.respond(StringHelper.getCommand("rss"));
+				return;
+				
+			/* --- STATUS --- */
+			} else if (message.toLowerCase().startsWith("$status")) {
+				input = message.substring(7);
+				if (StringHelper.isEmpty(input)) {
+					String statusMessage = "";
+					try {
+						if (status.getStatusCode("http://skaianet.net") == 200) {
+							statusMessage += "Blog: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL + " | ";
+						} else {
+							statusMessage += "Blog: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL + " | ";
+						}
+						if (status.getStatusCode("http://skaianet.net/radio") == 200 && status.getStatusCode("http://mixlr.com/skaianetradio/") == 200) {
+							statusMessage += "Radio: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL + " | ";
+						} else {
+							statusMessage += "Radio: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL + " | ";
+						}
+						if (status.getStatusCode("http://webchat.esper.net") == 200) {
+							statusMessage += "IRC: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL + " | ";
+						} else {
+							statusMessage += "IRC: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL + " | ";
+						}
+						if (status.getMinecraftStatus("mc.skaianet.net", 25565) == true) {
+							statusMessage += "MC: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL;
+						} else {
+							statusMessage += "MC: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL;
+						}
+						bot.sendMessage(channel, statusMessage);
+						return;
+					} catch (Exception e) { 
+						bot.sendMessage(channel, DataManager.ERROR + "Could check status");
+						logger.error("COULD NOT PARSE DATA FROM XML", e);
+						return;
+					}
+				}
+				if (!input.startsWith(" ")) {
+					return;
+				}
+				event.respond(StringHelper.getCommand("status"));
+				return;
+				
 			/* --- TALK --- */
 			} else if (message.toLowerCase().startsWith("$talk")) {
 				input = message.substring(5);
@@ -81,7 +144,7 @@ public class WebCommandListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					/* === CHECK IF CHANNEL 3 === */
-					if (channel.getName().equals("#hs_radio3")) {
+					if (channel.getName().equals("#skaianet_chat3")) {
 						try {
 							bot.sendMessage(channel, chatbot.think(input));
 							return;

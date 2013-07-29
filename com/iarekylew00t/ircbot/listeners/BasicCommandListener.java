@@ -336,7 +336,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$faq")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://iarekylew00t.me/faq");
+					event.respond("http://skaianet.net/faq");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -380,7 +380,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$irc")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://goo.gl/dIfQu || http://goo.gl/h4m3C");
+					event.respond("http://skaianet.net/chat || http://skaianet.net/chat2");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -418,7 +418,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$lmtyahs")) {
 				input = message.substring(8);
 				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "let me tell y0u ab0ut h0mestuck... http://goo.gl/XFYbz");
+					bot.sendMessage(channel, "let me tell y0u ab0ut h0mestuck... http://bit.ly/lmtyahs");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -500,7 +500,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$radio")) {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://www.mixlr.com/iarekylew00t/");
+					event.respond("http://skaianet.net/radio");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -589,7 +589,7 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$rules")) {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://iarekylew00t.me/rules");
+					event.respond("http://skaianet.net/rules");
 					return;
 				}
 				if (!input.startsWith(" ")) {

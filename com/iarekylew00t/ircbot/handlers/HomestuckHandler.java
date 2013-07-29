@@ -83,7 +83,7 @@ public class HomestuckHandler implements Runnable {
     public boolean checkUpdate() {
 		int latestPage = getLatestPage();
 		if (latestPage > curPage) {
-			logger.notice("THERE IS AND UPDATE");
+			logger.notice("THERE IS AN UPDATE");
 	    	curPage = latestPage;
 	        return true;
 		}
