@@ -1,7 +1,9 @@
 package com.iarekylew00t.ircbot.listeners;
 
 import org.pircbotx.Channel;
+import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -17,8 +19,62 @@ public class GoogleListener extends ListenerAdapter {
 	@Override
 	public void onMessage(MessageEvent event) {
 		PircBotX bot = event.getBot();
+		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
 
 		/* === CHECK FOR COMMAND SYMBOL === */
@@ -34,7 +90,7 @@ public class GoogleListener extends ListenerAdapter {
 					input = StringHelper.setString(input);
 					if (input.startsWith("goo.gl/") || input.startsWith("http://goo.gl/")) {
 						try {
-							event.respond(google.expandUrl(input));
+							bot.sendMessage(channel, nick + ": " + google.expandUrl(input));
 							return;
 						} catch (Exception e) {
 							logger.error("COULD NOT EXPAND URL", e);
@@ -43,7 +99,7 @@ public class GoogleListener extends ListenerAdapter {
 						}
 					}
 				}
-				event.respond(StringHelper.getCommand("expand"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("expand"));
 				return;
 				
 			/* --- SHORTEN URL --- */
@@ -55,7 +111,7 @@ public class GoogleListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					try {
-						event.respond(google.shortenUrl(input));
+						bot.sendMessage(channel, nick + ": " + google.shortenUrl(input));
 						return;
 					} catch (Exception e) {
 						logger.error("COULD NOT SHORTEN URL", e);
@@ -63,7 +119,7 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("shorten"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("shorten"));
 				return;
 				
 			/* --- GOOGLE SEARCH --- */
@@ -75,10 +131,10 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(google.googleSearch(input));
+					bot.sendMessage(channel, nick + ": " + google.googleSearch(input));
 					return;
 				}
-				event.respond(StringHelper.getCommand("google"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("google"));
 				return;
 			} else if (message.toLowerCase().startsWith("$g") && !(message.toLowerCase().startsWith("$gearup") || message.toLowerCase().startsWith("$github") || message.toLowerCase().startsWith("$google"))) {
 				input = message.substring(2);
@@ -87,10 +143,10 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(google.googleSearch(input));
+					bot.sendMessage(channel, nick + ": " + google.googleSearch(input));
 					return;
 				}
-				event.respond(StringHelper.getCommand("google"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("google"));
 				return;
 				
 			/* --- YOUTUBE SEARCH --- */
@@ -102,10 +158,10 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(google.youtubeSearch(input));
+					bot.sendMessage(channel, nick + ": " + google.youtubeSearch(input));
 					return;
 				}
-				event.respond(StringHelper.getCommand("youtube"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("youtube"));
 				return;
 			} else if (message.toLowerCase().startsWith("$youtube")) {
 				input = message.substring(8);
@@ -114,10 +170,10 @@ public class GoogleListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(google.youtubeSearch(input));
+					bot.sendMessage(channel, nick + ": " + google.youtubeSearch(input));
 					return;
 				}
-				event.respond(StringHelper.getCommand("youtube"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("youtube"));
 				return;
 			}
 			return;

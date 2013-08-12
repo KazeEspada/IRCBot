@@ -28,6 +28,7 @@ public class IRCBotMain {
 	private static DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
 	
 	public static void main(String[] args) throws Exception {
+		DataManager.VER = "1.0.5.10";
 		try {
 			FileManager.checkFiles();
 		} catch (MalformedURLException e) {
@@ -43,21 +44,6 @@ public class IRCBotMain {
         	email.setupEmail(DataManager.emailAddress, DataManager.emailPassword);
         	logger.info("EMAIL CLIENT SETUP SUCCESSFULLY");
         }
-		try {
-			PircBotX dummyBot = new IRCBot();
-			dummyBot.setName("DummyB0t");
-			dummyBot.setLogin("SN");
-			dummyBot.setAutoNickChange(true);
-	        dummyBot.setEncoding(Charset.forName("UTF-8"));
-	        dummyBot.setVerbose(true);
-	        dummyBot.startIdentServer();
-	        dummyBot.connect("irc.esper.net", 6667);
-	        dummyBot.joinChannel("#hs_radio,#hs_radio2,#hs_radio3,#hs_radio4,#hs_admin");
-		} catch (Exception e) {
-			Date date = new Date();
-			String time = dateFormat.format(date);
-			email.sendEmail("kyle10468@gmail.com", "WARNING: Aradiabot Encountered an Error", "DummyBot has encountered a fatal error @ " + time);
-		}
 		try {
 			PircBotX bot = DataManager.IRCbot;
 	        bot.setName(DataManager.nick);

@@ -101,7 +101,7 @@ public final class FileHelper {
 		int numOfLines = countLines(file);
 		String text = "";
 		if (line > numOfLines || line <= 0) {
-			return "Please enter a number from 1-" + numOfLines;
+			throw new IndexOutOfBoundsException ("Please enter a number from 1-" + numOfLines);
 		}
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));

@@ -44,6 +44,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -72,6 +76,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -102,6 +110,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -130,6 +142,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -160,6 +176,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -188,6 +208,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -218,6 +242,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -246,6 +274,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -305,6 +337,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -333,6 +369,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -363,6 +403,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -391,6 +435,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -421,6 +469,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -449,6 +501,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -479,6 +535,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -507,6 +567,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -537,6 +601,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -565,6 +633,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -595,6 +667,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -623,6 +699,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -653,6 +733,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -681,6 +765,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -711,6 +799,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -739,6 +831,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -769,6 +865,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -797,6 +897,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -827,6 +931,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -855,6 +963,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -885,6 +997,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -913,6 +1029,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -943,6 +1063,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -971,6 +1095,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1001,6 +1129,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1029,6 +1161,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1059,6 +1195,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1087,6 +1227,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1117,6 +1261,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1145,6 +1293,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1175,6 +1327,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1203,6 +1359,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1233,6 +1393,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1261,6 +1425,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1291,6 +1459,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1319,6 +1491,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
@@ -1349,6 +1525,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1378,6 +1558,10 @@ public class QuoteHandler {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
 		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
+		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}
 
@@ -1406,6 +1590,10 @@ public class QuoteHandler {
 			} catch (MalformedURLException e) {
 				logger.error("COULD NOT DOWNLOAD " + name.toUpperCase() + " FROM \"" + FILE_BASE + "/quotes/" + FILE.getName() + "\"", e);
 			}
+		}
+		int numOfLines = FileHelper.countLines(FILE);
+		if (line > numOfLines) {
+			return "Please enter a number from 1-" + numOfLines;
 		}
 		return Colors.TEAL + Colors.BOLD + "Quote #" + line + " - " + Colors.NORMAL + FileHelper.readLine(FILE, line);
 	}

@@ -22,8 +22,60 @@ public class HomestuckListener extends ListenerAdapter {
 		PircBotX bot = event.getBot();
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
-		String nick = sender.getNick();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
 
 		/* === CHECK FOR COMMAND SYMBOL === */
@@ -33,7 +85,7 @@ public class HomestuckListener extends ListenerAdapter {
 			if (message.toLowerCase().startsWith("$latest")) {
 				input = message.substring(7);
 				if (StringHelper.isEmpty(input)) {
-					event.respond(MSPA_BASE + PAGE_BASE + hsHandler.getLatestPage());
+					bot.sendMessage(channel, nick + ": " + MSPA_BASE + PAGE_BASE + hsHandler.getLatestPage());
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -51,7 +103,7 @@ public class HomestuckListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(hsHandler.searchWiki(input));
+					bot.sendMessage(channel, nick + ": " + hsHandler.searchWiki(input));
 					return;
 				}
 				bot.sendMessage(channel, StringHelper.getCommand("mspawiki"));
@@ -61,7 +113,7 @@ public class HomestuckListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$mspa") && !(message.toLowerCase().startsWith("$mspawiki"))) {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://www.mspaintadventures.com/");
+					bot.sendMessage(channel, nick + ": " + "http://www.mspaintadventures.com/");
 					return;
 				}
 				if (!input.startsWith(" ")) {
@@ -82,17 +134,17 @@ public class HomestuckListener extends ListenerAdapter {
 					try {
 						page = Integer.parseInt(input);
 						if (page == 4299 || page == 4938 || page == 4988) {
-							event.respond("that page d0es n0t exist");
+							bot.sendMessage(channel, nick + ": " + "that page d0es n0t exist");
 							return;
 						}
-						event.respond(MSPA_BASE + PAGE_BASE + hsHandler.getPage(page));
+						bot.sendMessage(channel, nick + ": " + MSPA_BASE + PAGE_BASE + hsHandler.getPage(page));
 						return;
 					} catch (Exception e) {
 						bot.sendMessage(channel, "please give me valid numbers " + nick);
 						return;
 					}
 				}
-				event.respond(MSPA_BASE + PAGE_BASE + hsHandler.getPage());
+				bot.sendMessage(channel, nick + ": " + MSPA_BASE + PAGE_BASE + hsHandler.getPage());
 				return;
 			
 			/* --- QUOTE --- */
@@ -409,7 +461,7 @@ public class HomestuckListener extends ListenerAdapter {
 				input = message.substring(7);
 				if (!StringHelper.isEmpty(input)) {
 					input = StringHelper.setString(input);
-					event.respond(hsHandler.searchPage(input));
+					bot.sendMessage(channel, nick + ": " + hsHandler.searchPage(input));
 					return;
 				}
 				bot.sendMessage(channel, StringHelper.getCommand("search"));

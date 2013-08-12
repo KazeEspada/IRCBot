@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Random;
 
 import org.pircbotx.Channel;
+import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -33,8 +34,60 @@ public class BasicCommandListener extends ListenerAdapter {
 		PircBotX bot = event.getBot();
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
-		String nick = sender.getNick();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
 		
 		/* === CHECK FOR COMMAND SYMBOL === */
@@ -53,13 +106,13 @@ public class BasicCommandListener extends ListenerAdapter {
 							cmdString += cmdList[i];
 						}
 					}
-					event.respond(cmdString);
+					bot.sendMessage(channel, nick + ": " + cmdString);
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("commands"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("commands"));
 				return;
 				
 			/* --- HELP --- */
@@ -71,13 +124,13 @@ public class BasicCommandListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					if (DataManager.commandList.containsKey(input)) {
-						event.respond(StringHelper.getCommand(input));
+						bot.sendMessage(channel, nick + ": " + StringHelper.getCommand(input));
 						return;
 					}
 					bot.sendMessage(channel, "thats n0t a c0mmand");
 					return;
 				}
-				event.respond(StringHelper.getCommand("help"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("help"));
 				return;
 				
 			/* --- 8BALL --- */
@@ -88,10 +141,10 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 					input = StringHelper.setString(input);
-					event.respond(getRandomOutcome(eightBall));
+					bot.sendMessage(channel, nick + ": " + getRandomOutcome(eightBall));
 					return;
 				}
-				event.respond(StringHelper.getCommand("8ball"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("8ball"));
 				return;
 				
 			/* --- DATE --- */
@@ -105,7 +158,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("date"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("date"));
 				return;
 				
 			/* --- ENCRYPT --- */
@@ -130,23 +183,23 @@ public class BasicCommandListener extends ListenerAdapter {
 						}
 						try {
 							if (args[0].equalsIgnoreCase("AES")) {
-								event.respond(Encryptor.encryptAES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.encryptAES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("DES")) {
-								event.respond(Encryptor.encryptDES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.encryptDES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("3DES") || args[0].equalsIgnoreCase("TripleDES") || args[0].equalsIgnoreCase("3-DES") || args[0].equalsIgnoreCase("DES3")  || args[0].equalsIgnoreCase("DES-3") || args[0].equalsIgnoreCase("DESede")) {
-								event.respond(Encryptor.encrypt3DES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.encrypt3DES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("Blowfish")) {
-								event.respond(Encryptor.encryptBlowfish(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.encryptBlowfish(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("RC2") || args[0].equalsIgnoreCase("RC-2")) {
-								event.respond(Encryptor.encryptRC2(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.encryptRC2(data));
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(DataManager.ERROR + "Could not encrypt data");
+							bot.sendMessage(channel, nick + ": " + DataManager.ERROR + "Could not encrypt data");
 							logger.error("COULD NOT ENCRYPT DATA", e);
 							return;
 						}
@@ -154,7 +207,7 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "im s0rry but i d0nt kn0w that alg0rithm");
 					return;
 				}
-				event.respond(StringHelper.getCommand("encrypt"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("encrypt"));
 				return;
 				
 			/* --- DECRYPT --- */
@@ -179,23 +232,23 @@ public class BasicCommandListener extends ListenerAdapter {
 						}
 						try {
 							if (args[0].equalsIgnoreCase("AES")) {
-								event.respond(Encryptor.decryptAES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.decryptAES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("DES")) {
-								event.respond(Encryptor.decryptDES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.decryptDES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("3DES") || args[0].equalsIgnoreCase("TripleDES") || args[0].equalsIgnoreCase("3-DES") || args[0].equalsIgnoreCase("DES3")  || args[0].equalsIgnoreCase("DES-3") || args[0].equalsIgnoreCase("DESede")) {
-								event.respond(Encryptor.decrypt3DES(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.decrypt3DES(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("Blowfish")) {
-								event.respond(Encryptor.decryptBlowfish(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.decryptBlowfish(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("RC2") || args[0].equalsIgnoreCase("RC-2")) {
-								event.respond(Encryptor.decryptRC2(data));
+								bot.sendMessage(channel, nick + ": " + Encryptor.decryptRC2(data));
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(DataManager.ERROR + "Could not decrypt data");
+							bot.sendMessage(channel, nick + ": " + DataManager.ERROR + "Could not decrypt data");
 							logger.error("COULD NOT DECRYPT DATA", e);
 							return;
 						}
@@ -203,7 +256,7 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "im s0rry but i d0nt kn0w that alg0rithm");
 					return;
 				}
-				event.respond(StringHelper.getCommand("decrypt"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("decrypt"));
 				return;
 				
 			/* --- ENCODE --- */
@@ -228,11 +281,11 @@ public class BasicCommandListener extends ListenerAdapter {
 						}
 						try {
 							if (args[0].equalsIgnoreCase("BASE64") || args[0].equalsIgnoreCase("BASE-64")) {
-								event.respond(Encoder.encodeBase64(data));
+								bot.sendMessage(channel, nick + ": " + Encoder.encodeBase64(data));
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(DataManager.ERROR + "Could not encode data");
+							bot.sendMessage(channel, nick + ": " + DataManager.ERROR + "Could not encode data");
 							logger.error("COULD NOT ENCODE DATA", e);
 							return;
 						}
@@ -240,7 +293,7 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "im s0rry but i d0nt kn0w that alg0rithm");
 					return;
 				}
-				event.respond(StringHelper.getCommand("encode"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("encode"));
 				return;
 				
 			/* --- DECRYPT --- */
@@ -265,11 +318,11 @@ public class BasicCommandListener extends ListenerAdapter {
 						}
 						try {
 							if (args[0].equalsIgnoreCase("BASE64") || args[0].equalsIgnoreCase("BASE-64")) {
-								event.respond(Encoder.decodeBase64(data));
+								bot.sendMessage(channel, nick + ": " + Encoder.decodeBase64(data));
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(DataManager.ERROR + "Could not decode data");
+							bot.sendMessage(channel, nick + ": " + DataManager.ERROR + "Could not decode data");
 							logger.error("COULD NOT DECODE DATA", e);
 							return;
 						}
@@ -277,7 +330,7 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "im s0rry but i d0nt kn0w that alg0rithm");
 					return;
 				}
-				event.respond(StringHelper.getCommand("decode"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("decode"));
 				return;
 				
 			/* --- HASH --- */
@@ -302,26 +355,26 @@ public class BasicCommandListener extends ListenerAdapter {
 						}
 						try {
 							if (args[0].equalsIgnoreCase("MD5") || args[0].equalsIgnoreCase("MD-5")) {
-								event.respond(HashGenerator.hashMD5(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashMD5(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("MD2") || args[0].equalsIgnoreCase("MD-2")) {
-								event.respond(HashGenerator.hashMD2(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashMD2(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("SHA1") || args[0].equalsIgnoreCase("SHA-1") || args[0].equalsIgnoreCase("SHA128") || args[0].equalsIgnoreCase("SHA-128")) {
-								event.respond(HashGenerator.hashSHA1(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashSHA1(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("SHA256") || args[0].equalsIgnoreCase("SHA-256")) {
-								event.respond(HashGenerator.hashSHA256(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashSHA256(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("SHA384") || args[0].equalsIgnoreCase("SHA-384")) {
-								event.respond(HashGenerator.hashSHA384(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashSHA384(data));
 								return;
 							} else if (args[0].equalsIgnoreCase("SHA512") || args[0].equalsIgnoreCase("SHA-512")) {
-								event.respond(HashGenerator.hashSHA512(data));
+								bot.sendMessage(channel, nick + ": " + HashGenerator.hashSHA512(data));
 								return;
 							}
 						} catch (Exception e) {
-							event.respond(DataManager.ERROR + "Could not generate hash");
+							bot.sendMessage(channel, nick + ": " + DataManager.ERROR + "Could not generate hash");
 							logger.error("COULD NOT GENERATE HASH", e);
 							return;
 						}
@@ -329,20 +382,20 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "im s0rry but i d0nt kn0w that alg0rithm");
 					return;
 				}
-				event.respond(StringHelper.getCommand("hash"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("hash"));
 				return;
 				
 			/* --- FAQ --- */	
 			} else if (message.toLowerCase().startsWith("$faq")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://skaianet.net/faq");
+					bot.sendMessage(channel, nick + ": " + "http://skaianet.net/faq");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("faq"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("faq"));
 				return;
 				
 			/* --- GEARUP --- */
@@ -355,7 +408,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("gearup"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("gearup"));
 				return;
 				
 			/* --- HEAL --- */	
@@ -373,20 +426,20 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, input + " has been healed");
 					return;
 				}
-				event.respond(StringHelper.getCommand("heal"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("heal"));
 				return;
 				
 			/* --- IRC --- */	
 			} else if (message.toLowerCase().startsWith("$irc")) {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://skaianet.net/chat || http://skaianet.net/chat2");
+					bot.sendMessage(channel, nick + ": " + "http://skaianet.net/chat || http://skaianet.net/chat2");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("irc"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("irc"));
 				return;
 				
 			/* --- KILL --- */	
@@ -411,7 +464,7 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("kill"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("kill"));
 				return;
 				
 			/* --- LMTYAHS --- */	
@@ -424,7 +477,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("lmtyahs"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("lmtyahs"));
 				return;
 				
 			/* --- PAP --- */	
@@ -446,33 +499,33 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("pap"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("pap"));
 				return;
 				
 			/* --- PING --- */
 			} else if (message.toLowerCase().startsWith("$ping")) {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("p0ng");
+					bot.sendMessage(channel, nick + ": " + "p0ng");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("ping"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("ping"));
 				return;
 				
 			/* --- PLAYFLUTE --- */	
 			} else if (message.toLowerCase().startsWith("$playflute")) {
 				input = message.substring(10);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://goo.gl/LpK89");
+					bot.sendMessage(channel, nick + ": " + "http://goo.gl/LpK89");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("playflute"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("playflute"));
 				return;
 				
 			/* --- POKE --- */
@@ -493,20 +546,20 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendAction(channel, "p0kes " + input);
 					return;
 				}
-				event.respond(StringHelper.getCommand("poke"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("poke"));
 				return;
 				
 			/* --- RADIO --- */	
 			} else if (message.toLowerCase().startsWith("$radio")) {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://skaianet.net/radio");
+					bot.sendMessage(channel, nick + ": " + "http://skaianet.net/radio");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("radio"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("radio"));
 				return;
 				
 			/* --- RANDOM --- */	
@@ -527,14 +580,14 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 					if (maxNum <= 0 || maxNum > 2147483647) {
-						event.respond("please enter a number fr0m 1-2,147,483,647");
+						bot.sendMessage(channel, nick + ": " + "please enter a number fr0m 1-2,147,483,647");
 						return;
 					}
 					int randNum = gen.nextInt(maxNum);
-					event.respond("" + randNum);
+					bot.sendMessage(channel, nick + ": " + "" + randNum);
 					return;
 				}
-				event.respond("" + gen.nextInt(10));
+				bot.sendMessage(channel, nick + ": " + "" + gen.nextInt(10));
 				return;
 				
 			/* --- SECURE RANDOM --- */	
@@ -554,13 +607,13 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 					if (bytes <= 0 || bytes > 192) {
-						event.respond("please enter a number fr0m 1-192");
+						bot.sendMessage(channel, nick + ": " + "please enter a number fr0m 1-192");
 						return;
 					}
-					event.respond(ByteGenerator.toHex(ByteGenerator.genRandomByte(bytes)));
+					bot.sendMessage(channel, nick + ": " + ByteGenerator.toHex(ByteGenerator.genRandomByte(bytes)));
 					return;
 				}
-				event.respond(ByteGenerator.toHex(ByteGenerator.genRandomByte(8)));
+				bot.sendMessage(channel, nick + ": " + ByteGenerator.toHex(ByteGenerator.genRandomByte(8)));
 				return;
 				
 			/* --- REVIVE --- */
@@ -582,20 +635,20 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("revive"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("revive"));
 				return;
 				
 			/* --- RULES --- */
 			} else if (message.toLowerCase().startsWith("$rules")) {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://skaianet.net/rules");
+					bot.sendMessage(channel, nick + ": " + "http://skaianet.net/rules");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("rules"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("rules"));
 				return;
 				
 			/* --- SERVE --- */	
@@ -609,7 +662,7 @@ public class BasicCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "serving " + input);
 					return;
 				}
-				event.respond(StringHelper.getCommand("serve"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("serve"));
 				return;
 				
 			/* --- SHOOSH --- */	
@@ -631,7 +684,7 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("shoosh"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("shoosh"));
 				return;
 				
 			/* --- SHOOSHPAP --- */	
@@ -653,7 +706,7 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("shooshpap"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("shooshpap"));
 				return;
 				
 			/* --- SHOOT --- */
@@ -678,7 +731,7 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("shoot"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("shoot"));
 				return;
 				
 			/* --- SLAP --- */
@@ -700,31 +753,31 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("slap"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("slap"));
 				return;
 			
 			/* --- SOURCE/GITHUB --- */
 			} else if (message.toLowerCase().startsWith("$source")) {
 				input = message.substring(7);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("https://github.com/IAreKyleW00t/IRCBot");
+					bot.sendMessage(channel, nick + ": " + "https://github.com/IAreKyleW00t/IRCBot");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("source"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("source"));
 				return;
 			} else if (message.toLowerCase().startsWith("$github")) {
 				input = message.substring(7);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("https://github.com/IAreKyleW00t/IRCBot");
+					bot.sendMessage(channel, nick + ": " + "https://github.com/IAreKyleW00t/IRCBot");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("source"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("source"));
 				return;
 				
 			/* --- STAB --- */
@@ -746,7 +799,7 @@ public class BasicCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("stab"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("stab"));
 				return;
 				
 			/* --- TIME --- */	
@@ -760,7 +813,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("time"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("time"));
 				return;
 				
 			/* --- VER --- */	
@@ -773,7 +826,7 @@ public class BasicCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("ver"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("ver"));
 				return;
 			}
 			return;

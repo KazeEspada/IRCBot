@@ -17,11 +17,63 @@ public class PermissionCommandListener extends ListenerAdapter {
 		PircBotX bot = event.getBot();
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
-		String nick = sender.getNick();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
-		boolean hasOp = channel.isOp(sender);
-		boolean hasVoice = channel.hasVoice(sender);
+		boolean hasOp = channel.isOp(sender) && !(sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t"));
+		boolean hasVoice = channel.hasVoice(sender) && !(sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t"));
 		
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if(message.startsWith("$")) {	
@@ -42,7 +94,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 					return;
 				}
-				event.respond(StringHelper.getCommand("tellkyle"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("tellkyle"));
 				return;
 				
 			/* --- ANNOUNCE --- */
@@ -60,7 +112,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 					return;
 				}
-				event.respond(StringHelper.getCommand("announce"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("announce"));
 				return;
 				
 			/* --- SHOUT --- */
@@ -78,7 +130,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
 					return;
 				}
-				event.respond(StringHelper.getCommand("shout"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("shout"));
 				return;
 				
 			/* --- REBOOT --- */
@@ -97,7 +149,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("reboot"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("reboot"));
 				return;
 				
 			/* --- ERROR --- */
@@ -105,7 +157,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 				input = message.substring(6);
 				if (StringHelper.isEmpty(input)) {
 					if (hasOp) {
-						event.respond("" + DataManager.exception);
+						bot.sendMessage(channel, nick + ": " + "" + DataManager.exception);
 						return;
 					}
 					bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -114,7 +166,7 @@ public class PermissionCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("error"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("error"));
 				return;
 			}
 			return;

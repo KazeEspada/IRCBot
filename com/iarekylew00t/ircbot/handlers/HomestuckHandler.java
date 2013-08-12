@@ -40,7 +40,7 @@ public class HomestuckHandler implements Runnable {
 			}
 		}
 		interval = 15;
-		checkUpdate();
+		curPage = getLatestPage();
 		updateThread = new Thread(this);
 		updateThread.start();
 	}
@@ -54,7 +54,7 @@ public class HomestuckHandler implements Runnable {
 			}
 		}
 		interval = min;
-		checkUpdate();
+		curPage = getLatestPage();
 		updateThread = new Thread(this);
 		updateThread.start();
 	}

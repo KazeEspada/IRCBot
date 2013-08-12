@@ -21,10 +21,10 @@ public class StatusHandler {
 		return statusCode;
 	}
 	
-	public boolean getMinecraftStatus(String ip, int port) {
+	public boolean getRawStatus(String ip, int port) {
 		try {
 			Socket socket = SocketFactory.getDefault().createSocket();
-			socket.setSoTimeout(5000);
+			socket.setSoTimeout(1000);
 			socket.connect(new InetSocketAddress(ip, port));
 			socket.close();
 			return true;

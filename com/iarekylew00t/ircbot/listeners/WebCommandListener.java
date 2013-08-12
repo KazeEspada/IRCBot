@@ -3,6 +3,7 @@ package com.iarekylew00t.ircbot.listeners;
 import org.pircbotx.Channel;
 import org.pircbotx.Colors;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 
@@ -20,7 +21,7 @@ import com.iarekylew00t.managers.DataManager;
 public class WebCommandListener extends ListenerAdapter {
 	private String WIKI_BASE = "http://en.wikipedia.org/wiki/";
 	private DefinitionHandler dictionary = new DefinitionHandler(); 
-	private RssHandler rss = new RssHandler("http://skaianet.net/rss", 15);
+	private RssHandler rss = new RssHandler("http://skaianet.net/rss", 5);
 	private WeatherHandler forecast = new WeatherHandler();
 	private ChatBot chatbot = new ChatBot();
 	private StatusHandler status = new StatusHandler();
@@ -29,8 +30,62 @@ public class WebCommandListener extends ListenerAdapter {
 	@Override
 	public void onMessage(MessageEvent event) throws Exception {
 		PircBotX bot = event.getBot();
+		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
 		
 		/* === CHECK FOR COMMAND SYMBOL === */
@@ -53,7 +108,7 @@ public class WebCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, Colors.BOLD + word.getWord() + Colors.NORMAL + ": " + word.getDefinition());
 					return;
 				}
-				event.respond(StringHelper.getCommand("define"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("define"));
 				return;
 				
 			/* --- URBAN DEFINE --- */
@@ -73,7 +128,7 @@ public class WebCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, Colors.BOLD + word.getWord() + Colors.NORMAL + ": " + word.getDefinition());
 					return;
 				}
-				event.respond(StringHelper.getCommand("udefine"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("udefine"));
 				return;
 				
 			/* --- RSS --- */
@@ -81,7 +136,7 @@ public class WebCommandListener extends ListenerAdapter {
 				input = message.substring(4);
 				if (StringHelper.isEmpty(input)) {
 					try {
-						bot.sendMessage(channel, rss.getLatest());
+						bot.sendMessage(channel, Colors.OLIVE + Colors.BOLD + rss.getLatest());
 						return;
 					} catch (Exception e) { 
 						bot.sendMessage(channel, DataManager.ERROR + "Could not parse data from XML");
@@ -92,7 +147,7 @@ public class WebCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("rss"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("rss"));
 				return;
 				
 			/* --- STATUS --- */
@@ -111,12 +166,12 @@ public class WebCommandListener extends ListenerAdapter {
 						} else {
 							statusMessage += "Radio: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL + " | ";
 						}
-						if (status.getStatusCode("http://webchat.esper.net") == 200) {
+						if (status.getRawStatus("irc.esper.net", 6667) == true) {
 							statusMessage += "IRC: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL + " | ";
 						} else {
 							statusMessage += "IRC: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL + " | ";
 						}
-						if (status.getMinecraftStatus("mc.skaianet.net", 25565) == true) {
+						if (status.getRawStatus("mc.skaianet.net", 25565) == true) {
 							statusMessage += "MC: " + Colors.GREEN + Colors.BOLD + "ONLINE" + Colors.NORMAL;
 						} else {
 							statusMessage += "MC: " + Colors.RED + Colors.BOLD + "OFFLINE" + Colors.NORMAL;
@@ -132,7 +187,7 @@ public class WebCommandListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("status"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("status"));
 				return;
 				
 			/* --- TALK --- */
@@ -157,7 +212,7 @@ public class WebCommandListener extends ListenerAdapter {
 					bot.sendMessage(channel, "i can 0nly talk pe0ple in channel 3");
 					return;
 				}
-				event.respond(StringHelper.getCommand("talk"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("talk"));
 				return;
 				
 			/* --- WEATHER --- */
@@ -181,7 +236,7 @@ public class WebCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("weather"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("weather"));
 				return;
 			} else if (message.toLowerCase().startsWith("$we") && !(message.toLowerCase().startsWith("$weather"))) {
 				input = message.substring(3);
@@ -203,7 +258,7 @@ public class WebCommandListener extends ListenerAdapter {
 						return;
 					}
 				}
-				event.respond(StringHelper.getCommand("weather"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("weather"));
 				return;
 				
 			/* --- WIKI --- */
@@ -215,10 +270,10 @@ public class WebCommandListener extends ListenerAdapter {
 					}
 					input = StringHelper.setString(input);
 					input = input.replace(" ", "_");
-					event.respond(WIKI_BASE + input);
+					bot.sendMessage(channel, nick + ": " + WIKI_BASE + input);
 					return;
 				}
-				event.respond(StringHelper.getCommand("wiki"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("wiki"));
 				return;
 			}
 			return;

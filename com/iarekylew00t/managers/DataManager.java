@@ -45,7 +45,6 @@ public enum DataManager {
 				exception = e;
 			}
         }
-        VER = props.getProperty("Version", "1.0.0.0");
 		server = props.getProperty("Server", "irc.esper.net");
 		channel = props.getProperty("Channel", "#channel1,#channel2,#channel3");
 		nick = props.getProperty("Nick", "Aradiabot");

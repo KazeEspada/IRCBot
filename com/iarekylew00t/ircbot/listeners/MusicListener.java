@@ -27,10 +27,63 @@ public class MusicListener extends ListenerAdapter {
 		PircBotX bot = event.getBot();
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
-		boolean hasOp = channel.isOp(sender);
-		boolean hasVoice = channel.hasVoice(sender);
+		boolean hasOp = channel.isOp(sender) && !sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t");
+		boolean hasVoice = channel.hasVoice(sender) && !sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t");
 		
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if (message.startsWith("$")) {
@@ -45,7 +98,7 @@ public class MusicListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("prevsong"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("prevsong"));
 				return;
 			} else if (message.toLowerCase().startsWith("$prev")) {
 				input = message.substring(5);
@@ -56,7 +109,7 @@ public class MusicListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("prevsong"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("prevsong"));
 				return;
 				
 				
@@ -64,13 +117,13 @@ public class MusicListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$songlist")) {
 				input = message.substring(9);
 				if (StringHelper.isEmpty(input)) {
-					event.respond("http://skaianet.net/songlist");
+					bot.sendMessage(channel, nick + ": " + "http://skaianet.net/songlist");
 					return;
 				}
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("songlist"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("songlist"));
 				return;
 				
 			/* --- CURRENT SONG --- */
@@ -83,7 +136,7 @@ public class MusicListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("song"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("song"));
 				return;
 			} else if (message.toLowerCase().startsWith("$song")) {
 				input = message.substring(5);
@@ -94,7 +147,7 @@ public class MusicListener extends ListenerAdapter {
 				if (!input.startsWith(" ")) {
 					return;
 				}
-				event.respond(StringHelper.getCommand("song"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("song"));
 				return;
 				
 				
@@ -120,10 +173,10 @@ public class MusicListener extends ListenerAdapter {
 					if (!input.startsWith(" ")) {
 						return;
 					}
-					event.respond(StringHelper.getCommand("restart"));
+					bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("restart"));
 					return;
 				}
-				event.respond("y0u d0nt have permissi0n t0 use that c0mmand");
+				bot.sendMessage(channel, nick + ": " + "y0u d0nt have permissi0n t0 use that c0mmand");
 				return;
 			}
 			return;

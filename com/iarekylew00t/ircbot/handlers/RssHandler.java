@@ -119,7 +119,7 @@ public class RssHandler implements Runnable {
     	Channel[] channels = bot.getChannels().toArray(new Channel[0]);
     	for (int i = 0; i < channels.length; i++) {
     		try {
-				bot.sendMessage(channels[i], Colors.OLIVE + getLatest());
+				bot.sendMessage(channels[i], Colors.OLIVE + Colors.BOLD + getLatest());
 			} catch (Exception e) {
 				bot.sendMessage("skaianet_chat", DataManager.ERROR + "Could not parse data from XML");
 				logger.error("COULD NOT PARSE DATA FROM XML", e);

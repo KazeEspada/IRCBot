@@ -18,10 +18,62 @@ public class RequestListener extends ListenerAdapter {
 		PircBotX bot = event.getBot();
 		User sender = event.getUser();
 		Channel channel = event.getChannel();
-		String message = event.getMessage();
-		String nick = sender.getNick();
+		String message;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			message = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<+.*?> ", "");
+		} else {
+			message = event.getMessage();
+		}
+		String nick;
+		if (sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t")) {
+			nick = event.getMessage()
+					.replaceAll(Colors.BLACK, "")
+					.replaceAll(Colors.BLUE, "")
+					.replaceAll(Colors.BOLD, "")
+					.replaceAll(Colors.BROWN, "")
+					.replaceAll(Colors.CYAN, "")
+					.replaceAll(Colors.DARK_BLUE, "")
+					.replaceAll(Colors.DARK_GRAY, "")
+					.replaceAll(Colors.DARK_GREEN, "")
+					.replaceAll(Colors.GREEN, "")
+					.replaceAll(Colors.LIGHT_GRAY, "")
+					.replaceAll(Colors.MAGENTA, "")
+					.replaceAll(Colors.NORMAL, "")
+					.replaceAll(Colors.OLIVE, "")
+					.replaceAll(Colors.PURPLE, "")
+					.replaceAll(Colors.RED, "")
+					.replaceAll(Colors.REVERSE, "")
+					.replaceAll(Colors.TEAL, "")
+					.replaceAll(Colors.UNDERLINE, "")
+					.replaceAll(Colors.WHITE, "")
+					.replaceAll(Colors.YELLOW, "")
+					.replaceFirst("<", "").replaceFirst(">.*", "");
+		} else {
+			nick = sender.getNick();
+		}
 		String input = "";
-		boolean hasOp = channel.isOp(sender);
+		boolean hasOp = channel.isOp(sender) && !(sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t"));
 
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if(message.startsWith("$")) {	
@@ -42,7 +94,7 @@ public class RequestListener extends ListenerAdapter {
 							String[] args = input.split(" ");
 							int time = 1;
 								if (!args[0].equals("-on")) {
-									event.respond(args[0] + " is n0t a valid argument");
+									bot.sendMessage(channel, nick + ": " + args[0] + " is n0t a valid argument");
 									return;
 								}
 								//Only do it if requests are scheduled to end
@@ -57,20 +109,20 @@ public class RequestListener extends ListenerAdapter {
 										requests.turnOnRequests(time);
 										return;
 									}
-									event.respond("requests are already 0pen");
+									bot.sendMessage(channel, nick + ": " + "requests are already 0pen");
 									return;
 								}
-								event.respond("requests are already scheduled t0 end");
+								bot.sendMessage(channel, nick + ": " + "requests are already scheduled t0 end");
 								return;
 							} else if (input.equals("-on")) {
 								if (!requests.areOpen()) {
 									requests.turnOnRequests();
 									return;
 								}
-								event.respond("requests are already 0pen");
+								bot.sendMessage(channel, nick + ": " + "requests are already 0pen");
 								return;
 							}
-							event.respond(input + " is n0t a valid argument");
+							bot.sendMessage(channel, nick + ": " + input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -83,7 +135,7 @@ public class RequestListener extends ListenerAdapter {
 								String[] args = input.split(" ");
 								int time = 1;
 								if (!args[0].equals("-off")) {
-									event.respond(args[0] + " is n0t a valid argument");
+									bot.sendMessage(channel, nick + ": " + args[0] + " is n0t a valid argument");
 									return;
 								}
 								//Only do it if requests are scheduled to end
@@ -98,20 +150,20 @@ public class RequestListener extends ListenerAdapter {
 										requests.turnOffRequests(time);
 										return;
 									}
-									event.respond("requests are already cl0sed");
+									bot.sendMessage(channel, nick + ": " + "requests are already cl0sed");
 									return;
 								}
-								event.respond("requests are already scheduled t0 end");
+								bot.sendMessage(channel, nick + ": " + "requests are already scheduled t0 end");
 								return;
 							} else if (input.equals("-off")) {
 								if (requests.areOpen()) {
 									requests.turnOffRequests();
 									return;
 								}
-								event.respond("requests are already cl0sed");
+								bot.sendMessage(channel, nick + ": " + "requests are already cl0sed");
 								return;
 							}
-							event.respond(input + " is n0t a valid argument");
+							bot.sendMessage(channel, nick + ": " + input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -123,32 +175,32 @@ public class RequestListener extends ListenerAdapter {
 							if (input.contains(" ")) {
 								String[] args = input.split(" ");
 								if (!args[0].equals("-clear") || args[0].equals("-c")) {
-									event.respond(args[0] + " is n0t a valid argument");
+									bot.sendMessage(channel, nick + ": " + args[0] + " is n0t a valid argument");
 									return;
 								}
 								if (args[1].equals("all")) {
 									requests.clearRequests();
 									requests.clearUsers();
-									event.respond("all requests have been cleared");
+									bot.sendMessage(channel, nick + ": " + "all requests have been cleared");
 									return;
 								} else if (args[1].equals("songs")) {
 									requests.clearRequests();
-									event.respond("all songs have been cleared");
+									bot.sendMessage(channel, nick + ": " + "all songs have been cleared");
 									return;
 								} else if (args[1].equals("users")) {
 									requests.clearUsers();
-									event.respond("all users have been cleared");
+									bot.sendMessage(channel, nick + ": " + "all users have been cleared");
 									return;
 								}
-								event.respond(args[1] + " is n0t a valid argument");
+								bot.sendMessage(channel, nick + ": " + args[1] + " is n0t a valid argument");
 								return;
 							} else if (input.equals("-clear") || input.equals("-c")) {
 								requests.clearRequests();
 								requests.clearUsers();
-								event.respond("all requests have been cleared");
+								bot.sendMessage(channel, nick + ": " + "all requests have been cleared");
 								return;
 							}
-							event.respond(input + " is n0t a valid argument");
+							bot.sendMessage(channel, nick + ": " + input + " is n0t a valid argument");
 							return;
 						}
 						bot.sendMessage(channel, "y0u d0nt have permiss0n t0 use that c0mmand");
@@ -158,19 +210,19 @@ public class RequestListener extends ListenerAdapter {
 						if (requests.countUserReqests(sender.getHostmask()) < 5) {
 							if (!requests.hasBeenRequested(input)) {
 								requests.addRequest(input, sender);
-								event.respond("y0ur request has been added t0 the list");
+								bot.sendMessage(channel, nick + ": " + "y0ur request has been added t0 the list");
 								return;
 							}
-							event.respond("that s0ng has already been requested");
+							bot.sendMessage(channel, nick + ": " + "that s0ng has already been requested");
 							return;
 						}
-						event.respond("y0u have already made 5 requests ");
+						bot.sendMessage(channel, nick + ": " + "y0u have already made 5 requests ");
 						return;
 					}
 					bot.sendMessage(channel, "requests are currenly " + Colors.BOLD + Colors.RED + "CLOSED");
 					return;
 				}
-				event.respond(StringHelper.getCommand("req"));
+				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("req"));
 				return;
 			}
 			return;
