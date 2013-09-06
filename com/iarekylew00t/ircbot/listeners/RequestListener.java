@@ -73,7 +73,7 @@ public class RequestListener extends ListenerAdapter {
 			nick = sender.getNick();
 		}
 		String input = "";
-		boolean hasOp = channel.isOp(sender) && !(sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t"));
+		boolean hasOp = channel.isOp(sender);
 
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if(message.startsWith("$")) {	

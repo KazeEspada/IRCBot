@@ -138,7 +138,7 @@ public enum DataManager {
     	commandList.put("ping", "Usage: $ping");
     	commandList.put("playflute", "Usage: $playflute");
     	commandList.put("poke", "Usage: $poke <user>");
-    	commandList.put("prevsong", "Usage: $prevsong || $prev");
+    	commandList.put("prevsong", "Usage: $prevsong [1-5] || $prev [1-5]");
     	commandList.put("quote", "Usage: $quote <character> [number]");
     	commandList.put("reboot", "OP ONLY - Usage: $reboot");
     	commandList.put("radio", "Usage: $radio");

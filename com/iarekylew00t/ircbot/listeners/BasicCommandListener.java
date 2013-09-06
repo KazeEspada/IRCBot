@@ -576,7 +576,6 @@ public class BasicCommandListener extends ListenerAdapter {
 						maxNum = Integer.parseInt(input);
 					} catch (Exception e) {
 						bot.sendMessage(channel, DataManager.ERROR + "I cannot handle numbers like that");
-						logger.error("CANNOT HANDLE HANDLE THOSE KIND OF NUMBERS", e);
 						return;
 					}
 					if (maxNum <= 0 || maxNum > 2147483647) {
@@ -806,8 +805,8 @@ public class BasicCommandListener extends ListenerAdapter {
 			} else if (message.toLowerCase().startsWith("$time")) {
 				input = message.substring(5);
 				if (StringHelper.isEmpty(input)) {
-					String timeStamp = new SimpleDateFormat("hh:mm aa").format(Calendar.getInstance().getTime());
-					bot.sendMessage(channel, "the current time is: " + timeStamp + " EST");
+					String timeStamp = new SimpleDateFormat("hh:mm aa z").format(Calendar.getInstance().getTime());
+					bot.sendMessage(channel, "the current time is: " + timeStamp);
 					return;
 				}
 				if (!input.startsWith(" ")) {

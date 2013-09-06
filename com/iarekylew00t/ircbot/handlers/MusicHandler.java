@@ -3,6 +3,7 @@ package com.iarekylew00t.ircbot.handlers;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.pircbotx.Channel;
@@ -15,22 +16,25 @@ import com.iarekylew00t.helpers.FileHelper;
 import com.iarekylew00t.managers.DataManager;
 
 public class MusicHandler implements Runnable {
-	private String curSong, prevSong = null, tempSong = null, curTime;
-	private File CURSONG_FILE = new File("./files/curSong.txt"), PREVSONG_FILE = new File("./files/prevSong.txt");
+	private String curSong, tempSong = null, curTime;
+	private File CURSONG_FILE = new File("./files/curSong.txt");
 	private LogHandler logger = DataManager.logHandler;
 	private Thread songThread;
 	private EmailClient emailClient = DataManager.emailClient;
 	private PircBotX bot = DataManager.IRCbot;
+	private ArrayList<String> prevSongs = new ArrayList<String>();
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
 	
 	public MusicHandler() {
 		if (!CURSONG_FILE.exists()) {
 			FileHelper.createFile(CURSONG_FILE);
 		}
-		if (!PREVSONG_FILE.exists()) {
-			FileHelper.createFile(PREVSONG_FILE);
-		}
 		tempSong = getCurSong();
+		prevSongs.add(null);
+		prevSongs.add(null);
+		prevSongs.add(null);
+		prevSongs.add(null);
+		prevSongs.add(null);
 		songThread = new Thread(this);
 		songThread.start();
 	}
@@ -94,14 +98,12 @@ public class MusicHandler implements Runnable {
     
     private void updatePrevSong() {
 		if (!curSong.equalsIgnoreCase(tempSong)) {
-			prevSong = tempSong;
-			FileHelper.writeToFile(PREVSONG_FILE, prevSong, false);
+			prevSongs.add(0, tempSong);
+			if (prevSongs.size() <= 6) {
+				prevSongs.remove(5);
+			}
+			//FileHelper.writeToFile(PREVSONG_FILE, prevSong, false);
 			tempSong = curSong;
-		}
-    	try {
-			prevSong = FileHelper.readLine(PREVSONG_FILE, 1);
-		} catch (Exception e) {
-			logger.error("COULD NOT READ 'PREVSONG_FILE'", e);
 		}
     }
     
@@ -116,7 +118,12 @@ public class MusicHandler implements Runnable {
 
     public String getPrevSong() {
     	updatePrevSong();
-    	return prevSong;
+    	return prevSongs.get(0);
+    }
+
+    public String getPrevSong(int number) {
+    	updatePrevSong();
+    	return prevSongs.get(number);
     }
     
     public String getCurSong() {

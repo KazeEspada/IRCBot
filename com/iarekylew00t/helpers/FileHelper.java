@@ -6,13 +6,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
+
+import org.apache.commons.io.FileUtils;
 
 import com.iarekylew00t.ircbot.handlers.LogHandler;
 import com.iarekylew00t.managers.DataManager;
@@ -34,9 +36,10 @@ public final class FileHelper {
 	
     public static void writeToFile(File file, String message, boolean append) {
         try {
-        	BufferedWriter writer = new BufferedWriter(new FileWriter(file, append));
-        	writer.write(message + "\r\n");
-        	writer.close();
+        	//BufferedWriter writer = new BufferedWriter(new FileWriter(file, append));
+        	//writer.write(message + "\r\n");
+        	//writer.close();
+        	FileUtils.write(file, message, append);
         }
         catch (Exception e) {
 			logger.error("COULD NOT WRITE TO FILE \"" + file.getName() + "\"", e);
@@ -45,7 +48,8 @@ public final class FileHelper {
     
     public static void copyFile(File from, File to) {
     	try {
-    		FileInputStream in = new FileInputStream(from);
+    		FileUtils.copyFile(from, to);
+    		/*FileInputStream in = new FileInputStream(from);
     		FileOutputStream out = new FileOutputStream(to);
     		byte[] buffer = new byte[4096];
     		int len;
@@ -53,7 +57,7 @@ public final class FileHelper {
     			out.write(buffer, 0, len);
     		}
     		in.close();
-    		out.close();
+    		out.close();*/
     	} catch (Exception e) {
     		logger.error("COULD NOT COPY \"" + from.getName() + "\" TO \"" + to.getName() + "\"" , e);
     	}

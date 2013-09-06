@@ -85,11 +85,8 @@ public enum FileManager {
     
     public static void updateConfig() {
     	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\r\n" +
-		   	   "#===  Configuration File for Aradiabot (Rev. 1.1C)  ===\r\n" +
+		   	   "#===  Configuration File for Aradiabot (Rev. 1.1D)  ===\r\n" +
 			   "#======================================================\r\n", false);
-    	
-    	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\r\n" +
-    			"Version = " + DataManager.VER + "\r\n", true);
     	
     	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\r\n" +
     			"Nick = " + DataManager.nick + "\r\n", true);
@@ -135,11 +132,8 @@ public enum FileManager {
     public static void createDefaultConfig() {
     	logger.notice("NO DataManager.CONFIGURATION FOUND - CREATING DEFAULT");
     	FileHelper.writeToFile(DataManager.CONFIG, "#======================================================\r\n" +
- 		   	   "#===  Configuration File for Aradiabot (Rev. 1.1C)  ===\r\n" +
+ 		   	   "#===  Configuration File for Aradiabot (Rev. 1.1D)  ===\r\n" +
  			   "#======================================================\r\n", false);
-     	
-     	FileHelper.writeToFile(DataManager.CONFIG, "# The Version of your bot\r\n" +
-     			"Version = 1.0.0.0\r\n", true);
      	
      	FileHelper.writeToFile(DataManager.CONFIG, "#The Nickname for your bot\r\n" +
      			"Nick = Aradiabot\r\n", true);

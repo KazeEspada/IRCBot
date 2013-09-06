@@ -82,8 +82,8 @@ public class MusicListener extends ListenerAdapter {
 			nick = sender.getNick();
 		}
 		String input = "";
-		boolean hasOp = channel.isOp(sender) && !sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t");
-		boolean hasVoice = channel.hasVoice(sender) && !sender.getNick().equals("Mineb0t") || sender.getNick().equals("Mineb1t");
+		boolean hasOp = channel.isOp(sender);
+		boolean hasVoice = channel.hasVoice(sender);
 		
 		/* === CHECK FOR COMMAND SYMBOL === */
 		if (message.startsWith("$")) {
@@ -91,25 +91,65 @@ public class MusicListener extends ListenerAdapter {
 			/* --- PREVIOUS SONG --- */
 			if (message.toLowerCase().startsWith("$prevsong")) {
 				input = message.substring(9);
-				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
+				if (!StringHelper.isEmpty(input)) {
+					if (!input.startsWith(" ")) {
+						return;
+					}
+					int number = 0;
+					try {
+						number = Integer.parseInt(StringHelper.setString(input));
+					} catch (Exception e) {
+						bot.sendMessage(channel, DataManager.ERROR + "I cannot handle numbers like that");
+						return;
+					}
+					if (number > 5) {
+						bot.sendMessage(channel, nick + ": i can 0nly sh0w up t0 5 previ0us s0ngs");
+						return;
+					} else if (number <= 0) {
+						bot.sendMessage(channel, nick + ": please enter a number fr0m 1-5");
+						return;
+					}
+					String songs = winamp.getPrevSong(0);
+					for (int i = 1; i < number-1; i++) {
+						songs += ", " + winamp.getPrevSong(i);
+					}
+					bot.sendMessage(channel, "the last " + number + " s0ngs were: " + Colors.BOLD + songs);
 					return;
 				}
-				if (!input.startsWith(" ")) {
-					return;
-				}
-				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("prevsong"));
+				bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
 				return;
 			} else if (message.toLowerCase().startsWith("$prev")) {
 				input = message.substring(5);
-				if (StringHelper.isEmpty(input)) {
-					bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
+				if (!StringHelper.isEmpty(input)) {
+					if (!input.startsWith(" ")) {
+						return;
+					}
+					int number = 0;
+					try {
+						number = Integer.parseInt(StringHelper.setString(input));
+					} catch (Exception e) {
+						bot.sendMessage(channel, DataManager.ERROR + "I cannot handle numbers like that");
+						return;
+					}
+					if (number > 5) {
+						bot.sendMessage(channel, nick + ": i can 0nly sh0w up t0 5 previ0us s0ngs");
+						return;
+					} else if (number <= 0) {
+						bot.sendMessage(channel, nick + ": please enter a number fr0m 1-5");
+						return;
+					}
+					String songs = winamp.getPrevSong(0);
+					if (number > 1) {
+						for (int i = 1; i <= number-1; i++) {
+							songs += ", " + winamp.getPrevSong(i);
+						}
+						bot.sendMessage(channel, "the last " + number + " s0ngs were: " + Colors.BOLD + songs);
+						return;
+					}
+					bot.sendMessage(channel, "the last s0ng was: " + Colors.BOLD + songs);
 					return;
 				}
-				if (!input.startsWith(" ")) {
-					return;
-				}
-				bot.sendMessage(channel, nick + ": " + StringHelper.getCommand("prevsong"));
+				bot.sendMessage(channel, "the previ0us s0ng was: " + Colors.BOLD + winamp.getPrevSong());
 				return;
 				
 				
